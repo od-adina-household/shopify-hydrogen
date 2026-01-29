@@ -17,14 +17,14 @@ export default function Homepage() {
       <ImageGridSection
         title="ambiance to your home with objects that inspire"
         images={[
-          { src: '/placeholder-shelf.jpg', alt: 'Curated shelf display' },
-          { src: '/placeholder-flowers.jpg', alt: 'Fresh flowers in vase' },
-          { src: '/placeholder-interior.jpg', alt: 'Modern interior design' },
+          { src: '/images/shelf.jpg', alt: 'Curated shelf display' },
+          { src: '/images/flowers.jpg', alt: 'Fresh flowers in vase' },
+          { src: '/images/interior.jpg', alt: 'Modern interior design' },
         ]}
       />
       <SplitSection
         title="Shaped by light"
-        imageSrc="/placeholder-lamps.jpg"
+        imageSrc="/images/lamps.jpg"
         imageAlt="Decorative lamps and objects"
         imageOnRight
       />
@@ -49,10 +49,10 @@ export default function Homepage() {
 
 function HeroSection() {
   return (
-    <section className="relative h-[70vh] min-h-[500px] w-full overflow-hidden">
+    <section className="relative h-screen w-full overflow-hidden">
       <div className="absolute inset-0">
         <img
-          src="/placeholder-hero.jpg"
+          src="/images/hero-image.jpg"
           alt="Curated home collection"
           className="h-full w-full object-cover"
         />
