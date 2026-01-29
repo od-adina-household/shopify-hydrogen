@@ -1,120 +1,179 @@
-import { Suspense } from 'react';
-import { Await, Link, useLoaderData } from 'react-router';
-import type {
-  RecommendedProductsQuery,
-} from 'storefrontapi.generated';
-import { ProductItem } from '~/components/ProductItem';
-import { AspectRatio } from '~/components/ui/aspect-ratio';
+import { Link } from 'react-router';
 import { Button } from '~/components/ui/button';
-import { Skeleton } from '~/components/ui/skeleton';
 import type { Route } from './+types/_index';
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Hydrogen | Home' }];
+  return [{ title: 'Home' }];
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
-
-  return { ...deferredData, ...criticalData };
-}
-
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
-async function loadCriticalData({ context }: Route.LoaderArgs) {
   return {};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({ context }: Route.LoaderArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
-    .catch((error: Error) => {
-      // Log query errors, but don't throw them so the page can still render
-      console.error(error);
-      return null;
-    });
-
-  return {
-    recommendedProducts,
-  };
-}
-
 export default function Homepage() {
-  const data = useLoaderData<typeof loader>();
   return (
-    <RecommendedProducts products={data.recommendedProducts} />
+    <div className="w-full">
+      <HeroSection />
+      <ImageGridSection
+        title="ambiance to your home with objects that inspire"
+        images={[
+          { src: '/placeholder-shelf.jpg', alt: 'Curated shelf display' },
+          { src: '/placeholder-flowers.jpg', alt: 'Fresh flowers in vase' },
+          { src: '/placeholder-interior.jpg', alt: 'Modern interior design' },
+        ]}
+      />
+      <SplitSection
+        title="Shaped by light"
+        imageSrc="/placeholder-lamps.jpg"
+        imageAlt="Decorative lamps and objects"
+        imageOnRight
+      />
+      <ImageGridSection
+        title="Our most expressive collection — for everyone who dares to live with imagination."
+        images={[
+          { src: '/placeholder-art.jpg', alt: 'Decorative art piece' },
+          { src: '/placeholder-tableware.jpg', alt: 'Artisan tableware' },
+          { src: '/placeholder-living.jpg', alt: 'Living room scene' },
+        ]}
+      />
+      <SplitSection
+        title="Cool in chrome"
+        imageSrc="/placeholder-chrome.jpg"
+        imageAlt="Chrome decorative piece"
+        imageOnRight={false}
+      />
+      <InfoColumnsSection />
+    </div>
   );
 }
 
-function RecommendedProducts({
-  products,
-}: {
-  products: Promise<RecommendedProductsQuery | null>;
-}) {
+function HeroSection() {
   return (
-    <section className="mx-auto max-w-4xl px-8 pt-8 pb-16">
-      <div className="mb-16 flex items-center justify-between">
-        <h2 className="text-xl font-semibold tracking-widest uppercase">
-          FEATURED PRODUCTS
-        </h2>
-        <Button variant="outline-black-rounded" asChild>
-          <Link to="/collections/all" className="text-xs font-semibold tracking-widest uppercase px-6 hover:scale-105 transition-transform">
-            VIEW ALL
-          </Link>
-        </Button>
+    <section className="relative h-[70vh] min-h-[500px] w-full overflow-hidden">
+      <div className="absolute inset-0">
+        <img
+          src="/placeholder-hero.jpg"
+          alt="Curated home collection"
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
       </div>
-      <Suspense fallback={<ProductsLoadingSkeleton />}>
-        <Await resolve={products}>
-          {(response) => (
-            <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-              {response
-                ? response.products.nodes.map((product, index) => (
-                  <ProductItem key={product.id} product={product} loading={index < 2 ? 'eager' : 'lazy'} />
-                ))
-                : null}
-            </div>
-          )}
-        </Await>
-      </Suspense>
+      <div className="relative h-full flex items-center">
+        <div className="container mx-auto px-8 max-w-7xl">
+          <div className="max-w-md space-y-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-tight text-white">
+              A collection that feels both curated and created — where every object carries intention.
+            </h1>
+            <Button
+              variant="outline"
+              size="lg"
+              className="bg-white/90 hover:bg-white text-foreground border-white"
+              asChild
+            >
+              <Link to="/collections/all">
+                Shop now
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
 
-function ProductsLoadingSkeleton() {
+interface ImageGridSectionProps {
+  title: string;
+  images: Array<{ src: string; alt: string }>;
+}
+
+function ImageGridSection({ title, images }: ImageGridSectionProps) {
   return (
-    <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-      {Array.from({ length: 4 }, (_, i) => (
-        <div key={`skeleton-${i}`} className="space-y-4">
-          <AspectRatio ratio={3 / 4}>
-            <Skeleton className="h-full w-full rounded-lg" />
-          </AspectRatio>
-          <div className="space-y-3">
-            <div>
-              <Skeleton className="h-4 w-3/4 mb-2" />
-              <Skeleton className="h-3 w-1/4" />
+    <section className="py-16 md:py-24">
+      <div className="container mx-auto px-8 max-w-7xl">
+        <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-2xl">
+          {title}
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {images.map((image, index) => (
+            <div key={index} className="aspect-[3/4] overflow-hidden">
+              <img
+                src={image.src}
+                alt={image.alt}
+                className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+              />
             </div>
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-4 w-16" />
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-9 w-9 rounded-md" />
-                <Skeleton className="h-9 w-28 rounded-md" />
-              </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+interface SplitSectionProps {
+  title: string;
+  imageSrc: string;
+  imageAlt: string;
+  imageOnRight: boolean;
+}
+
+function SplitSection({ title, imageSrc, imageAlt, imageOnRight }: SplitSectionProps) {
+  return (
+    <section className="py-16 md:py-24 bg-[#E8DDD0]">
+      <div className="container mx-auto px-8 max-w-7xl">
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 items-center ${imageOnRight ? '' : 'md:grid-flow-dense'}`}>
+          <div className={imageOnRight ? 'md:order-1' : 'md:order-2'}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-white">
+              {title}
+            </h2>
+          </div>
+          <div className={imageOnRight ? 'md:order-2' : 'md:order-1'}>
+            <div className="aspect-[4/3] overflow-hidden">
+              <img
+                src={imageSrc}
+                alt={imageAlt}
+                className="h-full w-full object-cover"
+              />
             </div>
           </div>
         </div>
-      ))}
-    </div>
+      </div>
+    </section>
+  );
+}
+
+function InfoColumnsSection() {
+  const infoItems = [
+    {
+      title: 'Arrival time may vary',
+      description: 'Please see our delivery page for up to date information.',
+    },
+    {
+      title: 'Returns if unused',
+      description: 'Most items are eligible for return within 30 days of delivery.',
+    },
+    {
+      title: 'Get yours pre-owned',
+      description: 'All items can be returned for store credit.',
+    },
+  ];
+
+  return (
+    <section className="py-16 md:py-24 border-t border-border">
+      <div className="container mx-auto px-8 max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          {infoItems.map((item, index) => (
+            <div key={index} className="space-y-3">
+              <h3 className="text-sm font-semibold tracking-wide">
+                {item.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {item.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
