@@ -49,3 +49,8 @@ customer-accountapi.generated.d.ts
 
 # oxygen deployment workflows (store-specific)
 .github/workflows/oxygen-deployment-*.yml
+
+# AI assistant files
+.claude
+CLAUDE.md
+GEMINI.md
