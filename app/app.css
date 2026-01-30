@@ -86,7 +86,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-ExtraLight.ttf") format("truetype");
@@ -94,7 +93,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-Light.ttf") format("truetype");
@@ -102,7 +100,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-Regular.ttf") format("truetype");
@@ -110,7 +107,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-Medium.ttf") format("truetype");
@@ -118,7 +114,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-SemiBold.ttf") format("truetype");
@@ -126,7 +121,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-Bold.ttf") format("truetype");
@@ -134,7 +128,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-ExtraBold.ttf") format("truetype");
@@ -142,7 +135,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Geist Mono";
   src: url("/fonts/GeistMono-Black.ttf") format("truetype");
@@ -151,11 +143,44 @@
   font-display: swap;
 }
 
+/* Recoleta */
+@font-face {
+  font-family: "Recoleta";
+  src: url("/fonts/fonnts.com-recoleta-regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Helvetica Neue */
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("/fonts/HelveticaNeueLight.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("/fonts/HelveticaNeueRoman.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("/fonts/HelveticaNeueBold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Recoleta", serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  --color-background: oklch(1 0 0);
+  --color-background: #F0EBDE;
   --color-foreground: oklch(0.145 0 0);
   --color-card: oklch(1 0 0);
   --color-card-foreground: oklch(0.145 0 0);
@@ -326,7 +351,11 @@
   }
 
   html {
-    font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
   }
 
   body {

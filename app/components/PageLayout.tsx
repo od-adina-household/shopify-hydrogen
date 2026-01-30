@@ -34,6 +34,7 @@ export function PageLayout({
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
+      <SearchAside />
       <CartAside cart={cart} />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} isLoggedIn={isLoggedIn} />
       {header && (
@@ -44,13 +45,103 @@ export function PageLayout({
           publicStoreDomain={publicStoreDomain}
         />
       )}
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className="w-full">{children}</main>
       <Footer
         footer={footer}
         header={header}
         publicStoreDomain={publicStoreDomain}
       />
     </Aside.Provider>
+  );
+}
+
+function SearchAside() {
+  const { close } = useAside();
+
+  return (
+    <Aside type="search" heading="Search">
+      <div className="p-6">
+        <SearchFormPredictive>
+          {({ fetchResults, goToSearch, inputRef }) => (
+            <>
+              <div className="flex items-center border border-border bg-muted px-4 py-3 rounded-md">
+                <SearchIcon className="mr-3 size-4 text-muted-foreground shrink-0" />
+                <Input
+                  name="q"
+                  onChange={fetchResults}
+                  onFocus={fetchResults}
+                  placeholder="Search products..."
+                  ref={inputRef}
+                  type="search"
+                  className="h-auto border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+              </div>
+
+              <div className="mt-4">
+                <SearchResultsPredictive>
+                  {({ items, total, term, state, closeSearch }) => {
+                    if (!term.current) return null;
+
+                    if (state === 'loading') {
+                      return (
+                        <div className="p-4">
+                          <p className="text-sm text-muted-foreground">Loading...</p>
+                        </div>
+                      );
+                    }
+
+                    if (!total) {
+                      return (
+                        <div className="p-4">
+                          <SearchResultsPredictive.Empty term={term} />
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="max-h-[60vh] overflow-y-auto space-y-4">
+                        <SearchResultsPredictive.Products
+                          products={items.products}
+                          closeSearch={() => {
+                            closeSearch();
+                            close();
+                          }}
+                          term={term}
+                        />
+                        <SearchResultsPredictive.Collections
+                          collections={items.collections}
+                          closeSearch={() => {
+                            closeSearch();
+                            close();
+                          }}
+                          term={term}
+                        />
+                        <SearchResultsPredictive.Pages
+                          pages={items.pages}
+                          closeSearch={() => {
+                            closeSearch();
+                            close();
+                          }}
+                          term={term}
+                        />
+                        <SearchResultsPredictive.Articles
+                          articles={items.articles}
+                          closeSearch={() => {
+                            closeSearch();
+                            close();
+                          }}
+                          term={term}
+                        />
+                      </div>
+                    );
+                  }}
+                </SearchResultsPredictive>
+              </div>
+            </>
+          )}
+        </SearchFormPredictive>
+      </div>
+    </Aside>
   );
 }
 
