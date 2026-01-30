@@ -76,7 +76,7 @@ export function Header({
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 pt-4 pb-2 md:pt-5 md:pb-1.5 transition-all duration-300 ${headerBgClass}`}
+        className={`fixed top-8 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 pt-4 pb-2 md:pt-5 md:pb-1.5 transition-all duration-300 ${headerBgClass}`}
       >
         <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
           <NavLink

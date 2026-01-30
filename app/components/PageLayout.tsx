@@ -14,6 +14,7 @@ import { SearchFormPredictive } from '~/components/SearchFormPredictive';
 import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
 import { Input } from '~/components/ui/input';
 import { Separator } from '~/components/ui/separator';
+import { AnnouncementBanner } from '~/components/AnnouncementBanner';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -34,6 +35,7 @@ export function PageLayout({
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
+      <AnnouncementBanner />
       <SearchAside />
       <CartAside cart={cart} />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} isLoggedIn={isLoggedIn} />
@@ -45,7 +47,7 @@ export function PageLayout({
           publicStoreDomain={publicStoreDomain}
         />
       )}
-      <main className="w-full">{children}</main>
+      <main className="w-full pt-8">{children}</main>
       <Footer
         footer={footer}
         header={header}
