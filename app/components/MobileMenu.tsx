@@ -22,7 +22,7 @@ export function MobileMenu({
 
   return (
     <div
-      className="fixed inset-0 z-40 bg-[rgb(178,160,124)] pt-20 px-6 overflow-y-auto"
+      className="fixed inset-0 z-40 bg-[rgb(178,160,124)] pt-28 px-6 overflow-y-auto"
       onClick={onClose}
     >
       <nav className="flex flex-col" onClick={(e) => e.stopPropagation()}>
