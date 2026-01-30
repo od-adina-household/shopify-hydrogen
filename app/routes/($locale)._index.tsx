@@ -100,9 +100,9 @@ interface IntroSectionProps {
 
 function IntroSection({ text, buttonLabel, buttonHref }: IntroSectionProps) {
   return (
-    <section className="w-full px-4 sm:px-6 lg:px-8">
+    <section className="w-full px-6 md:px-8 lg:px-12">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-xl md:text-3xl lg:text-4xl leading-relaxed font-serif font-normal text-[#3C281E] text-left max-w-4xl pt-16 md:pt-24 pb-6 md:pb-8">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-snug md:leading-relaxed font-serif font-normal text-[#3C281E] text-left max-w-4xl pt-16 md:pt-24 pb-6 md:pb-8">
           {text}
         </h2>
         <Link
@@ -125,7 +125,7 @@ interface CollectionCard {
 
 function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
   return (
-    <section className="w-full px-1 sm:px-2 lg:px-4 pt-2 pb-4 md:pb-6 lg:pb-8">
+    <section className="w-full px-2 sm:px-4 lg:px-6 pt-2 pb-4 md:pb-6 lg:pb-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
         {cards.map((card, index) => (
           <Link
@@ -138,9 +138,9 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
               alt={card.imageAlt}
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8">
-              <div className="flex items-center gap-3 px-5 py-3 bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:bg-white">
-                <span className="text-sm font-medium tracking-wider text-foreground">
+            <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 left-6 md:left-auto">
+              <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:bg-white">
+                <span className="text-sm font-medium tracking-wider text-foreground uppercase">
                   {card.title}
                 </span>
                 <ArrowRight className="h-4 w-4 text-foreground transition-transform duration-300 group-hover:translate-x-1" />
@@ -166,14 +166,14 @@ function HeroSection() {
       </div>
       <div className="relative h-full flex items-center">
         <div className="w-full">
-          <div className="max-w-7xl mx-auto px-8 space-y-6">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-tight text-white max-w-md">
+          <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 space-y-6 md:space-y-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light leading-tight text-white max-w-xl sm:max-w-2xl">
               A collection that feels both curated and created — where every object carries intention.
             </h1>
             <Button
               variant="outline"
               size="lg"
-              className="bg-white/90 hover:bg-white text-foreground border-white"
+              className="bg-white/90 hover:bg-white text-foreground border-white rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14"
               asChild
             >
               <Link to="/collections/all">
@@ -199,18 +199,18 @@ interface SplitSectionProps {
 function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ctaLabel, ctaHref }: SplitSectionProps) {
   const textContent = (
     <div className="flex flex-col justify-center h-full px-6 sm:px-10 md:px-12 lg:px-16 py-12 md:py-16 lg:py-20">
-      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
         {title}
       </h2>
       {description && (
-        <p className="text-[#3C281E] font-sans text-sm md:text-base leading-relaxed max-w-md mb-6 md:mb-8">
+        <p className="text-[#3C281E] font-sans text-sm md:text-base leading-relaxed max-w-md mb-8 md:mb-10">
           {description}
         </p>
       )}
       {ctaLabel && ctaHref && (
         <Link
           to={ctaHref}
-          className="inline-flex items-center gap-3 text-xs font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 w-fit"
+          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 w-fit"
         >
           {ctaLabel}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -250,19 +250,19 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
 
 function InfoColumnsSection() {
   return (
-    <section className="py-16 md:py-20 bg-background">
-      <div className="container mx-auto px-6 sm:px-8 max-w-7xl">
+    <section className="py-16 md:py-24 bg-background">
+      <div className="container mx-auto px-6 md:px-8 lg:px-12 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
           {/* Do you need some help? */}
           <div className="space-y-4">
-            <h3 className="text-lg md:text-xl font-serif font-normal text-[#3C281E]">
+            <h3 className="text-lg md:text-2xl font-serif font-normal text-[#3C281E]">
               Do you need some help?
             </h3>
-            <div className="flex items-start gap-3">
-              <MessageCircle className="w-6 h-6 mt-0.5 text-[#3C281E] flex-shrink-0" strokeWidth={1.5} />
-              <p className="text-sm text-[#3C281E] leading-relaxed">
+            <div className="flex items-start gap-4">
+              <MessageCircle className="w-5 h-5 md:w-6 md:h-6 mt-1 text-[#3C281E] flex-shrink-0" strokeWidth={1.5} />
+              <p className="text-sm md:text-base text-[#3C281E] leading-relaxed">
                 Our customer service team will be happy to assist you, please click{' '}
-                <Link to="/pages/contact" className="underline underline-offset-2 hover:no-underline">
+                <Link to="/pages/contact" className="underline underline-offset-2 hover:no-underline font-medium">
                   here
                 </Link>{' '}
                 to get in touch with us.
@@ -272,16 +272,16 @@ function InfoColumnsSection() {
 
           {/* Arrange it yourself */}
           <div className="space-y-4">
-            <h3 className="text-lg md:text-xl font-serif font-normal text-[#3C281E]">
+            <h3 className="text-lg md:text-2xl font-serif font-normal text-[#3C281E]">
               Arrange it yourself
             </h3>
-            <div className="space-y-3">
-              <Link to="/pages/pressroom" className="flex items-center gap-3 text-sm text-[#3C281E] hover:underline">
-                <Download className="w-6 h-6 flex-shrink-0" strokeWidth={1.5} />
+            <div className="space-y-4">
+              <Link to="/pages/pressroom" className="flex items-center gap-4 text-sm md:text-base text-[#3C281E] hover:underline group">
+                <Download className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:translate-y-1" strokeWidth={1.5} />
                 Download pressroom packages
               </Link>
-              <Link to="/pages/become-a-dealer" className="flex items-center gap-3 text-sm text-[#3C281E] hover:underline">
-                <Building2 className="w-6 h-6 flex-shrink-0" strokeWidth={1.5} />
+              <Link to="/pages/become-a-dealer" className="flex items-center gap-4 text-sm md:text-base text-[#3C281E] hover:underline group">
+                <Building2 className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
                 Become a dealer
               </Link>
             </div>
@@ -289,11 +289,11 @@ function InfoColumnsSection() {
 
           {/* Got some questions? */}
           <div className="space-y-4">
-            <h3 className="text-lg md:text-xl font-serif font-normal text-[#3C281E]">
+            <h3 className="text-lg md:text-2xl font-serif font-normal text-[#3C281E]">
               Got some questions?
             </h3>
-            <Link to="/pages/stores" className="flex items-center gap-3 text-sm text-[#3C281E] hover:underline">
-              <MessageCircle className="w-6 h-6 flex-shrink-0" strokeWidth={1.5} />
+            <Link to="/pages/stores" className="flex items-center gap-4 text-sm md:text-base text-[#3C281E] hover:underline group">
+              <MessageCircle className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
               Where can I buy HKLIVING?
             </Link>
           </div>
