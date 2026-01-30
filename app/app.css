@@ -180,7 +180,7 @@
   --font-serif: "Recoleta", serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  --color-background: oklch(1 0 0);
+  --color-background: #F0EBDE;
   --color-foreground: oklch(0.145 0 0);
   --color-card: oklch(1 0 0);
   --color-card-foreground: oklch(0.145 0 0);

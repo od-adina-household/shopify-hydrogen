@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import type { Route } from './+types/_index';
 
@@ -14,38 +15,87 @@ export default function Homepage() {
   return (
     <div className="w-full">
       <HeroSection />
-      <div className="container mx-auto px-4 py-8">
-        <ImageGridSection
-          title="ambiance to your home with objects that inspire"
-          images={[
-            { src: '/images/shelf.jpg', alt: 'Curated shelf display' },
-            { src: '/images/flowers.jpg', alt: 'Fresh flowers in vase' },
-            { src: '/images/interior.jpg', alt: 'Modern interior design' },
-          ]}
-        />
-        <SplitSection
-          title="Shaped by light"
-          imageSrc="/images/lamps.jpg"
-          imageAlt="Decorative lamps and objects"
-          imageOnRight
-        />
-        <ImageGridSection
-          title="Our most expressive collection — for everyone who dares to live with imagination."
-          images={[
-            { src: '/placeholder-art.jpg', alt: 'Decorative art piece' },
-            { src: '/placeholder-tableware.jpg', alt: 'Artisan tableware' },
-            { src: '/placeholder-living.jpg', alt: 'Living room scene' },
-          ]}
-        />
-        <SplitSection
-          title="Cool in chrome"
-          imageSrc="/placeholder-chrome.jpg"
-          imageAlt="Chrome decorative piece"
-          imageOnRight={false}
-        />
-        <InfoColumnsSection />
-      </div>
+      <CollectionCardsSection
+        cards={[
+          {
+            title: 'KITCHEN',
+            imageSrc: '/images/shelf.jpg',
+            imageAlt: 'Kitchen collection',
+            href: '/collections/kitchen',
+          },
+          {
+            title: 'ACCESSORIES',
+            imageSrc: '/images/flowers.jpg',
+            imageAlt: 'Accessories collection',
+            href: '/collections/accessories',
+          },
+          {
+            title: 'FURNITURE',
+            imageSrc: '/images/interior.jpg',
+            imageAlt: 'Furniture collection',
+            href: '/collections/furniture',
+          },
+        ]}
+      />
+      <SplitSection
+        title="Shaped by light"
+        imageSrc="/images/lamps.jpeg"
+        imageAlt="Decorative lamps and objects"
+        imageOnRight
+      />
+      <ImageGridSection
+        title="Our most expressive collection — for everyone who dares to live with imagination."
+        images={[
+          { src: '/images/art.jpeg', alt: 'Decorative art piece' },
+          { src: '/images/tableware.jpeg', alt: 'Artisan tableware' },
+          { src: '/images/living.jpeg', alt: 'Living room scene' },
+        ]}
+      />
+      <SplitSection
+        title="Cool in chrome"
+        imageSrc="/images/chrome.jpeg"
+        imageAlt="Chrome decorative piece"
+        imageOnRight={false}
+      />
+      <InfoColumnsSection />
     </div>
+  );
+}
+
+interface CollectionCard {
+  title: string;
+  imageSrc: string;
+  imageAlt: string;
+  href: string;
+}
+
+function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
+  return (
+    <section className="w-full px-4 sm:px-6 lg:px-8 pt-2 pb-8 md:pb-12 lg:pb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+        {cards.map((card, index) => (
+          <Link
+            key={index}
+            to={card.href}
+            className="relative aspect-[3/4] overflow-hidden group block"
+          >
+            <img
+              src={card.imageSrc}
+              alt={card.imageAlt}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8">
+              <div className="flex items-center gap-3 px-5 py-3 bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:bg-white">
+                <span className="text-sm font-medium tracking-wider text-foreground">
+                  {card.title}
+                </span>
+                <ArrowRight className="h-4 w-4 text-foreground transition-transform duration-300 group-hover:translate-x-1" />
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 
