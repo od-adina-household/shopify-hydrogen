@@ -125,20 +125,20 @@ interface CollectionCard {
 
 function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
   return (
-    <section className="w-full px-2 sm:px-4 lg:px-6 pt-2 pb-4 md:pb-6 lg:pb-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+    <section className="w-full pt-2 pb-4 md:pb-6 lg:pb-8 px-6 md:px-8 lg:px-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-4">
         {cards.map((card, index) => (
           <Link
             key={index}
             to={card.href}
-            className="relative aspect-[3/4] overflow-hidden group block"
+            className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden group block w-full bg-[#F0EBDE] md:bg-transparent"
           >
             <img
               src={card.imageSrc}
               alt={card.imageAlt}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              className="h-full w-full object-cover transition-all duration-700 group-hover:opacity-90 md:group-hover:opacity-100 md:group-hover:scale-105"
             />
-            <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 left-6 md:left-auto">
+            <div className="absolute bottom-6 right-6 left-6 md:bottom-8 md:right-8 md:left-auto">
               <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:bg-white">
                 <span className="text-sm font-medium tracking-wider text-foreground uppercase">
                   {card.title}

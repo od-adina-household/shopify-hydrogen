@@ -61,7 +61,7 @@ export function Header({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 md:py-5 transition-all duration-300 ${headerBgClass}`}
+      className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 pt-4 pb-2 md:pt-5 md:pb-1.5 transition-all duration-300 ${headerBgClass}`}
     >
       <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
         <NavLink
@@ -114,13 +114,13 @@ export function HeaderMenu({
     const reverseIndex = total - 1 - index;
 
     switch (reverseIndex) {
-      case 0: // Last item (About) - hide first at 980px
-        return 'max-[980px]:hidden';
-      case 1: // Third item (Policies) - hide at 900px
-        return 'max-[900px]:hidden';
-      case 2: // Second item (Blog) - hide at 820px
-        return 'max-[820px]:hidden';
-      case 3: // First item (Collections) - stays visible until md breakpoint (768px)
+      case 0: // Last item (About) - hide at xl breakpoint (1280px) instead of 980px
+        return 'max-xl:hidden';
+      case 1: // Third item (Policies) - hide at lg breakpoint (1024px) instead of 900px
+        return 'max-lg:hidden';
+      case 2: // Second item (Blog) - hide at md breakpoint (768px) instead of 820px
+        return 'max-md:hidden';
+      case 3: // First item (Collections) - stays visible
         return '';
       default:
         return '';
@@ -178,12 +178,12 @@ function HeaderCtas({
   return (
     <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0" role="navigation">
       <SearchToggle isScrolled={isScrolled} isHome={isHome} />
-      <Button variant="ghost" size="icon" className={`h-8 w-8 p-0 ${textColorClass}`} asChild>
+      <Button variant="ghost" size="icon-lg" className={`h-10 w-10 p-0 ${textColorClass}`} asChild>
         <NavLink
           prefetch="intent"
           to="/account"
         >
-          <UserIcon className="h-8 w-8" />
+          <UserIcon className="h-9 w-9" />
           <span className="sr-only">
             <Suspense fallback="Account">
               <Await resolve={isLoggedIn} errorElement="Account">
@@ -208,11 +208,11 @@ function HeaderMenuMobileToggle({ isScrolled, isHome }: { isScrolled: boolean; i
   return (
     <Button
       variant="ghost"
-      size="icon"
-      className={`h-8 w-8 p-0 ${textColorClass}`}
+      size="icon-lg"
+      className={`h-10 w-10 p-0 ${textColorClass}`}
       onClick={() => open('mobile')}
     >
-      <MenuIcon className="h-8 w-8" />
+      <MenuIcon className="h-9 w-9" />
       <span className="sr-only">Menu</span>
     </Button>
   );
@@ -227,11 +227,11 @@ function SearchToggle({ isScrolled, isHome }: { isScrolled: boolean; isHome: boo
   return (
     <Button
       variant="ghost"
-      size="icon"
-      className={`h-8 w-8 p-0 ${textColorClass}`}
+      size="icon-lg"
+      className={`h-10 w-10 p-0 ${textColorClass}`}
       onClick={() => open('search')}
     >
-      <SearchIcon className="h-8 w-8" />
+      <SearchIcon className="h-9 w-9" />
       <span className="sr-only">Search</span>
     </Button>
   );
@@ -248,8 +248,8 @@ function CartBadge({ count, isScrolled, isHome }: { count: number | null; isScro
   return (
     <Button
       variant="ghost"
-      size="icon"
-      className={`relative h-8 w-8 ${textColorClass}`}
+      size="icon-lg"
+      className={`relative h-10 w-10 ${textColorClass}`}
       onClick={(e) => {
         e.preventDefault();
         open('cart');
@@ -261,7 +261,7 @@ function CartBadge({ count, isScrolled, isHome }: { count: number | null; isScro
         } as CartViewPayload);
       }}
     >
-      <ShoppingBag className="h-5 w-5" />
+      <ShoppingBag className="h-9 w-9" />
       {count !== null && count > 0 && (
         <Badge
           variant="default"
