@@ -47,6 +47,7 @@ export default function Homepage() {
         imageSrc="/images/lamps.jpeg"
         imageAlt="Decorative lamps and objects"
         imageOnRight
+        description="Some lamps are made to adapt — others are made to lead. From table lamps to wall pieces, this collection plays with material, surface and light in bold, expressive ways. Ceramic, metal, plastic, textile and glass come together, each adding its own character. Use one as a statement, or let multiple pieces shape the atmosphere of a space."
       />
       <IntroSection
         text="Our most expressive collection — for everyone who dares to live with imagination."
@@ -185,17 +186,23 @@ interface SplitSectionProps {
   imageSrc: string;
   imageAlt: string;
   imageOnRight: boolean;
+  description?: string;
 }
 
-function SplitSection({ title, imageSrc, imageAlt, imageOnRight }: SplitSectionProps) {
+function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description }: SplitSectionProps) {
   return (
-    <section className="py-16 md:py-24 bg-[#E8DDD0]">
+    <section className="py-16 md:py-24 bg-[#E0BD99]">
       <div className="container mx-auto px-8 max-w-7xl">
         <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 items-center ${imageOnRight ? '' : 'md:grid-flow-dense'}`}>
           <div className={imageOnRight ? 'md:order-1' : 'md:order-2'}>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-white">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-white mb-4">
               {title}
             </h2>
+            {description && (
+              <p className="text-white font-serif text-opacity-90 max-w-lg mt-2 text-base leading-6">
+                {description}
+              </p>
+            )}
           </div>
           <div className={imageOnRight ? 'md:order-2' : 'md:order-1'}>
             <div className="aspect-[4/3] overflow-hidden">
