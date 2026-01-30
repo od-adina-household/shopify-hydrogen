@@ -5,7 +5,7 @@ import {
 } from '@shopify/hydrogen';
 import { HeartIcon, MenuIcon, SearchIcon, ShoppingBag, UserIcon } from 'lucide-react';
 import { Suspense, useEffect, useId, useRef, useState } from 'react';
-import { Await, NavLink, useAsyncValue } from 'react-router';
+import { Await, NavLink, useAsyncValue, useLocation } from 'react-router';
 import type { CartApiQueryFragment, HeaderQuery } from 'storefrontapi.generated';
 import { useAside } from '~/components/Aside';
 import { ModeToggle } from '~/components/mode-toggle';
@@ -32,6 +32,7 @@ export function Header({
 }: HeaderProps) {
   const { shop, menu } = header;
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,20 +48,27 @@ export function Header({
   // Use Shopify brand logo if it exists, otherwise fallback to shop name
   const logoUrl = shop.brand?.logo?.image?.url;
 
+  // Determine if we are on the homepage (handling potential locale prefixes)
+  const isHome = location.pathname === '/' || /^\/(en|nl|de|fr)(\/|$)/.test(location.pathname);
+
+  const headerBgClass = isHome 
+    ? (isScrolled ? 'bg-background shadow-sm' : 'bg-transparent')
+    : 'bg-background shadow-sm';
+
+  const textColorClass = isHome
+    ? (isScrolled ? 'text-foreground' : 'text-white')
+    : 'text-foreground';
+
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 md:py-5 transition-all duration-300 ${isScrolled
-        ? 'bg-background shadow-sm'
-        : 'bg-transparent'
-        }`}
+      className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 md:py-5 transition-all duration-300 ${headerBgClass}`}
     >
       <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
         <NavLink
           prefetch="intent"
           to="/"
           end
-          className={`flex items-center hover:opacity-80 transition-opacity flex-shrink-0 ${isScrolled ? 'text-foreground' : 'text-white'
-            }`}
+          className={`flex items-center hover:opacity-80 transition-opacity flex-shrink-0 ${textColorClass}`}
         >
           {logoUrl ? (
             <img
@@ -74,7 +82,7 @@ export function Header({
             </strong>
           )}
         </NavLink>
-        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} isScrolled={isScrolled} />
+        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} isScrolled={isScrolled} isHome={isHome} />
       </div>
     </header>
   );
@@ -161,15 +169,19 @@ function HeaderCtas({
   isLoggedIn,
   cart,
   isScrolled,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & { isScrolled: boolean }) {
+  isHome,
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & { isScrolled: boolean; isHome: boolean }) {
+  const textColorClass = isHome
+    ? (isScrolled ? 'text-foreground' : 'text-white')
+    : 'text-foreground';
+
   return (
     <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0" role="navigation">
-      <SearchToggle isScrolled={isScrolled} />
-      <Button variant="ghost" size="icon" className="h-8 w-8 p-0" asChild>
+      <SearchToggle isScrolled={isScrolled} isHome={isHome} />
+      <Button variant="ghost" size="icon" className={`h-8 w-8 p-0 ${textColorClass}`} asChild>
         <NavLink
           prefetch="intent"
           to="/account"
-          className={isScrolled ? 'text-foreground' : 'text-white'}
         >
           <UserIcon className="h-8 w-8" />
           <span className="sr-only">
@@ -181,18 +193,23 @@ function HeaderCtas({
           </span>
         </NavLink>
       </Button>
-      <HeaderMenuMobileToggle isScrolled={isScrolled} />
+      <HeaderMenuMobileToggle isScrolled={isScrolled} isHome={isHome} />
+      <CartToggle cart={cart} isScrolled={isScrolled} isHome={isHome} />
     </div>
   );
 }
 
-function HeaderMenuMobileToggle({ isScrolled }: { isScrolled: boolean }) {
+function HeaderMenuMobileToggle({ isScrolled, isHome }: { isScrolled: boolean; isHome: boolean }) {
   const { open } = useAside();
+  const textColorClass = isHome
+    ? (isScrolled ? 'text-foreground' : 'text-white')
+    : 'text-foreground';
+
   return (
     <Button
       variant="ghost"
       size="icon"
-      className={`h-8 w-8 p-0 ${isScrolled ? 'text-foreground' : 'text-white'}`}
+      className={`h-8 w-8 p-0 ${textColorClass}`}
       onClick={() => open('mobile')}
     >
       <MenuIcon className="h-8 w-8" />
@@ -201,13 +218,17 @@ function HeaderMenuMobileToggle({ isScrolled }: { isScrolled: boolean }) {
   );
 }
 
-function SearchToggle({ isScrolled }: { isScrolled: boolean }) {
+function SearchToggle({ isScrolled, isHome }: { isScrolled: boolean; isHome: boolean }) {
   const { open } = useAside();
+  const textColorClass = isHome
+    ? (isScrolled ? 'text-foreground' : 'text-white')
+    : 'text-foreground';
+
   return (
     <Button
       variant="ghost"
       size="icon"
-      className={`h-8 w-8 p-0 ${isScrolled ? 'text-foreground' : 'text-white'}`}
+      className={`h-8 w-8 p-0 ${textColorClass}`}
       onClick={() => open('search')}
     >
       <SearchIcon className="h-8 w-8" />
@@ -216,168 +237,19 @@ function SearchToggle({ isScrolled }: { isScrolled: boolean }) {
   );
 }
 
-function SearchBar() {
-  const queriesDatalistId = useId();
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  return (
-    <div className="hidden sm:block relative group" ref={searchContainerRef}>
-      <SearchFormPredictive>
-        {({ fetchResults, goToSearch, inputRef }) => {
-          const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            fetchResults(e);
-            setIsSearchOpen(!!e.target.value);
-          };
-
-          const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-            fetchResults(e as any);
-            setIsSearchOpen(!!e.target.value);
-          };
-
-          return (
-            <div className="flex items-center border border-border bg-muted px-4 py-2 hover:bg-accent transition-colors rounded-md">
-              <SearchIcon className="mr-3 size-4 text-muted-foreground shrink-0" />
-              <Input
-                name="q"
-                onChange={handleChange}
-                onFocus={handleFocus}
-                placeholder="SEARCH"
-                ref={inputRef}
-                type="search"
-                className="w-24 h-auto border-0 bg-transparent p-0 text-xs font-mono tracking-wider shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            </div>
-          );
-        }}
-      </SearchFormPredictive>
-
-      {/* Predictive search results dropdown - wider and better positioned */}
-      {isSearchOpen && (
-        <div className="absolute top-full right-0 mt-2 z-50 w-[400px]">
-          <SearchResultsPredictive>
-            {({ items, total, term, state, closeSearch }) => {
-              const handleClose = () => {
-                closeSearch();
-                setIsSearchOpen(false);
-              };
-
-              return (
-                <SearchResults
-                  items={items}
-                  total={total}
-                  term={term}
-                  state={state}
-                  closeSearch={handleClose}
-                  queriesDatalistId={queriesDatalistId}
-                  searchContainerRef={searchContainerRef}
-                />
-              );
-            }}
-          </SearchResultsPredictive>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SearchResults({
-  items,
-  total,
-  term,
-  state,
-  closeSearch,
-  queriesDatalistId,
-  searchContainerRef,
-}: {
-  items: any;
-  total: number;
-  term: React.MutableRefObject<string>;
-  state: string;
-  closeSearch: () => void;
-  queriesDatalistId: string;
-  searchContainerRef: React.RefObject<HTMLDivElement>;
-}) {
-  // Handle click outside to close search
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target as Node)
-      ) {
-        closeSearch();
-      }
-    }
-
-    if (term.current) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeSearch, searchContainerRef]);
-
-  // Don't show anything if there's no search term
-  if (!term.current) {
-    return null;
-  }
-
-  if (state === 'loading') {
-    return (
-      <div className="bg-popover border rounded-md p-4 shadow-lg">
-        <p className="text-sm text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!total) {
-    return (
-      <div className="bg-popover border rounded-md p-4 shadow-lg">
-        <SearchResultsPredictive.Empty term={term} />
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-popover border rounded-md p-4 shadow-lg max-h-[500px] overflow-y-auto space-y-4">
-      <SearchResultsPredictive.Queries
-        queries={items.queries}
-        queriesDatalistId={queriesDatalistId}
-      />
-      <SearchResultsPredictive.Products
-        products={items.products}
-        closeSearch={closeSearch}
-        term={term}
-      />
-      <SearchResultsPredictive.Collections
-        collections={items.collections}
-        closeSearch={closeSearch}
-        term={term}
-      />
-      <SearchResultsPredictive.Pages
-        pages={items.pages}
-        closeSearch={closeSearch}
-        term={term}
-      />
-      <SearchResultsPredictive.Articles
-        articles={items.articles}
-        closeSearch={closeSearch}
-        term={term}
-      />
-    </div>
-  );
-}
-
-function CartBadge({ count }: { count: number | null }) {
+function CartBadge({ count, isScrolled, isHome }: { count: number | null; isScrolled: boolean; isHome: boolean }) {
   const { open } = useAside();
   const { publish, shop, cart, prevCart } = useAnalytics();
+  
+  const textColorClass = isHome
+    ? (isScrolled ? 'text-foreground' : 'text-white')
+    : 'text-foreground';
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      className="relative h-8 w-8"
+      className={`relative h-8 w-8 ${textColorClass}`}
       onClick={(e) => {
         e.preventDefault();
         open('cart');
@@ -405,20 +277,20 @@ function CartBadge({ count }: { count: number | null }) {
   );
 }
 
-function CartToggle({ cart }: Pick<HeaderProps, 'cart'>) {
+function CartToggle({ cart, isScrolled, isHome }: Pick<HeaderProps, 'cart'> & { isScrolled: boolean; isHome: boolean }) {
   return (
-    <Suspense fallback={<CartBadge count={null} />}>
+    <Suspense fallback={<CartBadge count={null} isScrolled={isScrolled} isHome={isHome} />}>
       <Await resolve={cart}>
-        <CartBanner />
+        <CartBanner isScrolled={isScrolled} isHome={isHome} />
       </Await>
     </Suspense>
   );
 }
 
-function CartBanner() {
+function CartBanner({ isScrolled, isHome }: { isScrolled: boolean; isHome: boolean }) {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
+  return <CartBadge count={cart?.totalQuantity ?? 0} isScrolled={isScrolled} isHome={isHome} />;
 }
 
 const FALLBACK_HEADER_MENU = {
