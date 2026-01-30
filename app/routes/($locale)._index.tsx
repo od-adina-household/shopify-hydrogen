@@ -15,6 +15,7 @@ export default function Homepage() {
   return (
     <div className="w-full">
       <HeroSection />
+      <IntroSection />  
       <CollectionCardsSection
         cards={[
           {
@@ -61,7 +62,15 @@ export default function Homepage() {
     </div>
   );
 }
-
+function IntroSection() {
+  return (
+    <section className="w-full px-4 sm:px-6 lg:px-8 py-12 md:py-16 max-w-7xl mx-auto">
+      <h2 className="text-[32px] md:text-[50px] leading-[40px] md:leading-[60px] font-serif font-normal text-[#3C281E] text-left max-w-5xl">
+        Let us guide you in the art of living — we bring ambience to your home with objects that inspire.
+      </h2>
+    </section>
+  );
+}
 interface CollectionCard {
   title: string;
   imageSrc: string;
