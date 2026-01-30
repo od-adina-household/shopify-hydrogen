@@ -294,7 +294,7 @@ function InfoColumnsSection() {
             </h3>
             <Link to="/pages/stores" className="flex items-center gap-4 text-sm md:text-base text-[#3C281E] hover:underline group">
               <MessageCircle className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
-              Where can I buy HKLIVING?
+              Where can I buy AD Household?
             </Link>
           </div>
         </div>
