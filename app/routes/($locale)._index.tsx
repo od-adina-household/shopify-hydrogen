@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MessageCircle, Download, Building2 } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import type { Route } from './+types/_index';
 
@@ -249,35 +249,54 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
 }
 
 function InfoColumnsSection() {
-  const infoItems = [
-    {
-      title: 'Arrival time may vary',
-      description: 'Please see our delivery page for up to date information.',
-    },
-    {
-      title: 'Returns if unused',
-      description: 'Most items are eligible for return within 30 days of delivery.',
-    },
-    {
-      title: 'Get yours pre-owned',
-      description: 'All items can be returned for store credit.',
-    },
-  ];
-
   return (
-    <section className="py-16 md:py-24 border-t border-border">
-      <div className="container mx-auto px-8 max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-          {infoItems.map((item, index) => (
-            <div key={index} className="space-y-3">
-              <h3 className="text-sm font-semibold tracking-wide">
-                {item.title}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {item.description}
+    <section className="py-16 md:py-20 bg-background">
+      <div className="container mx-auto px-6 sm:px-8 max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
+          {/* Do you need some help? */}
+          <div className="space-y-4">
+            <h3 className="text-lg md:text-xl font-serif font-normal text-[#3C281E]">
+              Do you need some help?
+            </h3>
+            <div className="flex items-start gap-3">
+              <MessageCircle className="w-6 h-6 mt-0.5 text-[#3C281E] flex-shrink-0" strokeWidth={1.5} />
+              <p className="text-sm text-[#3C281E] leading-relaxed">
+                Our customer service team will be happy to assist you, please click{' '}
+                <Link to="/pages/contact" className="underline underline-offset-2 hover:no-underline">
+                  here
+                </Link>{' '}
+                to get in touch with us.
               </p>
             </div>
-          ))}
+          </div>
+
+          {/* Arrange it yourself */}
+          <div className="space-y-4">
+            <h3 className="text-lg md:text-xl font-serif font-normal text-[#3C281E]">
+              Arrange it yourself
+            </h3>
+            <div className="space-y-3">
+              <Link to="/pages/pressroom" className="flex items-center gap-3 text-sm text-[#3C281E] hover:underline">
+                <Download className="w-6 h-6 flex-shrink-0" strokeWidth={1.5} />
+                Download pressroom packages
+              </Link>
+              <Link to="/pages/become-a-dealer" className="flex items-center gap-3 text-sm text-[#3C281E] hover:underline">
+                <Building2 className="w-6 h-6 flex-shrink-0" strokeWidth={1.5} />
+                Become a dealer
+              </Link>
+            </div>
+          </div>
+
+          {/* Got some questions? */}
+          <div className="space-y-4">
+            <h3 className="text-lg md:text-xl font-serif font-normal text-[#3C281E]">
+              Got some questions?
+            </h3>
+            <Link to="/pages/stores" className="flex items-center gap-3 text-sm text-[#3C281E] hover:underline">
+              <MessageCircle className="w-6 h-6 flex-shrink-0" strokeWidth={1.5} />
+              Where can I buy HKLIVING?
+            </Link>
+          </div>
         </div>
       </div>
     </section>
