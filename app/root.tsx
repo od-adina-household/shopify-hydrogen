@@ -12,7 +12,6 @@ import {
   useRouteLoaderData,
   type ShouldRevalidateFunction,
 } from 'react-router';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
@@ -156,16 +155,14 @@ export function Layout({ children }: { children?: React.ReactNode }) {
 function LayoutWithTheme({ children }: { children?: React.ReactNode }) {
   const nonce = useNonce();
   const data = useRouteLoaderData<RootLoader>('root');
-  const [theme] = useTheme();
 
   return (
-    <html lang="en" data-theme={theme ?? ''} suppressHydrationWarning>
+    <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={Styling}></link>
         <Meta />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme)} nonce={nonce} />
         <Links />
       </head>
       <body className="font-sans" suppressHydrationWarning>
@@ -185,11 +182,9 @@ function AppWithProviders() {
   }
 
   return (
-    <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
-      <LayoutWithTheme>
-        <AppContent />
-      </LayoutWithTheme>
-    </ThemeProvider>
+    <LayoutWithTheme>
+      <AppContent />
+    </LayoutWithTheme>
   );
 }
 

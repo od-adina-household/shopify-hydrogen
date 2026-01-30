@@ -5,16 +5,52 @@ import {
   getSelectedProductOptions,
   useOptimisticVariant,
   useSelectedOptionInUrlParam,
+  Image,
 } from '@shopify/hydrogen';
-import { CheckIcon, PackageIcon, RotateCcwIcon, TruckIcon } from 'lucide-react';
-import { Suspense } from 'react';
+import {
+  CheckIcon,
+  PackageIcon,
+  RotateCcwIcon,
+  TruckIcon,
+  Share2,
+  Mail,
+  Facebook,
+  Twitter,
+  ChevronRight,
+} from 'lucide-react';
+import { Suspense, useState, useEffect } from 'react';
 import { Await, Link, useLoaderData } from 'react-router';
-import type { ProductRecommendationsQuery } from 'storefrontapi.generated';
+import type { 
+  ProductVariantFragment, 
+  ProductFragment, 
+  ProductRecommendationsQuery,
+  FallbackProductsQuery
+} from 'storefrontapi.generated';
 import { ProductForm } from '~/components/ProductForm';
-import { ProductImage } from '~/components/ProductImage';
-import { ProductItem } from '~/components/ProductItem';
 import { ProductPrice } from '~/components/ProductPrice';
 import { Skeleton } from '~/components/ui/skeleton';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '~/components/ui/accordion';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from '~/components/ui/carousel';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '~/components/ui/breadcrumb';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/products.$handle';
 
@@ -85,13 +121,13 @@ function loadDeferredData({ context }: Route.LoaderArgs, productId: string) {
       .query(RECOMMENDED_PRODUCTS_QUERY, {
         variables: { productId },
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error(error);
         return null;
       }),
     storefront
       .query(FALLBACK_PRODUCTS_QUERY)
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error(error);
         return null;
       }),
@@ -104,6 +140,9 @@ function loadDeferredData({ context }: Route.LoaderArgs, productId: string) {
 
 export default function Product() {
   const { product, relatedProducts } = useLoaderData<typeof loader>();
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -121,106 +160,209 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const { title, descriptionHtml, description, vendor } = product;
+  const { title, descriptionHtml, description, images } = product;
+  const productImages = images.nodes.length > 0 ? images.nodes : selectedVariant?.image ? [selectedVariant.image] : [];
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on('select', () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
 
   return (
-    <div className="space-y-16">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Product Image */}
-        <div>
-          <ProductImage image={selectedVariant?.image} />
-        </div>
-
-        {/* Product Info */}
-        <div className="space-y-8">
-          {/* Title & Price Section */}
-          <div className="space-y-6">
-            <div className="space-y-3">
-              {vendor && (
-                <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-                  {vendor}
-                </p>
+    <div className="relative min-h-screen bg-[#F0EBDE]">
+      <div className="mx-auto max-w-[1920px]">
+        <div className="flex flex-col lg:flex-row relative">
+          {/* Left Column - Sticky Carousel */}
+          <div className="w-full lg:w-[calc(100%-480px)] xl:w-[calc(100%-550px)] lg:sticky lg:top-[70px] lg:h-[calc(100vh-70px)] bg-[#fafafa] overflow-hidden">
+            <Carousel setApi={setApi} className="w-full h-full relative">
+              <CarouselContent className="h-[500px] lg:h-full">
+                {productImages.map((image: any, index: number) => (
+                  <CarouselItem key={image.id || index} className="w-full h-full flex items-center justify-center p-0">
+                    <div className="relative w-full h-full flex items-center justify-center bg-[#fafafa]">
+                      <Image
+                        data={image}
+                        sizes="(min-width: 1024px) 60vw, 100vw"
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+                {productImages.length === 0 && (
+                  <CarouselItem className="w-full h-full flex items-center justify-center">
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                      No Image Available
+                    </div>
+                  </CarouselItem>
+                )}
+              </CarouselContent>
+              {productImages.length > 1 && (
+                <>
+                  <div className="absolute left-0 top-0 bottom-0 w-[75px] flex items-center justify-center pointer-events-none">
+                     <div className="pointer-events-auto">
+                        <CarouselPrevious className="static translate-y-0 h-12 w-12 bg-white/80 hover:bg-white shadow-md [&_svg]:size-6 text-[#3c281e]" />
+                     </div>
+                  </div>
+                  <div className="absolute right-0 top-0 bottom-0 w-[75px] flex items-center justify-center pointer-events-none">
+                    <div className="pointer-events-auto">
+                        <CarouselNext className="static translate-y-0 h-12 w-12 bg-white/80 hover:bg-white shadow-md [&_svg]:size-6 text-[#3c281e]" />
+                    </div>
+                  </div>
+                </>
               )}
-              <h1 className="text-3xl font-bold tracking-tight">
+            </Carousel>
+            {productImages.length > 0 && (
+              <div className="absolute bottom-10 left-10 text-[26px] font-normal font-sans text-[#3c281e]">
+                {current} / {count}
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Scrollable Content */}
+          <div className="w-full lg:w-[480px] xl:w-[550px] bg-[#F0EBDE] px-6 py-10 lg:px-8 lg:py-12 flex flex-col min-h-screen">
+            
+            {/* Breadcrumb */}
+            <div className="mb-8">
+              <Breadcrumb>
+                <BreadcrumbList className="text-[#a47d44] text-xs uppercase tracking-wider">
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/products" className="hover:text-[#3c281e]">All Products</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="#" className="hover:text-[#3c281e]">Kitchen</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage className="text-[#a47d44]">Artist ceramics</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+
+            {/* Social Share */}
+            <div className="flex justify-end gap-2 mb-8">
+               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><Mail className="w-4 h-4 text-[#3c281e]" /></button>
+               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><Share2 className="w-4 h-4 text-[#3c281e]" /></button>
+               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><div className="w-4 h-4 border border-[#3c281e] rounded-full flex items-center justify-center text-[10px] font-bold text-[#3c281e]">P</div></button>
+               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><Twitter className="w-4 h-4 text-[#3c281e]" /></button>
+               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><Facebook className="w-4 h-4 text-[#3c281e]" /></button>
+            </div>
+
+            {/* Product Title & Info */}
+            <div className="mb-12">
+              <h1 className="text-[56px] leading-[1.1] font-normal text-[#3c281e] mb-2 font-serif">
                 {title}
               </h1>
-            </div>
-
-            <ProductPrice
-              price={selectedVariant?.price}
-              compareAtPrice={selectedVariant?.compareAtPrice}
-            />
-
-            {description && (
-              <p className="text-muted-foreground leading-relaxed">{description}</p>
-            )}
-
-            {/* Stock Status */}
-            <div className="flex items-center gap-2">
-              {selectedVariant?.availableForSale ? (
-                <>
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-sm text-green-600 font-medium">
-                    In Stock
-                  </span>
-                </>
-              ) : (
-                <>
-                  <div className="h-2 w-2 rounded-full bg-red-500" />
-                  <span className="text-sm text-red-600 font-medium">
-                    Sold Out
-                  </span>
-                </>
+              {selectedVariant?.title && selectedVariant.title !== 'Default Title' && (
+                <p className="text-[27px] leading-none text-[#3c281e] mb-4 font-sans">
+                  {selectedVariant.title}
+                </p>
+              )}
+              {selectedVariant?.sku && (
+                <p className="text-sm text-[#3c281e] font-sans">
+                  {selectedVariant.sku}
+                </p>
               )}
             </div>
-          </div>
 
-          {/* Product Form */}
-          <ProductForm
-            productOptions={productOptions}
-            selectedVariant={selectedVariant}
-          />
+            {/* Accordions */}
+            <div className="space-y-0 border-t border-[#d6c4ad]">
+              <Accordion type="single" collapsible className="w-full" defaultValue="description">
+                <AccordionItem value="description" className="border-b border-[#d6c4ad]">
+                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                    Description
+                  </AccordionTrigger>
+                  <AccordionContent className="text-[12.5px] leading-7 text-[#212529] font-sans pb-6">
+                    {descriptionHtml ? (
+                      <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+                    ) : (
+                      description
+                    )}
+                    
+                    <div className="mt-6 pt-4">
+                        <ProductPrice
+                          price={selectedVariant?.price}
+                          compareAtPrice={selectedVariant?.compareAtPrice}
+                          className="text-lg font-medium text-[#3c281e] mb-4 block"
+                        />
+                         <ProductForm
+                            productOptions={productOptions}
+                            selectedVariant={selectedVariant}
+                          />
+                    </div>
 
-          {/* Features */}
-          <div className="grid grid-cols-3 gap-4 border-t border-b border-border py-6">
-            <div className="flex flex-col items-center text-center gap-2">
-              <TruckIcon className="h-6 w-6 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Free Shipping</span>
-            </div>
-            <div className="flex flex-col items-center text-center gap-2">
-              <PackageIcon className="h-6 w-6 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">2 Year Warranty</span>
-            </div>
-            <div className="flex flex-col items-center text-center gap-2">
-              <RotateCcwIcon className="h-6 w-6 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Easy Returns</span>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="general" className="border-b border-[#d6c4ad]">
+                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                    General
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-[#3c281e] pb-6">
+                     <p>General specifications go here.</p>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="dimensions" className="border-b border-[#d6c4ad]">
+                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                    Dimensions
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-[#3c281e] pb-6">
+                     <p>Product dimensions go here.</p>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="care" className="border-b border-[#d6c4ad]">
+                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                    Care & Maintenance Instructions
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-[#3c281e] pb-6">
+                     <p>Care instructions go here.</p>
+                  </AccordionContent>
+                </AccordionItem>
+                 <AccordionItem value="downloads" className="border-b border-[#d6c4ad]">
+                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                    Downloads
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-[#3c281e] pb-6">
+                     <p>Downloadable content goes here.</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
+        </div>
 
-          {/* Product Details */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold tracking-widest uppercase">
-              Product Details
-            </h3>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                <CheckIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <span>Premium quality materials</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                <CheckIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <span>Designed for maximum comfort</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                <CheckIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <span>Sustainable manufacturing process</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                <CheckIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <span>Available in multiple sizes</span>
-              </li>
-            </ul>
-          </div>
+        {/* You Might Also Like */}
+        <div className="bg-[#f0ebde] px-6 py-16 lg:px-8 border-t border-[#d6c4ad]">
+           <Suspense fallback={<RelatedProductsSkeleton />}>
+            <Await resolve={relatedProducts}>
+              {(data: [ProductRecommendationsQuery | null, FallbackProductsQuery | null]) => {
+                const recommendationsData = data[0];
+                const fallbackData = data[1];
+                const recommendations = recommendationsData?.productRecommendations || [];
+                const fallbackProducts = fallbackData?.products?.nodes || [];
+                const allProducts = [...recommendations];
+                const currentProductId = product.id;
+                for (const fallbackProduct of fallbackProducts) {
+                  if (allProducts.length >= 4) break;
+                  if (
+                    fallbackProduct.id !== currentProductId &&
+                    !allProducts.find(p => p.id === fallbackProduct.id)
+                  ) {
+                    allProducts.push(fallbackProduct);
+                  }
+                }
+                const displayProducts = allProducts.slice(0, 4);
+                return <RelatedProducts products={displayProducts} />;
+              }}
+            </Await>
+          </Suspense>
         </div>
 
         <Analytics.ProductView
@@ -239,37 +381,6 @@ export default function Product() {
           }}
         />
       </div>
-
-      {/* Related Products */}
-      <Suspense fallback={<RelatedProductsSkeleton />}>
-        <Await resolve={relatedProducts}>
-          {([recommendationsData, fallbackData]) => {
-            const recommendations = recommendationsData?.productRecommendations || [];
-            const fallbackProducts = fallbackData?.products?.nodes || [];
-
-            // Combine recommendations with fallback products, filtering out the current product
-            const allProducts = [...recommendations];
-            const currentProductId = product.id;
-
-            // Add fallback products to fill up to 4 slots
-            for (const fallbackProduct of fallbackProducts) {
-              if (allProducts.length >= 4) break;
-              // Don't add the current product or duplicates
-              if (
-                fallbackProduct.id !== currentProductId &&
-                !allProducts.find(p => p.id === fallbackProduct.id)
-              ) {
-                allProducts.push(fallbackProduct);
-              }
-            }
-
-            // Always show exactly 4 products
-            const displayProducts = allProducts.slice(0, 4);
-
-            return <RelatedProducts products={displayProducts} />;
-          }}
-        </Await>
-      </Suspense>
     </div>
   );
 }
@@ -282,37 +393,65 @@ function RelatedProducts({
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="border-t border-border pt-16">
-      <div className="mb-8 flex items-center justify-between">
-        <h2 className="text-xl font-semibold tracking-widest uppercase">
-          You May Also Like
+    <section>
+      <div className="mb-10 text-center">
+        <h2 className="text-[33px] font-normal font-serif text-[#3c281e]">
+          You might also like these
         </h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {products.map((product) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading="lazy"
-          />
+          <div key={product.id} className="bg-[#fafafa] border border-[#f0ebde] p-4 group">
+            <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] mb-4 overflow-hidden">
+               {product.featuredImage && (
+                 <Image
+                   data={product.featuredImage}
+                   className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                   sizes="(min-width: 1024px) 25vw, 50vw"
+                 />
+               )}
+            </Link>
+            <div className="space-y-2">
+               <h3 className="text-[23px] font-medium leading-[28px] text-[#3c281e] font-sans">
+                 {product.title}
+               </h3>
+               <div className="flex justify-between items-end">
+                  <p className="text-[14px] text-[#3c281e] font-sans">
+                    {product.variants?.nodes?.[0]?.sku || 'KCT0015'}
+                  </p>
+                  <button className="w-6 h-6 rounded-full border border-[#3c281e] flex items-center justify-center text-[#3c281e] hover:bg-[#3c281e] hover:text-white transition-colors">
+                     <span className="sr-only">Add to cart</span>
+                     <span className="text-lg leading-none mb-1">+</span>
+                  </button>
+               </div>
+            </div>
+          </div>
         ))}
       </div>
+       <div className="flex justify-end gap-3 mt-8">
+         <button className="w-10 h-10 flex items-center justify-center hover:bg-[#d6c4ad]/20 rounded-full">
+            <ChevronRight className="rotate-180 w-5 h-5 text-[#3c281e]" />
+         </button>
+         <button className="w-10 h-10 flex items-center justify-center hover:bg-[#d6c4ad]/20 rounded-full">
+            <ChevronRight className="w-5 h-5 text-[#3c281e]" />
+         </button>
+       </div>
     </section>
   );
 }
 
 function RelatedProductsSkeleton() {
   return (
-    <section className="border-t border-border pt-16">
-      <div className="mb-8">
-        <Skeleton className="h-6 w-48" />
+    <section className="pt-16">
+      <div className="mb-8 text-center">
+        <Skeleton className="h-8 w-64 mx-auto bg-[#d6c4ad]/50" />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {Array.from({ length: 4 }, (_, i) => `skeleton-${i}`).map((key) => (
-          <div key={key} className="space-y-4">
-            <Skeleton className="aspect-[3/4] w-full" />
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/4" />
+          <div key={key} className="space-y-4 p-4 border border-[#f0ebde] bg-[#fafafa]">
+            <Skeleton className="aspect-[4/5] w-full bg-[#d6c4ad]/30" />
+            <Skeleton className="h-6 w-3/4 bg-[#d6c4ad]/30" />
+            <Skeleton className="h-4 w-1/4 bg-[#d6c4ad]/30" />
           </div>
         ))}
       </div>
@@ -365,6 +504,15 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    images(first: 10) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
     encodedVariantExistence
     encodedVariantAvailability
     options {
@@ -454,6 +602,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
           id
           title
           availableForSale
+          sku
           selectedOptions {
             name
             value
@@ -510,6 +659,7 @@ const FALLBACK_PRODUCTS_QUERY = `#graphql
             id
             title
             availableForSale
+            sku
             selectedOptions {
               name
               value
