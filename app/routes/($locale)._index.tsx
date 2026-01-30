@@ -48,11 +48,13 @@ export default function Homepage() {
         imageAlt="Decorative lamps and objects"
         imageOnRight
         description="Some lamps are made to adapt — others are made to lead. From table lamps to wall pieces, this collection plays with material, surface and light in bold, expressive ways. Ceramic, metal, plastic, textile and glass come together, each adding its own character. Use one as a statement, or let multiple pieces shape the atmosphere of a space."
+        ctaLabel="DISCOVER COLLECTION"
+        ctaHref="/collections/lighting"
       />
       <IntroSection
         text="Our most expressive collection — for everyone who dares to live with imagination."
-        buttonLabel="COOL IN CHROME"
-        buttonHref="/collections/chrome"
+        buttonLabel="COLLECTION 25-26"
+        buttonHref="/collections/collection-25-26"
       />
       <CollectionCardsSection
         cards={[
@@ -81,6 +83,9 @@ export default function Homepage() {
         imageSrc="/images/chrome.jpeg"
         imageAlt="Chrome decorative piece"
         imageOnRight={false}
+        description="Whether wrapped around a light, formed into a tray or cast as a fully chromed bowl, it changes the mood of a space. Cool, sleek and unexpected — these accents catch the light and sharpen the atmosphere with their quiet intensity."
+        ctaLabel="NEW CLASSICS"
+        ctaHref="/collections/chrome"
       />
       <InfoColumnsSection />
     </div>
@@ -95,17 +100,17 @@ interface IntroSectionProps {
 
 function IntroSection({ text, buttonLabel, buttonHref }: IntroSectionProps) {
   return (
-    <section className="w-full px-1 sm:px-2 lg:px-4">
-      <div className="max-w-7xl">
-        <h2 className="text-lg md:text-3xl lg:text-4xl leading-relaxed font-serif font-normal text-[#3C281E] text-left max-w-5xl pt-12 md:pt-16 pb-6 md:pb-8 pl-0">
+    <section className="w-full px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-xl md:text-3xl lg:text-4xl leading-relaxed font-serif font-normal text-[#3C281E] text-left max-w-4xl pt-16 md:pt-24 pb-6 md:pb-8">
           {text}
         </h2>
         <Link
           to={buttonHref}
-          className="inline-flex items-center gap-3 text-base md:text-lg lg:text-xl font-medium tracking-wider text-foreground underline underline-offset-4 hover:no-underline transition-all duration-300 mb-4 md:mb-6"
+          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 mb-8 md:mb-12"
         >
           {buttonLabel}
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
     </section>
@@ -187,33 +192,57 @@ interface SplitSectionProps {
   imageAlt: string;
   imageOnRight: boolean;
   description?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
 }
 
-function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description }: SplitSectionProps) {
+function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ctaLabel, ctaHref }: SplitSectionProps) {
+  const textContent = (
+    <div className="flex flex-col justify-center h-full px-6 sm:px-10 md:px-12 lg:px-16 py-12 md:py-16 lg:py-20">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
+        {title}
+      </h2>
+      {description && (
+        <p className="text-[#3C281E] font-sans text-sm md:text-base leading-relaxed max-w-md mb-6 md:mb-8">
+          {description}
+        </p>
+      )}
+      {ctaLabel && ctaHref && (
+        <Link
+          to={ctaHref}
+          className="inline-flex items-center gap-3 text-xs font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 w-fit"
+        >
+          {ctaLabel}
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      )}
+    </div>
+  );
+
+  const imageContent = (
+    <div className="h-full min-h-[400px] md:min-h-[500px] lg:min-h-[600px]">
+      <img
+        src={imageSrc}
+        alt={imageAlt}
+        className="h-full w-full object-cover"
+      />
+    </div>
+  );
+
   return (
-    <section className="py-16 md:py-24 bg-[#E0BD99]">
-      <div className="container mx-auto px-8 max-w-7xl">
-        <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 items-center ${imageOnRight ? '' : 'md:grid-flow-dense'}`}>
-          <div className={imageOnRight ? 'md:order-1' : 'md:order-2'}>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-white mb-4">
-              {title}
-            </h2>
-            {description && (
-              <p className="text-white font-serif text-opacity-90 max-w-lg mt-2 text-base leading-6">
-                {description}
-              </p>
-            )}
-          </div>
-          <div className={imageOnRight ? 'md:order-2' : 'md:order-1'}>
-            <div className="aspect-[4/3] overflow-hidden">
-              <img
-                src={imageSrc}
-                alt={imageAlt}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
+    <section className="w-full bg-[#C4A882]">
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        {imageOnRight ? (
+          <>
+            <div className="bg-[#C4A882]">{textContent}</div>
+            <div className="relative">{imageContent}</div>
+          </>
+        ) : (
+          <>
+            <div className="relative order-2 md:order-1">{imageContent}</div>
+            <div className="bg-[#C4A882] order-1 md:order-2">{textContent}</div>
+          </>
+        )}
       </div>
     </section>
   );

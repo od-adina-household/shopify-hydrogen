@@ -31,38 +31,50 @@ export function Header({
   publicStoreDomain,
 }: HeaderProps) {
   const { shop, menu } = header;
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check initial state
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Use Shopify brand logo if it exists, otherwise fallback to shop name
   const logoUrl = shop.brand?.logo?.image?.url;
 
   return (
-    <header className="px-4 sm:px-6 md:px-8 py-4 md:py-6 border-b border-border">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 py-4 md:py-5 transition-all duration-300 ${isScrolled
+        ? 'bg-background shadow-sm'
+        : 'bg-transparent'
+        }`}
+    >
       <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
         <NavLink
           prefetch="intent"
           to="/"
           end
-          className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
+          className={`flex items-center hover:opacity-80 transition-opacity flex-shrink-0 ${isScrolled ? 'text-foreground' : 'text-white'
+            }`}
         >
           {logoUrl ? (
             <img
               src={logoUrl}
               alt={shop.name}
-              className="h-8 md:h-10 w-auto"
+              className="h-6 md:h-8 w-auto"
             />
           ) : (
-            <strong className="text-xl md:text-2xl font-bold tracking-tight">
+            <strong className="text-xl md:text-2xl font-serif font-normal tracking-tight lowercase">
               {shop.name}
             </strong>
           )}
         </NavLink>
-        <HeaderMenu
-          menu={menu}
-          viewport="desktop"
-          primaryDomainUrl={header.shop.primaryDomain.url}
-          publicStoreDomain={publicStoreDomain}
-        />
-        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} isScrolled={isScrolled} />
       </div>
     </header>
   );
@@ -148,22 +160,18 @@ export function HeaderMenu({
 function HeaderCtas({
   isLoggedIn,
   cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+  isScrolled,
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & { isScrolled: boolean }) {
   return (
-    <div className="flex items-center gap-x-2 sm:gap-x-3 lg:gap-x-6 flex-shrink-0" role="navigation">
-      <SearchBar />
-      <MobileSearchToggle />
-      <Button variant="ghost" size="icon" className="h-8 w-8 hidden md:flex" asChild>
-        <NavLink prefetch="intent" to="/account/wishlist">
-          <HeartIcon className="h-5 w-5" />
-          <span className="sr-only">Wishlist</span>
-        </NavLink>
-      </Button>
-      <CartToggle cart={cart} />
-      <ModeToggle />
-      <Button variant="ghost" size="icon" className="h-8 w-8 hidden md:flex" asChild>
-        <NavLink prefetch="intent" to="/account">
-          <UserIcon className="h-5 w-5" />
+    <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0" role="navigation">
+      <SearchToggle isScrolled={isScrolled} />
+      <Button variant="ghost" size="icon" className="h-8 w-8 p-0" asChild>
+        <NavLink
+          prefetch="intent"
+          to="/account"
+          className={isScrolled ? 'text-foreground' : 'text-white'}
+        >
+          <UserIcon className="h-8 w-8" />
           <span className="sr-only">
             <Suspense fallback="Account">
               <Await resolve={isLoggedIn} errorElement="Account">
@@ -173,36 +181,36 @@ function HeaderCtas({
           </span>
         </NavLink>
       </Button>
-      <HeaderMenuMobileToggle />
+      <HeaderMenuMobileToggle isScrolled={isScrolled} />
     </div>
   );
 }
 
-function HeaderMenuMobileToggle() {
+function HeaderMenuMobileToggle({ isScrolled }: { isScrolled: boolean }) {
   const { open } = useAside();
   return (
     <Button
       variant="ghost"
       size="icon"
-      className="md:hidden h-8 w-8"
+      className={`h-8 w-8 p-0 ${isScrolled ? 'text-foreground' : 'text-white'}`}
       onClick={() => open('mobile')}
     >
-      <MenuIcon className="h-5 w-5" />
+      <MenuIcon className="h-8 w-8" />
       <span className="sr-only">Menu</span>
     </Button>
   );
 }
 
-function MobileSearchToggle() {
+function SearchToggle({ isScrolled }: { isScrolled: boolean }) {
   const { open } = useAside();
   return (
     <Button
       variant="ghost"
       size="icon"
-      className="sm:hidden h-8 w-8"
-      onClick={() => open('mobile')}
+      className={`h-8 w-8 p-0 ${isScrolled ? 'text-foreground' : 'text-white'}`}
+      onClick={() => open('search')}
     >
-      <SearchIcon className="h-5 w-5" />
+      <SearchIcon className="h-8 w-8" />
       <span className="sr-only">Search</span>
     </Button>
   );
