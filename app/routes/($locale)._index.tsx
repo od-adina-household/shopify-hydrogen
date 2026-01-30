@@ -14,35 +14,37 @@ export default function Homepage() {
   return (
     <div className="w-full">
       <HeroSection />
-      <ImageGridSection
-        title="ambiance to your home with objects that inspire"
-        images={[
-          { src: '/images/shelf.jpg', alt: 'Curated shelf display' },
-          { src: '/images/flowers.jpg', alt: 'Fresh flowers in vase' },
-          { src: '/images/interior.jpg', alt: 'Modern interior design' },
-        ]}
-      />
-      <SplitSection
-        title="Shaped by light"
-        imageSrc="/images/lamps.jpg"
-        imageAlt="Decorative lamps and objects"
-        imageOnRight
-      />
-      <ImageGridSection
-        title="Our most expressive collection — for everyone who dares to live with imagination."
-        images={[
-          { src: '/placeholder-art.jpg', alt: 'Decorative art piece' },
-          { src: '/placeholder-tableware.jpg', alt: 'Artisan tableware' },
-          { src: '/placeholder-living.jpg', alt: 'Living room scene' },
-        ]}
-      />
-      <SplitSection
-        title="Cool in chrome"
-        imageSrc="/placeholder-chrome.jpg"
-        imageAlt="Chrome decorative piece"
-        imageOnRight={false}
-      />
-      <InfoColumnsSection />
+      <div className="container mx-auto px-4 py-8">
+        <ImageGridSection
+          title="ambiance to your home with objects that inspire"
+          images={[
+            { src: '/images/shelf.jpg', alt: 'Curated shelf display' },
+            { src: '/images/flowers.jpg', alt: 'Fresh flowers in vase' },
+            { src: '/images/interior.jpg', alt: 'Modern interior design' },
+          ]}
+        />
+        <SplitSection
+          title="Shaped by light"
+          imageSrc="/images/lamps.jpg"
+          imageAlt="Decorative lamps and objects"
+          imageOnRight
+        />
+        <ImageGridSection
+          title="Our most expressive collection — for everyone who dares to live with imagination."
+          images={[
+            { src: '/placeholder-art.jpg', alt: 'Decorative art piece' },
+            { src: '/placeholder-tableware.jpg', alt: 'Artisan tableware' },
+            { src: '/placeholder-living.jpg', alt: 'Living room scene' },
+          ]}
+        />
+        <SplitSection
+          title="Cool in chrome"
+          imageSrc="/placeholder-chrome.jpg"
+          imageAlt="Chrome decorative piece"
+          imageOnRight={false}
+        />
+        <InfoColumnsSection />
+      </div>
     </div>
   );
 }
@@ -59,9 +61,9 @@ function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
       </div>
       <div className="relative h-full flex items-center">
-        <div className="container mx-auto px-8 max-w-7xl">
-          <div className="max-w-md space-y-6">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-tight text-white">
+        <div className="w-full">
+          <div className="max-w-7xl mx-auto px-8 space-y-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-tight text-white max-w-md">
               A collection that feels both curated and created — where every object carries intention.
             </h1>
             <Button

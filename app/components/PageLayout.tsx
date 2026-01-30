@@ -44,7 +44,7 @@ export function PageLayout({
           publicStoreDomain={publicStoreDomain}
         />
       )}
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className="w-full">{children}</main>
       <Footer
         footer={footer}
         header={header}
