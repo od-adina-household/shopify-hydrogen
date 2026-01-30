@@ -17,6 +17,8 @@ import {
   Facebook,
   Twitter,
   ChevronRight,
+  ArrowLeft,
+  ArrowRight,
 } from 'lucide-react';
 import { Suspense, useState, useEffect } from 'react';
 import { Await, Link, useLoaderData } from 'react-router';
@@ -181,65 +183,69 @@ export default function Product() {
       <div className="mx-auto max-w-[1920px]">
         <div className="flex flex-col lg:flex-row relative">
           {/* Left Column - Sticky Carousel */}
-          <div className="w-full lg:w-[calc(100%-480px)] xl:w-[calc(100%-550px)] lg:sticky lg:top-[70px] lg:h-[calc(100vh-70px)] bg-[#fafafa] overflow-hidden">
-            <Carousel setApi={setApi} className="w-full h-full relative">
-              <CarouselContent className="h-[500px] lg:h-full">
-                {productImages.map((image: any, index: number) => (
-                  <CarouselItem key={image.id || index} className="w-full h-full flex items-center justify-center p-0">
-                    <div className="relative w-full h-full flex items-center justify-center bg-[#fafafa]">
-                      <Image
-                        data={image}
-                        sizes="(min-width: 1024px) 60vw, 100vw"
-                        className="max-h-full max-w-full object-contain"
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-                {productImages.length === 0 && (
-                  <CarouselItem className="w-full h-full flex items-center justify-center">
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
-                      No Image Available
-                    </div>
-                  </CarouselItem>
+          <div className="w-full lg:w-[calc(100%-480px)] xl:w-[calc(100%-550px)] lg:sticky lg:top-[70px] lg:h-[calc(100vh-70px)] bg-[#fafafa] overflow-hidden flex flex-col">
+            <div className="flex-1 relative h-full">
+              <Carousel setApi={setApi} className="w-full h-full" opts={{ loop: true }}>
+                <CarouselContent className="h-full ml-0">
+                  {productImages.map((image: any, index: number) => (
+                    <CarouselItem key={image.id || index} className="w-full h-full flex items-center justify-center p-0 pl-0">
+                      <div className="relative w-full h-full flex items-center justify-center bg-[#fafafa]">
+                        <Image
+                          data={image}
+                          sizes="(min-width: 1024px) 60vw, 100vw"
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                  {productImages.length === 0 && (
+                    <CarouselItem className="w-full h-full flex items-center justify-center pl-0">
+                      <div className="w-full h-full bg-[#fafafa] flex items-center justify-center text-gray-400">
+                        No Image Available
+                      </div>
+                    </CarouselItem>
+                  )}
+                </CarouselContent>
+                
+                {productImages.length > 1 && (
+                  <>
+                    <CarouselPrevious className="absolute left-6 top-1/2 -translate-y-1/2 h-12 w-12 bg-white hover:bg-white/90 border-none shadow-md text-[#3c281e] p-0 flex items-center justify-center rounded-full cursor-pointer z-10">
+                        <ArrowLeft className="size-6 stroke-[1.5px]" />
+                    </CarouselPrevious>
+                    <CarouselNext className="absolute right-6 top-1/2 -translate-y-1/2 h-12 w-12 bg-white hover:bg-white/90 border-none shadow-md text-[#3c281e] p-0 flex items-center justify-center rounded-full cursor-pointer z-10">
+                        <ArrowRight className="size-6 stroke-[1.5px]" />
+                    </CarouselNext>
+                  </>
                 )}
-              </CarouselContent>
-              {productImages.length > 1 && (
-                <>
-                  <div className="absolute left-0 top-0 bottom-0 w-[75px] flex items-center justify-center pointer-events-none">
-                     <div className="pointer-events-auto">
-                        <CarouselPrevious className="static translate-y-0 h-12 w-12 bg-white/80 hover:bg-white shadow-md [&_svg]:size-6 text-[#3c281e]" />
-                     </div>
-                  </div>
-                  <div className="absolute right-0 top-0 bottom-0 w-[75px] flex items-center justify-center pointer-events-none">
-                    <div className="pointer-events-auto">
-                        <CarouselNext className="static translate-y-0 h-12 w-12 bg-white/80 hover:bg-white shadow-md [&_svg]:size-6 text-[#3c281e]" />
-                    </div>
-                  </div>
-                </>
+              </Carousel>
+              
+              {productImages.length > 0 && (
+                <div className="absolute bottom-[30px] left-[15px] text-[26px] font-normal font-sans text-white leading-[28px] z-10">
+                  {current} / {count}
+                </div>
               )}
-            </Carousel>
-            {productImages.length > 0 && (
-              <div className="absolute bottom-10 left-10 text-[26px] font-normal font-sans text-[#3c281e]">
-                {current} / {count}
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Right Column - Scrollable Content */}
-          <div className="w-full lg:w-[480px] xl:w-[550px] bg-[#F0EBDE] px-6 py-10 lg:px-8 lg:py-12 flex flex-col min-h-screen">
+          <div className="w-full lg:w-[480px] xl:w-[550px] bg-[#F0EBDE] px-6 py-10 lg:px-12 lg:py-16 flex flex-col min-h-screen">
             
             {/* Breadcrumb */}
-            <div className="mb-8">
+            <div className="mb-12">
               <Breadcrumb>
-                <BreadcrumbList className="text-[#a47d44] text-xs uppercase tracking-wider">
+                <BreadcrumbList className="text-[16px] text-[#3c281e] font-sans">
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/products" className="hover:text-[#3c281e]">All Products</BreadcrumbLink>
+                    <BreadcrumbLink href="/products" className="hover:opacity-70 transition-opacity text-[#a47d44]">All Products</BreadcrumbLink>
                   </BreadcrumbItem>
-                  <BreadcrumbSeparator />
+                  <BreadcrumbSeparator className="text-[#3c281e]/50">
+                    <ChevronRight className="size-4" />
+                  </BreadcrumbSeparator>
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="#" className="hover:text-[#3c281e]">Kitchen</BreadcrumbLink>
+                    <BreadcrumbLink href="#" className="hover:opacity-70 transition-opacity text-[#a47d44]">Kitchen</BreadcrumbLink>
                   </BreadcrumbItem>
-                  <BreadcrumbSeparator />
+                  <BreadcrumbSeparator className="text-[#3c281e]/50">
+                    <ChevronRight className="size-4" />
+                  </BreadcrumbSeparator>
                   <BreadcrumbItem>
                     <BreadcrumbPage className="text-[#a47d44]">Artist ceramics</BreadcrumbPage>
                   </BreadcrumbItem>
@@ -248,50 +254,51 @@ export default function Product() {
             </div>
 
             {/* Social Share */}
-            <div className="flex justify-end gap-2 mb-8">
-               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><Mail className="w-4 h-4 text-[#3c281e]" /></button>
-               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><Share2 className="w-4 h-4 text-[#3c281e]" /></button>
-               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><div className="w-4 h-4 border border-[#3c281e] rounded-full flex items-center justify-center text-[10px] font-bold text-[#3c281e]">P</div></button>
-               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><Twitter className="w-4 h-4 text-[#3c281e]" /></button>
-               <button className="p-2 hover:bg-[#d6c4ad]/20 rounded-full transition-colors"><Facebook className="w-4 h-4 text-[#3c281e]" /></button>
+            <div className="flex justify-end gap-4 mb-12">
+               <button className="hover:opacity-70 transition-opacity"><Mail className="w-5 h-5 text-[#3c281e]" /></button>
+               {/* Using SVG paths for exact replication if needed, but keeping Lucide for now with matching size */}
+               <button className="hover:opacity-70 transition-opacity"><Share2 className="w-5 h-5 text-[#3c281e]" /></button>
+               <button className="hover:opacity-70 transition-opacity"><div className="w-5 h-5 border border-[#3c281e] rounded-full flex items-center justify-center text-[10px] font-bold text-[#3c281e]">P</div></button>
+               <button className="hover:opacity-70 transition-opacity"><Twitter className="w-5 h-5 text-[#3c281e]" /></button>
+               <button className="hover:opacity-70 transition-opacity"><Facebook className="w-5 h-5 text-[#3c281e]" /></button>
             </div>
 
             {/* Product Title & Info */}
-            <div className="mb-12">
-              <h1 className="text-[56px] leading-[1.1] font-normal text-[#3c281e] mb-2 font-serif">
+            <div className="mb-16">
+              <h1 className="text-[60px] leading-[63px] mb-[24px] font-serif font-normal text-[#3c281e]">
                 {title}
               </h1>
               {selectedVariant?.title && selectedVariant.title !== 'Default Title' && (
-                <p className="text-[27px] leading-none text-[#3c281e] mb-4 font-sans">
+                <p className="text-[27px] leading-tight text-[#3c281e] mb-4 font-sans font-light">
                   {selectedVariant.title}
                 </p>
               )}
               {selectedVariant?.sku && (
-                <p className="text-sm text-[#3c281e] font-sans">
+                <p className="text-[14px] text-[#3c281e] font-sans opacity-80">
                   {selectedVariant.sku}
                 </p>
               )}
             </div>
 
             {/* Accordions */}
-            <div className="space-y-0 border-t border-[#d6c4ad]">
+            <div className="space-y-0 border-t border-[#3c281e]/20">
               <Accordion type="single" collapsible className="w-full" defaultValue="description">
-                <AccordionItem value="description" className="border-b border-[#d6c4ad]">
-                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                <AccordionItem value="description" className="border-b border-[#3c281e]/20">
+                  <AccordionTrigger className="text-[26px] font-normal text-[#3c281e] py-8 hover:no-underline font-serif text-left pr-[30px]">
                     Description
                   </AccordionTrigger>
-                  <AccordionContent className="text-[12.5px] leading-7 text-[#212529] font-sans pb-6">
+                  <AccordionContent className="text-[14px] leading-7 text-[#212529] font-sans pb-8 pr-4">
                     {descriptionHtml ? (
-                      <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+                      <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
                     ) : (
-                      description
+                      <p>{description}</p>
                     )}
                     
-                    <div className="mt-6 pt-4">
+                    <div className="mt-8 pt-8 border-t border-[#3c281e]/10">
                         <ProductPrice
                           price={selectedVariant?.price}
                           compareAtPrice={selectedVariant?.compareAtPrice}
-                          className="text-lg font-medium text-[#3c281e] mb-4 block"
+                          className="text-2xl font-light text-[#3c281e] mb-6 block"
                         />
                          <ProductForm
                             productOptions={productOptions}
@@ -301,36 +308,36 @@ export default function Product() {
 
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="general" className="border-b border-[#d6c4ad]">
-                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                <AccordionItem value="general" className="border-b border-[#3c281e]/20">
+                  <AccordionTrigger className="text-[26px] font-normal text-[#3c281e] py-8 hover:no-underline font-serif text-left pr-[30px]">
                     General
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-[#3c281e] pb-6">
-                     <p>General specifications go here.</p>
+                  <AccordionContent className="text-sm text-[#3c281e] pb-8">
+                     <p className="opacity-80">General specifications go here.</p>
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="dimensions" className="border-b border-[#d6c4ad]">
-                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                <AccordionItem value="dimensions" className="border-b border-[#3c281e]/20">
+                  <AccordionTrigger className="text-[26px] font-normal text-[#3c281e] py-8 hover:no-underline font-serif text-left pr-[30px]">
                     Dimensions
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-[#3c281e] pb-6">
-                     <p>Product dimensions go here.</p>
+                  <AccordionContent className="text-sm text-[#3c281e] pb-8">
+                     <p className="opacity-80">Product dimensions go here.</p>
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="care" className="border-b border-[#d6c4ad]">
-                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                <AccordionItem value="care" className="border-b border-[#3c281e]/20">
+                  <AccordionTrigger className="text-[26px] font-normal text-[#3c281e] py-8 hover:no-underline font-serif text-left pr-[30px]">
                     Care & Maintenance Instructions
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-[#3c281e] pb-6">
-                     <p>Care instructions go here.</p>
+                  <AccordionContent className="text-sm text-[#3c281e] pb-8">
+                     <p className="opacity-80">Care instructions go here.</p>
                   </AccordionContent>
                 </AccordionItem>
-                 <AccordionItem value="downloads" className="border-b border-[#d6c4ad]">
-                  <AccordionTrigger className="text-[24px] font-normal text-[#3c281e] py-6 hover:no-underline font-serif text-left">
+                 <AccordionItem value="downloads" className="border-b border-[#3c281e]/20">
+                  <AccordionTrigger className="text-[26px] font-normal text-[#3c281e] py-8 hover:no-underline font-serif text-left pr-[30px]">
                     Downloads
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-[#3c281e] pb-6">
-                     <p>Downloadable content goes here.</p>
+                  <AccordionContent className="text-sm text-[#3c281e] pb-8">
+                     <p className="opacity-80">Downloadable content goes here.</p>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -339,7 +346,7 @@ export default function Product() {
         </div>
 
         {/* You Might Also Like */}
-        <div className="bg-[#f0ebde] px-6 py-16 lg:px-8 border-t border-[#d6c4ad]">
+        <div className="bg-[#f0ebde] px-6 py-20 lg:px-12 border-t border-[#3c281e]/10">
            <Suspense fallback={<RelatedProductsSkeleton />}>
             <Await resolve={relatedProducts}>
               {(data: [ProductRecommendationsQuery | null, FallbackProductsQuery | null]) => {
@@ -394,46 +401,46 @@ function RelatedProducts({
 
   return (
     <section>
-      <div className="mb-10 text-center">
+      <div className="mb-12">
         <h2 className="text-[33px] font-normal font-serif text-[#3c281e]">
           You might also like these
         </h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-          <div key={product.id} className="bg-[#fafafa] border border-[#f0ebde] p-4 group">
-            <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] mb-4 overflow-hidden">
+          <div key={product.id} className="bg-white border border-[#3c281e]/5 p-6 group transition-all hover:shadow-sm">
+            <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] mb-6 overflow-hidden bg-[#fafafa]">
                {product.featuredImage && (
                  <Image
                    data={product.featuredImage}
-                   className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                   className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                    sizes="(min-width: 1024px) 25vw, 50vw"
                  />
                )}
             </Link>
-            <div className="space-y-2">
-               <h3 className="text-[23px] font-medium leading-[28px] text-[#3c281e] font-sans">
+            <div className="space-y-3">
+               <h3 className="text-[23px] font-medium leading-tight text-[#3c281e] font-sans">
                  {product.title}
                </h3>
-               <div className="flex justify-between items-end">
-                  <p className="text-[14px] text-[#3c281e] font-sans">
-                    {product.variants?.nodes?.[0]?.sku || 'KCT0015'}
+               <div className="flex justify-between items-end pt-2">
+                  <p className="text-[14px] text-[#3c281e]/60 font-sans">
+                    {product.variants?.nodes?.[0]?.sku || 'AAX0004'}
                   </p>
-                  <button className="w-6 h-6 rounded-full border border-[#3c281e] flex items-center justify-center text-[#3c281e] hover:bg-[#3c281e] hover:text-white transition-colors">
+                  <button className="w-8 h-8 rounded-full border border-[#3c281e] flex items-center justify-center text-[#3c281e] hover:bg-[#3c281e] hover:text-white transition-all">
                      <span className="sr-only">Add to cart</span>
-                     <span className="text-lg leading-none mb-1">+</span>
+                     <span className="text-xl leading-none mb-1">+</span>
                   </button>
                </div>
             </div>
           </div>
         ))}
       </div>
-       <div className="flex justify-end gap-3 mt-8">
-         <button className="w-10 h-10 flex items-center justify-center hover:bg-[#d6c4ad]/20 rounded-full">
-            <ChevronRight className="rotate-180 w-5 h-5 text-[#3c281e]" />
+       <div className="flex justify-end gap-4 mt-12">
+         <button className="w-12 h-12 flex items-center justify-center hover:bg-[#3c281e]/5 rounded-full transition-colors border border-[#3c281e]/10">
+            <ChevronRight className="rotate-180 w-6 h-6 text-[#3c281e]" />
          </button>
-         <button className="w-10 h-10 flex items-center justify-center hover:bg-[#d6c4ad]/20 rounded-full">
-            <ChevronRight className="w-5 h-5 text-[#3c281e]" />
+         <button className="w-12 h-12 flex items-center justify-center hover:bg-[#3c281e]/5 rounded-full transition-colors border border-[#3c281e]/10">
+            <ChevronRight className="w-6 h-6 text-[#3c281e]" />
          </button>
        </div>
     </section>
@@ -442,16 +449,16 @@ function RelatedProducts({
 
 function RelatedProductsSkeleton() {
   return (
-    <section className="pt-16">
-      <div className="mb-8 text-center">
-        <Skeleton className="h-8 w-64 mx-auto bg-[#d6c4ad]/50" />
+    <section className="py-16">
+      <div className="mb-12">
+        <Skeleton className="h-10 w-64 bg-[#3c281e]/10" />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {Array.from({ length: 4 }, (_, i) => `skeleton-${i}`).map((key) => (
-          <div key={key} className="space-y-4 p-4 border border-[#f0ebde] bg-[#fafafa]">
-            <Skeleton className="aspect-[4/5] w-full bg-[#d6c4ad]/30" />
-            <Skeleton className="h-6 w-3/4 bg-[#d6c4ad]/30" />
-            <Skeleton className="h-4 w-1/4 bg-[#d6c4ad]/30" />
+          <div key={key} className="space-y-6 p-6 border border-[#3c281e]/5 bg-white">
+            <Skeleton className="aspect-[4/5] w-full bg-[#3c281e]/5" />
+            <Skeleton className="h-8 w-3/4 bg-[#3c281e]/5" />
+            <Skeleton className="h-6 w-1/4 bg-[#3c281e]/5" />
           </div>
         ))}
       </div>
