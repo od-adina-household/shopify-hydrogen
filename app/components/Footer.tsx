@@ -151,7 +151,7 @@ export function Footer({
 
                 <div className="hidden lg:flex flex-col gap-4 items-center">
                   <a
-                    href="https://instagram.com"
+                    href="https://www.instagram.com/adina.household/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full border border-[#f0ebde] flex items-center justify-center hover:bg-[#f0ebde]/10 transition-colors"
