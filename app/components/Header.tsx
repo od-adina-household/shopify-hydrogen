@@ -3,11 +3,12 @@ import {
   useAnalytics,
   useOptimisticCart,
 } from '@shopify/hydrogen';
-import { HeartIcon, MenuIcon, SearchIcon, ShoppingBag, UserIcon } from 'lucide-react';
+import { HeartIcon, MenuIcon, SearchIcon, ShoppingBag, UserIcon, X } from 'lucide-react';
 import { Suspense, useEffect, useId, useRef, useState } from 'react';
 import { Await, NavLink, useAsyncValue, useLocation } from 'react-router';
 import type { CartApiQueryFragment, HeaderQuery } from 'storefrontapi.generated';
 import { useAside } from '~/components/Aside';
+import { MobileMenu } from '~/components/MobileMenu';
 import { ModeToggle } from '~/components/mode-toggle';
 import { SearchFormPredictive } from '~/components/SearchFormPredictive';
 import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
@@ -32,6 +33,7 @@ export function Header({
 }: HeaderProps) {
   const { shop, menu } = header;
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -45,46 +47,68 @@ export function Header({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Use Shopify brand logo if it exists, otherwise fallback to shop name
-  const logoUrl = shop.brand?.logo?.image?.url;
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
 
   // Determine if we are on the homepage (handling potential locale prefixes)
   const isHome = location.pathname === '/' || /^\/(en|nl|de|fr)(\/|$)/.test(location.pathname);
 
-  const headerBgClass = isHome 
-    ? (isScrolled ? 'bg-background shadow-sm' : 'bg-transparent')
-    : 'bg-background shadow-sm';
+  const headerBgClass = isMobileMenuOpen
+    ? 'bg-[rgb(178,160,124)]'
+    : isHome
+      ? (isScrolled ? 'bg-background shadow-sm' : 'bg-transparent')
+      : 'bg-background shadow-sm';
 
-  const textColorClass = isHome
-    ? (isScrolled ? 'text-foreground' : 'text-white')
-    : 'text-foreground';
+  const textColorClass = isMobileMenuOpen
+    ? 'text-[rgb(60,40,30)]'
+    : isHome
+      ? (isScrolled ? 'text-foreground' : 'text-white')
+      : 'text-foreground';
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 pt-4 pb-2 md:pt-5 md:pb-1.5 transition-all duration-300 ${headerBgClass}`}
-    >
-      <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
-        <NavLink
-          prefetch="intent"
-          to="/"
-          end
-          className={`flex items-center hover:opacity-80 transition-opacity flex-shrink-0 ${textColorClass}`}
-        >
-          {logoUrl ? (
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 pt-4 pb-2 md:pt-5 md:pb-1.5 transition-all duration-300 ${headerBgClass}`}
+      >
+        <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
+          <NavLink
+            prefetch="intent"
+            to="/"
+            end
+            className={`flex items-center hover:opacity-80 transition-opacity flex-shrink-0 ${textColorClass}`}
+          >
             <img
-              src={logoUrl}
+              src="/logo.png"
               alt={shop.name}
               className="h-6 md:h-8 w-auto"
             />
-          ) : (
-            <strong className="text-xl md:text-2xl font-serif font-normal tracking-tight lowercase">
-              {shop.name}
-            </strong>
-          )}
-        </NavLink>
-        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} isScrolled={isScrolled} isHome={isHome} />
-      </div>
-    </header>
+          </NavLink>
+          <HeaderCtas
+            isLoggedIn={isLoggedIn}
+            cart={cart}
+            isScrolled={isScrolled}
+            isHome={isHome}
+            isMobileMenuOpen={isMobileMenuOpen}
+            setIsMobileMenuOpen={setIsMobileMenuOpen}
+          />
+        </div>
+      </header>
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        menu={menu}
+        primaryDomainUrl={shop.primaryDomain.url}
+        publicStoreDomain={publicStoreDomain}
+      />
+    </>
   );
 }
 
@@ -170,7 +194,14 @@ function HeaderCtas({
   cart,
   isScrolled,
   isHome,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & { isScrolled: boolean; isHome: boolean }) {
+  isMobileMenuOpen,
+  setIsMobileMenuOpen,
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & {
+  isScrolled: boolean;
+  isHome: boolean;
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean) => void;
+}) {
   const textColorClass = isHome
     ? (isScrolled ? 'text-foreground' : 'text-white')
     : 'text-foreground';
@@ -183,7 +214,7 @@ function HeaderCtas({
           prefetch="intent"
           to="/account"
         >
-          <UserIcon className="h-9 w-9" />
+          <UserIcon className="w-[26px] h-[26px]" />
           <span className="sr-only">
             <Suspense fallback="Account">
               <Await resolve={isLoggedIn} errorElement="Account">
@@ -193,14 +224,28 @@ function HeaderCtas({
           </span>
         </NavLink>
       </Button>
-      <HeaderMenuMobileToggle isScrolled={isScrolled} isHome={isHome} />
+      <HeaderMenuMobileToggle
+        isScrolled={isScrolled}
+        isHome={isHome}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       <CartToggle cart={cart} isScrolled={isScrolled} isHome={isHome} />
     </div>
   );
 }
 
-function HeaderMenuMobileToggle({ isScrolled, isHome }: { isScrolled: boolean; isHome: boolean }) {
-  const { open } = useAside();
+function HeaderMenuMobileToggle({
+  isScrolled,
+  isHome,
+  isMobileMenuOpen,
+  setIsMobileMenuOpen,
+}: {
+  isScrolled: boolean;
+  isHome: boolean;
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean) => void;
+}) {
   const textColorClass = isHome
     ? (isScrolled ? 'text-foreground' : 'text-white')
     : 'text-foreground';
@@ -210,10 +255,14 @@ function HeaderMenuMobileToggle({ isScrolled, isHome }: { isScrolled: boolean; i
       variant="ghost"
       size="icon-lg"
       className={`h-10 w-10 p-0 ${textColorClass}`}
-      onClick={() => open('mobile')}
+      onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
     >
-      <MenuIcon className="h-9 w-9" />
-      <span className="sr-only">Menu</span>
+      {isMobileMenuOpen ? (
+        <X className="w-[26px] h-[26px]" />
+      ) : (
+        <MenuIcon className="w-[26px] h-[26px]" />
+      )}
+      <span className="sr-only">{isMobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
     </Button>
   );
 }
@@ -231,7 +280,7 @@ function SearchToggle({ isScrolled, isHome }: { isScrolled: boolean; isHome: boo
       className={`h-10 w-10 p-0 ${textColorClass}`}
       onClick={() => open('search')}
     >
-      <SearchIcon className="h-9 w-9" />
+      <SearchIcon className="w-[20px] h-[20px]" />
       <span className="sr-only">Search</span>
     </Button>
   );
@@ -261,7 +310,7 @@ function CartBadge({ count, isScrolled, isHome }: { count: number | null; isScro
         } as CartViewPayload);
       }}
     >
-      <ShoppingBag className="h-9 w-9" />
+      <ShoppingBag className="w-[26px] h-[26px]" />
       {count !== null && count > 0 && (
         <Badge
           variant="default"
