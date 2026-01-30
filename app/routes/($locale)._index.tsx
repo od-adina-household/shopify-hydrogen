@@ -15,7 +15,11 @@ export default function Homepage() {
   return (
     <div className="w-full">
       <HeroSection />
-      <IntroSection />  
+      <IntroSection
+        text="Let us guide you in the art of living — we bring ambience to your home with objects that inspire."
+        buttonLabel="COLLECTION 25-26"
+        buttonHref="/collections/all"
+      />
       <CollectionCardsSection
         cards={[
           {
@@ -44,12 +48,31 @@ export default function Homepage() {
         imageAlt="Decorative lamps and objects"
         imageOnRight
       />
-      <ImageGridSection
-        title="Our most expressive collection — for everyone who dares to live with imagination."
-        images={[
-          { src: '/images/art.jpeg', alt: 'Decorative art piece' },
-          { src: '/images/tableware.jpeg', alt: 'Artisan tableware' },
-          { src: '/images/living.jpeg', alt: 'Living room scene' },
+      <IntroSection
+        text="Our most expressive collection — for everyone who dares to live with imagination."
+        buttonLabel="COOL IN CHROME"
+        buttonHref="/collections/chrome"
+      />
+      <CollectionCardsSection
+        cards={[
+          {
+            title: 'ART',
+            imageSrc: '/images/art.jpeg',
+            imageAlt: 'Decorative art piece',
+            href: '/collections/art',
+          },
+          {
+            title: 'TABLEWARE',
+            imageSrc: '/images/tableware.jpeg',
+            imageAlt: 'Artisan tableware',
+            href: '/collections/tableware',
+          },
+          {
+            title: 'LIVING',
+            imageSrc: '/images/living.jpeg',
+            imageAlt: 'Living room scene',
+            href: '/collections/living',
+          },
         ]}
       />
       <SplitSection
@@ -62,12 +85,28 @@ export default function Homepage() {
     </div>
   );
 }
-function IntroSection() {
+
+interface IntroSectionProps {
+  text: string;
+  buttonLabel: string;
+  buttonHref: string;
+}
+
+function IntroSection({ text, buttonLabel, buttonHref }: IntroSectionProps) {
   return (
-    <section className="w-full px-4 sm:px-6 lg:px-8 py-12 md:py-16 max-w-7xl mx-auto">
-      <h2 className="text-[32px] md:text-[50px] leading-[40px] md:leading-[60px] font-serif font-normal text-[#3C281E] text-left max-w-5xl">
-        Let us guide you in the art of living — we bring ambience to your home with objects that inspire.
-      </h2>
+    <section className="w-full px-1 sm:px-2 lg:px-4">
+      <div className="max-w-7xl">
+        <h2 className="text-lg md:text-3xl lg:text-4xl leading-relaxed font-serif font-normal text-[#3C281E] text-left max-w-5xl pt-12 md:pt-16 pb-6 md:pb-8 pl-0">
+          {text}
+        </h2>
+        <Link
+          to={buttonHref}
+          className="inline-flex items-center gap-3 text-base md:text-lg lg:text-xl font-medium tracking-wider text-foreground underline underline-offset-4 hover:no-underline transition-all duration-300 mb-4 md:mb-6"
+        >
+          {buttonLabel}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
     </section>
   );
 }
@@ -80,7 +119,7 @@ interface CollectionCard {
 
 function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
   return (
-    <section className="w-full px-4 sm:px-6 lg:px-8 pt-2 pb-8 md:pb-12 lg:pb-16">
+    <section className="w-full px-1 sm:px-2 lg:px-4 pt-2 pb-4 md:pb-6 lg:pb-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
         {cards.map((card, index) => (
           <Link
@@ -141,35 +180,6 @@ function HeroSection() {
     </section>
   );
 }
-
-interface ImageGridSectionProps {
-  title: string;
-  images: Array<{ src: string; alt: string }>;
-}
-
-function ImageGridSection({ title, images }: ImageGridSectionProps) {
-  return (
-    <section className="py-16 md:py-24">
-      <div className="container mx-auto px-8 max-w-7xl">
-        <p className="text-sm md:text-base text-muted-foreground mb-8 max-w-2xl">
-          {title}
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {images.map((image, index) => (
-            <div key={index} className="aspect-[3/4] overflow-hidden">
-              <img
-                src={image.src}
-                alt={image.alt}
-                className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 interface SplitSectionProps {
   title: string;
   imageSrc: string;
