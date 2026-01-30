@@ -273,10 +273,23 @@ export default function Product() {
                 </p>
               )}
               {selectedVariant?.sku && (
-                <p className="text-[12px] sm:text-[14px] text-[#3c281e] font-sans opacity-80">
+                <p className="text-[12px] sm:text-[14px] text-[#3c281e] font-sans opacity-80 mb-8">
                   {selectedVariant.sku}
                 </p>
               )}
+
+              {/* Price and Add to Cart */}
+              <div className="mt-8 pt-8 border-t border-[#3c281e]/10">
+                <ProductPrice
+                  price={selectedVariant?.price}
+                  compareAtPrice={selectedVariant?.compareAtPrice}
+                  className="text-xl sm:text-2xl font-light text-[#3c281e] mb-6 block"
+                />
+                <ProductForm
+                  productOptions={productOptions}
+                  selectedVariant={selectedVariant}
+                />
+              </div>
             </div>
 
             {/* Accordions */}
@@ -292,19 +305,6 @@ export default function Product() {
                     ) : (
                       <p>{description}</p>
                     )}
-                    
-                    <div className="mt-8 pt-8 border-t border-[#3c281e]/10">
-                        <ProductPrice
-                          price={selectedVariant?.price}
-                          compareAtPrice={selectedVariant?.compareAtPrice}
-                          className="text-xl sm:text-2xl font-light text-[#3c281e] mb-6 block"
-                        />
-                         <ProductForm
-                            productOptions={productOptions}
-                            selectedVariant={selectedVariant}
-                          />
-                    </div>
-
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="general" className="border-b border-[#3c281e]/20">

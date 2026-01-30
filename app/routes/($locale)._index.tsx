@@ -155,7 +155,7 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
 
 function HeroSection() {
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden">
       <div className="absolute inset-0">
         <img
           src="/images/hero-image.jpg"

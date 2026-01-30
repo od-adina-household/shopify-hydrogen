@@ -70,37 +70,39 @@ export default function Collection() {
   const productCount = collection.products?.nodes?.length ?? 0;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-4">
-          {collection.title}
-        </h1>
-        <p className="text-muted-foreground min-h-[24px]">
-          {productCount === 0
-            ? 'No products found'
-            : `Showing ${productCount} product${productCount !== 1 ? 's' : ''}`}
-        </p>
+    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
+      <div className="max-w-[1400px] mx-auto space-y-8 md:space-y-12">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight mb-4">
+            {collection.title}
+          </h1>
+          <p className="text-muted-foreground min-h-[24px]">
+            {productCount === 0
+              ? 'No products found'
+              : `Showing ${productCount} product${productCount !== 1 ? 's' : ''}`}
+          </p>
+        </div>
+        <PaginatedResourceSection<ProductItemFragment>
+          connection={collection.products}
+          resourcesClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 md:gap-x-8 md:gap-y-10 lg:gap-x-10 lg:gap-y-12"
+        >
+          {({ node: product, index }) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+              loading={index < 8 ? 'eager' : undefined}
+            />
+          )}
+        </PaginatedResourceSection>
+        <Analytics.CollectionView
+          data={{
+            collection: {
+              id: collection.id,
+              handle: collection.handle,
+            },
+          }}
+        />
       </div>
-      <PaginatedResourceSection<ProductItemFragment>
-        connection={collection.products}
-        resourcesClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
-      >
-        {({ node: product, index }) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        )}
-      </PaginatedResourceSection>
-      <Analytics.CollectionView
-        data={{
-          collection: {
-            id: collection.id,
-            handle: collection.handle,
-          },
-        }}
-      />
     </div>
   );
 }
