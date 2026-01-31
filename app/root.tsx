@@ -1,5 +1,5 @@
 import { Analytics, getShopAnalytics, useNonce } from '@shopify/hydrogen';
-import { AlertCircle, Home } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import {
   isRouteErrorResponse,
   Link,
@@ -12,8 +12,7 @@ import {
   useRouteLoaderData,
   type ShouldRevalidateFunction,
 } from 'react-router';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import { Footer } from '~/components/Footer';
 import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
 import { themeSessionResolver } from '~/lib/sessions.server';
 import type { Route } from './+types/root';
@@ -220,50 +219,108 @@ export default AppWithProviders;
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  let errorMessage = 'Unknown error';
+  const rootData = useRouteLoaderData<RootLoader>('root');
   let errorStatus = 500;
-  let errorTitle = 'Oops! Something went wrong';
+  let is404 = false;
 
   if (isRouteErrorResponse(error)) {
-    errorMessage = error?.data?.message ?? error.data;
     errorStatus = error.status;
+    is404 = errorStatus === 404;
+  }
 
-    if (errorStatus === 404) {
-      errorTitle = 'Page Not Found';
-      errorMessage = "Sorry, we couldn't find the page you're looking for.";
-    } else if (errorStatus === 500) {
-      errorTitle = 'Server Error';
-    }
-  } else if (error instanceof Error) {
-    errorMessage = error.message;
+  if (is404) {
+    return (
+      <LayoutWithTheme>
+        <div className="w-full">
+          <section className="w-full px-6 md:px-8 lg:px-12 py-16 md:py-24 lg:py-32">
+            <div className="max-w-7xl mx-auto">
+              <div className="max-w-3xl">
+                <p className="text-sm md:text-base font-medium tracking-[0.2em] uppercase text-[#3C281E] mb-6">
+                  Error 404
+                </p>
+
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
+                  Page not found
+                </h1>
+
+                <p className="text-[#3C281E] font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
+                  The page you are looking for might have been removed, had its name changed, or is temporarily unavailable. Let us guide you back to discovering beautiful objects for your home.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-6 md:gap-8">
+                  <Link
+                    to="/"
+                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+                  >
+                    Back to Home
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+
+                  <Link
+                    to="/collections/all"
+                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+                  >
+                    Browse Collections
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+
+                  <Link
+                    to="/search"
+                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+                  >
+                    Search
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        {rootData && (
+          <Footer
+            footer={rootData.footer}
+            header={rootData.header}
+            publicStoreDomain={rootData.publicStoreDomain}
+          />
+        )}
+      </LayoutWithTheme>
+    );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="max-w-md w-full">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <AlertCircle className="h-8 w-8 text-destructive" />
-            <div>
-              <CardTitle className="text-2xl">{errorTitle}</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                Error {errorStatus}
-              </p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {errorMessage && (
-            <p className="text-muted-foreground">{errorMessage}</p>
-          )}
-          <Button asChild className="w-full" size="lg">
-            <Link to="/">
-              <Home className="h-4 w-4 mr-2" />
+    <LayoutWithTheme>
+      <div className="w-full px-6 md:px-8 lg:px-12 py-16 md:py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-3xl">
+            <p className="text-sm md:text-base font-medium tracking-[0.2em] uppercase text-[#3C281E] mb-6">
+              Error {errorStatus}
+            </p>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
+              Something went wrong
+            </h1>
+
+            <p className="text-[#3C281E] font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
+              We apologize for the inconvenience. An unexpected error has occurred. Please try again or return to the homepage.
+            </p>
+
+            <Link
+              to="/"
+              className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+            >
               Back to Home
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+          </div>
+        </div>
+      </div>
+      {rootData && (
+        <Footer
+          footer={rootData.footer}
+          header={rootData.header}
+          publicStoreDomain={rootData.publicStoreDomain}
+        />
+      )}
+    </LayoutWithTheme>
   );
 }

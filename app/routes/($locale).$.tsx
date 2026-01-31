@@ -1,7 +1,5 @@
-import { AlertCircle, Home, Search } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import type { Route } from './+types/$';
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -12,37 +10,77 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function CatchAllPage() {
   return (
-    <div className="flex items-center justify-center min-h-[60vh] p-4">
-      <Card className="max-w-lg w-full">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <AlertCircle className="h-10 w-10 text-destructive" />
-            <div>
-              <CardTitle className="text-3xl">Page Not Found</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">Error 404</p>
+    <div className="w-full">
+      <section className="w-full px-6 md:px-8 lg:px-12 py-16 md:py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-3xl">
+            <p className="text-sm md:text-base font-medium tracking-[0.2em] uppercase text-[#3C281E] mb-6">
+              Error 404
+            </p>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
+              Page not found
+            </h1>
+
+            <p className="text-[#3C281E] font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
+              The page you are looking for might have been removed, had its name changed, or is temporarily unavailable. Let us guide you back to discovering beautiful objects for your home.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-6 md:gap-8">
+              <Link
+                to="/"
+                className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+              >
+                Back to Home
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+
+              <Link
+                to="/collections/all"
+                className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+              >
+                Browse Collections
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+
+              <Link
+                to="/search"
+                className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+              >
+                Search
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-muted-foreground">
-            Sorry, we couldn&apos;t find the page you&apos;re looking for. The page may have been moved or deleted.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button asChild className="flex-1" size="lg">
-              <Link to="/">
-                <Home className="h-4 w-4 mr-2" />
-                Back to Home
+        </div>
+      </section>
+
+      <section className="w-full bg-[#C4A882] px-6 md:px-8 lg:px-12 py-12 md:py-16">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8">
+            Popular Collections
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { title: 'KITCHEN', href: '/collections/kitchen' },
+              { title: 'LIGHTING', href: '/collections/lighting' },
+              { title: 'FURNITURE', href: '/collections/furniture' },
+            ].map((collection) => (
+              <Link
+                key={collection.title}
+                to={collection.href}
+                className="group flex items-center justify-between px-5 py-4 bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white"
+              >
+                <span className="text-sm font-medium tracking-wider text-foreground uppercase">
+                  {collection.title}
+                </span>
+                <ArrowRight className="h-4 w-4 text-foreground transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
-            </Button>
-            <Button asChild variant="outline" className="flex-1" size="lg">
-              <Link to="/search">
-                <Search className="h-4 w-4 mr-2" />
-                Search
-              </Link>
-            </Button>
+            ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   );
 }
