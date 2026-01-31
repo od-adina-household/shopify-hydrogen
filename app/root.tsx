@@ -63,7 +63,32 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+    { rel: 'icon', type: 'image/x-icon', href: '/favicon.jpg' },
+  ];
+}
+
+export function meta({ data }: Route.MetaArgs) {
+  const title = data?.header?.shop?.name || 'Adina Household';
+  const description = data?.header?.shop?.description || 'Discover beautiful objects for your home';
+  const url = data?.header?.shop?.primaryDomain?.url || '';
+  const imageUrl = url ? `${url}/favicon.jpg` : '/favicon.jpg';
+
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:url', content: url },
+    { property: 'og:image', content: imageUrl },
+    { property: 'og:image:width', content: '512' },
+    { property: 'og:image:height', content: '512' },
+    { property: 'og:image:type', content: 'image/jpeg' },
+    { property: 'og:site_name', content: title },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: imageUrl },
   ];
 }
 

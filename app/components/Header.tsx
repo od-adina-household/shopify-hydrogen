@@ -62,10 +62,10 @@ export function Header({
   const isHome = location.pathname === '/' || /^\/(en|nl|de|fr)(\/|$)/.test(location.pathname);
 
   const headerBgClass = isMobileMenuOpen
-    ? 'bg-[rgb(178,160,124)]'
+    ? 'bg-[rgb(178,160,124)]/70 backdrop-blur-md'
     : isHome
-      ? (isScrolled ? 'bg-background shadow-sm' : 'bg-transparent')
-      : 'bg-background shadow-sm';
+      ? (isScrolled ? 'bg-background/40 backdrop-blur-lg shadow-sm' : 'bg-transparent')
+      : 'bg-background/40 backdrop-blur-lg shadow-sm';
 
   const textColorClass = isMobileMenuOpen
     ? 'text-[rgb(60,40,30)]'
