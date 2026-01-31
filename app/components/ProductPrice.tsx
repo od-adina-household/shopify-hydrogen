@@ -1,4 +1,5 @@
 import type { MoneyV2 } from '@shopify/hydrogen/storefront-api-types';
+import { Money } from '@shopify/hydrogen';
 import { Badge } from '~/components/ui/badge';
 
 export function ProductPrice({
@@ -12,27 +13,23 @@ export function ProductPrice({
 }) {
   const isOnSale = compareAtPrice && price && compareAtPrice.amount > price.amount;
 
-  const formatPrice = (money: MoneyV2) => {
-    return `$${Math.floor(parseFloat(money.amount))}`;
-  };
-
   return (
     <div className="flex items-center gap-3">
       {compareAtPrice && isOnSale ? (
         <>
           <div className="flex items-baseline gap-2">
             <span className={className || "text-2xl font-bold text-foreground"}>
-              {price ? formatPrice(price) : null}
+              {price ? <Money data={price} withoutTrailingZeros /> : null}
             </span>
             <s className="text-lg text-muted-foreground">
-              {formatPrice(compareAtPrice)}
+              <Money data={compareAtPrice} withoutTrailingZeros />
             </s>
           </div>
           <Badge variant="destructive">Sale</Badge>
         </>
       ) : price ? (
         <span className={className || "text-2xl font-bold text-foreground"}>
-          {formatPrice(price)}
+          <Money data={price} withoutTrailingZeros />
         </span>
       ) : (
         <span>&nbsp;</span>
