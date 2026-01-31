@@ -40,7 +40,6 @@ export const CART_QUERY_FRAGMENT = `#graphql
           altText
           width
           height
-
         }
         product {
           handle
@@ -52,6 +51,7 @@ export const CART_QUERY_FRAGMENT = `#graphql
           name
           value
         }
+        quantityAvailable
       }
     }
   }
@@ -102,6 +102,7 @@ export const CART_QUERY_FRAGMENT = `#graphql
           name
           value
         }
+        quantityAvailable
       }
     }
   }
@@ -132,8 +133,6 @@ export const CART_QUERY_FRAGMENT = `#graphql
     lines(first: $numCartLines) {
       nodes {
         ...CartLine
-      }
-      nodes {
         ...CartLineComponent
       }
     }

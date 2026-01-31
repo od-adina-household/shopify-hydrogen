@@ -81,6 +81,24 @@ export async function action({ request, context }: Route.ActionArgs) {
   const headers = cartId ? cart.setCartId(result.cart.id) : new Headers();
   const { cart: cartResult, errors, warnings } = result;
 
+  if (errors && errors.length > 0) {
+    console.error('Cart action errors:', JSON.stringify(errors, null, 2));
+  }
+
+  if (warnings && warnings.length > 0) {
+    console.warn('Cart action warnings:', JSON.stringify(warnings, null, 2));
+  }
+
+  if (cartResult) {
+    console.log('Cart updated successfully. Total quantity:', cartResult.totalQuantity);
+    console.log('Cart lines:', cartResult.lines?.nodes?.map((line: any) => ({
+      id: line.id,
+      quantity: line.quantity,
+      available: line.merchandise?.availableForSale,
+      quantityAvailable: line.merchandise?.quantityAvailable,
+    })));
+  }
+
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string') {
     status = 303;
@@ -102,7 +120,13 @@ export async function action({ request, context }: Route.ActionArgs) {
 
 export async function loader({ context }: Route.LoaderArgs) {
   const { cart } = context;
-  return await cart.get();
+  const cartData = await cart.get();
+
+  return data(cartData, {
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    },
+  });
 }
 
 export default function Cart() {
