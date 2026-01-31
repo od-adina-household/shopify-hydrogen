@@ -184,12 +184,12 @@ export default function Product() {
         <div className="flex flex-col lg:flex-row lg:gap-8 xl:gap-12 relative lg:px-8 xl:px-12">
           {/* Left Column - Image Carousel */}
           <div className="w-full lg:w-[55%] bg-[#F0EBDE] flex flex-col">
-            <div className="relative min-h-[250px] sm:min-h-[300px] lg:min-h-[500px] lg:max-h-[650px]">
+            <div className="relative min-h-64 sm:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
               <Carousel setApi={setApi} className="w-full h-full" opts={{ loop: true }}>
                 <CarouselContent className="h-full ml-0">
                   {productImages.map((image: any, index: number) => (
                     <CarouselItem key={image.id || index} className="w-full h-full flex items-center justify-center p-0 pl-0">
-                      <div className="relative w-full h-full flex items-center justify-center bg-[#F0EBDE] min-h-[250px] sm:min-h-[300px] lg:min-h-[500px] lg:max-h-[650px]">
+                      <div className="relative w-full h-full flex items-center justify-center bg-[#F0EBDE] min-h-64 sm:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
                         <Image
                           data={image}
                           sizes="(min-width: 1024px) 55vw, 100vw"
@@ -200,7 +200,7 @@ export default function Product() {
                   ))}
                   {productImages.length === 0 && (
                     <CarouselItem className="w-full h-full flex items-center justify-center pl-0">
-                      <div className="w-full h-full bg-[#F0EBDE] flex items-center justify-center text-gray-400 min-h-[250px] sm:min-h-[300px]">
+                      <div className="w-full h-full bg-[#F0EBDE] flex items-center justify-center text-gray-400 min-h-64 sm:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh]">
                         No Image Available
                       </div>
                     </CarouselItem>
