@@ -181,18 +181,18 @@ export default function Product() {
   return (
     <div className="relative min-h-screen bg-[#F0EBDE]">
       <div className="mx-auto max-w-[1920px]">
-        <div className="flex flex-col lg:flex-row relative">
-          {/* Left Column - Sticky Carousel */}
-          <div className="w-full lg:w-[calc(100%-480px)] xl:w-[calc(100%-550px)] lg:sticky lg:top-[70px] lg:h-[calc(100vh-70px)] bg-[#F0EBDE] overflow-hidden flex flex-col min-h-[400px] sm:min-h-[500px] lg:min-h-0">
-            <div className="flex-1 relative h-full">
+        <div className="flex flex-col lg:flex-row lg:gap-8 xl:gap-12 relative lg:px-8 xl:px-12">
+          {/* Left Column - Image Carousel */}
+          <div className="w-full lg:w-[55%] bg-[#F0EBDE] flex flex-col">
+            <div className="relative min-h-[250px] sm:min-h-[300px] lg:min-h-[500px] lg:max-h-[650px]">
               <Carousel setApi={setApi} className="w-full h-full" opts={{ loop: true }}>
                 <CarouselContent className="h-full ml-0">
                   {productImages.map((image: any, index: number) => (
                     <CarouselItem key={image.id || index} className="w-full h-full flex items-center justify-center p-0 pl-0">
-                      <div className="relative w-full h-full flex items-center justify-center bg-[#F0EBDE]">
+                      <div className="relative w-full h-full flex items-center justify-center bg-[#F0EBDE] min-h-[250px] sm:min-h-[300px] lg:min-h-[500px] lg:max-h-[650px]">
                         <Image
                           data={image}
-                          sizes="(min-width: 1024px) 60vw, 100vw"
+                          sizes="(min-width: 1024px) 55vw, 100vw"
                           className="size-full object-contain mix-blend-multiply"
                         />
                       </div>
@@ -200,35 +200,60 @@ export default function Product() {
                   ))}
                   {productImages.length === 0 && (
                     <CarouselItem className="w-full h-full flex items-center justify-center pl-0">
-                      <div className="w-full h-full bg-[#F0EBDE] flex items-center justify-center text-gray-400">
+                      <div className="w-full h-full bg-[#F0EBDE] flex items-center justify-center text-gray-400 min-h-[250px] sm:min-h-[300px]">
                         No Image Available
                       </div>
                     </CarouselItem>
                   )}
                 </CarouselContent>
-                
+
                 {productImages.length > 1 && (
                   <>
-                    <CarouselPrevious className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 h-10 w-10 sm:h-12 sm:w-12 bg-white hover:bg-white/90 border-none shadow-md text-[#3c281e] p-0 flex items-center justify-center rounded-full cursor-pointer z-10 transition-all">
-                        <ArrowLeft className="size-5 sm:size-6 stroke-[1.5px]" />
+                    <CarouselPrevious className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10 bg-white hover:bg-white/90 border-none shadow-md text-[#3c281e] p-0 flex items-center justify-center rounded-full cursor-pointer z-10 transition-all" aria-label="Previous image">
+                        <ArrowLeft className="size-4 sm:size-5 stroke-[1.5px]" />
                     </CarouselPrevious>
-                    <CarouselNext className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 h-10 w-10 sm:h-12 sm:w-12 bg-white hover:bg-white/90 border-none shadow-md text-[#3c281e] p-0 flex items-center justify-center rounded-full cursor-pointer z-10 transition-all">
-                        <ArrowRight className="size-5 sm:size-6 stroke-[1.5px]" />
+                    <CarouselNext className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10 bg-white hover:bg-white/90 border-none shadow-md text-[#3c281e] p-0 flex items-center justify-center rounded-full cursor-pointer z-10 transition-all" aria-label="Next image">
+                        <ArrowRight className="size-4 sm:size-5 stroke-[1.5px]" />
                     </CarouselNext>
                   </>
                 )}
               </Carousel>
-              
+
               {productImages.length > 0 && (
-                <div className="absolute bottom-[20px] sm:bottom-[30px] left-[15px] sm:left-[25px] text-[20px] sm:text-[26px] font-normal font-sans text-[#3c281e] leading-none z-10 lg:bg-transparent px-2 py-1 rounded lg:p-0">
+                <div className="absolute bottom-[15px] sm:bottom-[20px] left-[12px] sm:left-[18px] text-[16px] sm:text-[20px] font-normal font-sans text-[#3c281e] leading-none z-10 px-2 py-1 rounded">
                   {current} / {count}
                 </div>
               )}
             </div>
+
+            {/* Thumbnail Navigation */}
+            {productImages.length > 1 && (
+              <div className="flex gap-2 mt-4 px-4 lg:px-0 overflow-x-auto pb-2">
+                {productImages.map((image: any, index: number) => (
+                  <button
+                    key={image.id || index}
+                    onClick={() => api?.scrollTo(index)}
+                    aria-label={`View image ${index + 1} of ${productImages.length}`}
+                    aria-current={current === index + 1 ? 'true' : 'false'}
+                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 border-2 transition-all ${
+                      current === index + 1
+                        ? 'border-[#3c281e] shadow-md'
+                        : 'border-[#3c281e]/20 hover:border-[#3c281e]/50'
+                    }`}
+                  >
+                    <Image
+                      data={image}
+                      sizes="80px"
+                      className="size-full object-cover mix-blend-multiply"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Right Column - Scrollable Content */}
-          <div className="w-full lg:w-[480px] xl:w-[550px] bg-[#F0EBDE] px-6 py-10 lg:px-12 lg:py-16 flex flex-col min-h-screen">
+          {/* Right Column - Product Information */}
+          <div className="w-full lg:w-[45%] bg-[#F0EBDE] px-6 py-10 lg:px-0 lg:py-12 flex flex-col">
             
             {/* Breadcrumb */}
             <div className="mb-8 lg:mb-12">
