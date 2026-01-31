@@ -7,7 +7,7 @@ import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/collections.$handle';
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `Hydrogen | ${data?.collection.title ?? ''} Collection` }];
+  return [{ title: data?.collection.title ?? 'Collection' }];
 };
 
 export async function loader(args: Route.LoaderArgs) {

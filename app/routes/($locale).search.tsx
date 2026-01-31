@@ -18,7 +18,7 @@ import {
 import type { Route } from './+types/search';
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `Hydrogen | Search` }];
+  return [{ title: 'Search' }];
 };
 
 export async function loader({ request, context }: Route.LoaderArgs) {

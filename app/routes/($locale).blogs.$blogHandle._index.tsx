@@ -9,7 +9,7 @@ import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/blogs.$blogHandle._index';
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `Hydrogen | ${data?.blog.title ?? ''} blog` }];
+  return [{ title: data?.blog.title ?? 'Blog' }];
 };
 
 export async function loader(args: Route.LoaderArgs) {

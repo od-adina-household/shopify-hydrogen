@@ -5,7 +5,7 @@ import { CartMain } from '~/components/CartMain';
 import type { Route } from './+types/cart';
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `Hydrogen | Cart` }];
+  return [{ title: 'Cart' }];
 };
 
 export const headers: HeadersFunction = ({ actionHeaders }) => actionHeaders;

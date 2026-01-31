@@ -58,7 +58,7 @@ import type { Route } from './+types/products.$handle';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
-    { title: `Hydrogen | ${data?.product.title ?? ''}` },
+    { title: data?.product.title ?? 'Product' },
     {
       rel: 'canonical',
       href: `/products/${data?.product.handle}`,

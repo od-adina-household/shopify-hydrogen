@@ -6,7 +6,7 @@ import { ProductItem } from '~/components/ProductItem';
 import type { Route } from './+types/collections.all';
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `Hydrogen | Products` }];
+  return [{ title: 'All Products' }];
 };
 
 export async function loader(args: Route.LoaderArgs) {

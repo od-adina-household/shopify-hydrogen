@@ -8,7 +8,7 @@ import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/blogs.$blogHandle.$articleHandle';
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `Hydrogen | ${data?.article.title ?? ''} article` }];
+  return [{ title: data?.article.title ?? 'Article' }];
 };
 
 export async function loader(args: Route.LoaderArgs) {

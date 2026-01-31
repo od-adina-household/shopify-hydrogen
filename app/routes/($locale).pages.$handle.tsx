@@ -5,7 +5,7 @@ import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/pages.$handle';
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `Hydrogen | ${data?.page.title ?? ''}` }];
+  return [{ title: data?.page.title ?? 'Page' }];
 };
 
 export async function loader(args: Route.LoaderArgs) {
