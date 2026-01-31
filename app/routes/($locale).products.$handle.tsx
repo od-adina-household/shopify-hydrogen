@@ -220,7 +220,7 @@ export default function Product() {
               </Carousel>
 
               {productImages.length > 0 && (
-                <div className="absolute bottom-[15px] sm:bottom-[20px] left-[12px] sm:left-[18px] text-[16px] sm:text-[20px] font-normal font-sans text-[#3c281e] leading-none z-10 px-2 py-1 rounded">
+                <div className="absolute bottom-4 sm:bottom-5 left-3 sm:left-4 text-base sm:text-lg font-normal font-sans text-[#3c281e] leading-none z-10 px-2 py-1 rounded">
                   {current} / {count}
                 </div>
               )}
@@ -235,7 +235,7 @@ export default function Product() {
                     onClick={() => api?.scrollTo(index)}
                     aria-label={`View image ${index + 1} of ${productImages.length}`}
                     aria-current={current === index + 1 ? 'true' : 'false'}
-                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 border-2 transition-all ${
+                    className={`flex-shrink-0 size-16 sm:size-20 border-2 transition-all ${
                       current === index + 1
                         ? 'border-[#3c281e] shadow-md'
                         : 'border-[#3c281e]/20 hover:border-[#3c281e]/50'
@@ -258,7 +258,7 @@ export default function Product() {
             {/* Breadcrumb */}
             <div className="mb-8 lg:mb-12">
               <Breadcrumb>
-                <BreadcrumbList className="text-[14px] sm:text-[16px] text-[#3c281e] font-sans">
+                <BreadcrumbList className="text-sm sm:text-base text-[#3c281e] font-sans">
                   <BreadcrumbItem>
                     <BreadcrumbLink href="/products" className="hover:opacity-70 transition-opacity text-[#a47d44]">All Products</BreadcrumbLink>
                   </BreadcrumbItem>
@@ -280,25 +280,25 @@ export default function Product() {
 
             {/* Social Share */}
             <div className="flex justify-end gap-3 sm:gap-4 mb-8 lg:mb-12">
-               <button className="hover:opacity-70 transition-opacity"><Mail className="w-4 h-4 sm:w-5 sm:h-5 text-[#3c281e]" /></button>
-               <button className="hover:opacity-70 transition-opacity"><Share2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#3c281e]" /></button>
-               <button className="hover:opacity-70 transition-opacity"><div className="w-4 h-4 sm:w-5 sm:h-5 border border-[#3c281e] rounded-full flex items-center justify-center text-[8px] sm:text-[10px] font-bold text-[#3c281e]">P</div></button>
-               <button className="hover:opacity-70 transition-opacity"><Twitter className="w-4 h-4 sm:w-5 sm:h-5 text-[#3c281e]" /></button>
-               <button className="hover:opacity-70 transition-opacity"><Facebook className="w-4 h-4 sm:w-5 sm:h-5 text-[#3c281e]" /></button>
+               <button className="hover:opacity-70 transition-opacity"><Mail className="size-4 sm:size-5 text-[#3c281e]" /></button>
+               <button className="hover:opacity-70 transition-opacity"><Share2 className="size-4 sm:size-5 text-[#3c281e]" /></button>
+               <button className="hover:opacity-70 transition-opacity"><div className="size-4 sm:size-5 border border-[#3c281e] rounded-full flex items-center justify-center text-xs font-bold text-[#3c281e]">P</div></button>
+               <button className="hover:opacity-70 transition-opacity"><Twitter className="size-4 sm:size-5 text-[#3c281e]" /></button>
+               <button className="hover:opacity-70 transition-opacity"><Facebook className="size-4 sm:size-5 text-[#3c281e]" /></button>
             </div>
 
             {/* Product Title & Info */}
             <div className="mb-10 lg:mb-16">
-              <h1 className="text-[40px] sm:text-[50px] lg:text-[60px] leading-[1.05] mb-[16px] lg:mb-[24px] font-serif font-normal text-[#3c281e]">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl leading-tight mb-4 lg:mb-6 font-serif font-normal text-[#3c281e]">
                 {title}
               </h1>
               {selectedVariant?.title && selectedVariant.title !== 'Default Title' && (
-                <p className="text-[22px] sm:text-[26px] leading-tight text-[#3c281e] mb-4 font-sans font-light">
+                <p className="text-xl sm:text-2xl leading-tight text-[#3c281e] mb-4 font-sans font-light">
                   {selectedVariant.title}
                 </p>
               )}
               {selectedVariant?.sku && (
-                <p className="text-[12px] sm:text-[14px] text-[#3c281e] font-sans opacity-80 mb-8">
+                <p className="text-xs sm:text-sm text-[#3c281e] font-sans opacity-80 mb-8">
                   {selectedVariant.sku}
                 </p>
               )}
@@ -321,10 +321,10 @@ export default function Product() {
             <div className="space-y-0 border-t border-[#3c281e]/20">
               <Accordion type="single" collapsible className="w-full" defaultValue="description">
                 <AccordionItem value="description" className="border-b border-[#3c281e]/20">
-                  <AccordionTrigger className="text-[22px] sm:text-[26px] font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-[30px]">
+                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
                     Description
                   </AccordionTrigger>
-                  <AccordionContent className="text-[14px] leading-7 text-[#212529] font-sans pb-6 lg:pb-8 pr-4">
+                  <AccordionContent className="text-sm leading-relaxed text-[#212529] font-sans pb-6 lg:pb-8 pr-4">
                     {descriptionHtml ? (
                       <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
                     ) : (
@@ -333,7 +333,7 @@ export default function Product() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="general" className="border-b border-[#3c281e]/20">
-                  <AccordionTrigger className="text-[22px] sm:text-[26px] font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-[30px]">
+                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
                     General
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-[#3c281e] pb-6 lg:pb-8">
@@ -341,7 +341,7 @@ export default function Product() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="dimensions" className="border-b border-[#3c281e]/20">
-                  <AccordionTrigger className="text-[22px] sm:text-[26px] font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-[30px]">
+                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
                     Dimensions
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-[#3c281e] pb-6 lg:pb-8">
@@ -349,7 +349,7 @@ export default function Product() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="care" className="border-b border-[#3c281e]/20">
-                  <AccordionTrigger className="text-[22px] sm:text-[26px] font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-[30px]">
+                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
                     Care & Maintenance Instructions
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-[#3c281e] pb-6 lg:pb-8">
@@ -357,7 +357,7 @@ export default function Product() {
                   </AccordionContent>
                 </AccordionItem>
                  <AccordionItem value="downloads" className="border-b border-[#3c281e]/20">
-                  <AccordionTrigger className="text-[22px] sm:text-[26px] font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-[30px]">
+                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-[#3c281e] py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
                     Downloads
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-[#3c281e] pb-6 lg:pb-8">
@@ -426,7 +426,7 @@ function RelatedProducts({
   return (
     <section>
       <div className="mb-10 lg:mb-12 text-center lg:text-left">
-        <h2 className="text-[28px] sm:text-[33px] font-normal font-serif text-[#3c281e]">
+        <h2 className="text-2xl sm:text-3xl font-normal font-serif text-[#3c281e]">
           You might also like these
         </h2>
       </div>
@@ -443,14 +443,14 @@ function RelatedProducts({
                )}
             </Link>
             <div className="space-y-2 sm:space-y-3">
-               <h3 className="text-[20px] sm:text-[23px] font-medium leading-tight text-[#3c281e] font-sans">
+               <h3 className="text-lg sm:text-xl font-medium leading-tight text-[#3c281e] font-sans">
                  {product.title}
                </h3>
                <div className="flex justify-between items-end pt-1 sm:pt-2">
-                  <p className="text-[12px] sm:text-[14px] text-[#3c281e]/60 font-sans">
+                  <p className="text-xs sm:text-sm text-[#3c281e]/60 font-sans">
                     {product.variants?.nodes?.[0]?.sku || 'AAX0004'}
                   </p>
-                  <button className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#3c281e] flex items-center justify-center text-[#3c281e] hover:bg-[#3c281e] hover:text-white transition-all">
+                  <button className="size-7 sm:size-8 rounded-full border border-[#3c281e] flex items-center justify-center text-[#3c281e] hover:bg-[#3c281e] hover:text-white transition-all">
                      <span className="sr-only">Add to cart</span>
                      <span className="text-lg sm:text-xl leading-none mb-1">+</span>
                   </button>
@@ -460,11 +460,11 @@ function RelatedProducts({
         ))}
       </div>
        <div className="flex justify-center lg:justify-end gap-3 sm:gap-4 mt-10 lg:mt-12">
-         <button className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-[#3c281e]/5 rounded-full transition-colors border border-[#3c281e]/10">
-            <ChevronRight className="rotate-180 w-5 h-5 sm:w-6 sm:h-6 text-[#3c281e]" />
+         <button className="size-10 sm:size-12 flex items-center justify-center hover:bg-[#3c281e]/5 rounded-full transition-colors border border-[#3c281e]/10">
+            <ChevronRight className="rotate-180 size-5 sm:size-6 text-[#3c281e]" />
          </button>
-         <button className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-[#3c281e]/5 rounded-full transition-colors border border-[#3c281e]/10">
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#3c281e]" />
+         <button className="size-10 sm:size-12 flex items-center justify-center hover:bg-[#3c281e]/5 rounded-full transition-colors border border-[#3c281e]/10">
+            <ChevronRight className="size-5 sm:size-6 text-[#3c281e]" />
          </button>
        </div>
     </section>
