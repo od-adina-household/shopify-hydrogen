@@ -131,14 +131,14 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
           <Link
             key={index}
             to={card.href}
-            className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden group block w-full bg-[#F0EBDE] md:bg-transparent"
+            className="relative aspect-[4/5] sm:aspect-[3/4] md:aspect-[3/4] overflow-hidden group block w-full bg-[#F0EBDE] md:bg-transparent"
           >
             <img
               src={card.imageSrc}
               alt={card.imageAlt}
-              className="h-full w-full object-cover transition-all duration-700 group-hover:opacity-90 md:group-hover:opacity-100 md:group-hover:scale-105"
+              className="h-full w-full object-cover transition-all duration-700 group-hover:opacity-90 md:group-hover:opacity-100 md:group-hover:scale-105 max-w-full max-h-full"
             />
-            <div className="absolute bottom-6 right-6 left-6 md:bottom-8 md:right-8 md:left-auto">
+            <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 left-4 sm:left-6 md:bottom-8 md:right-8 md:left-auto">
               <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:bg-white">
                 <span className="text-sm font-medium tracking-wider text-foreground uppercase">
                   {card.title}
@@ -220,11 +220,11 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
   );
 
   const imageContent = (
-    <div className="h-full min-h-[400px] md:min-h-[500px] lg:min-h-[600px]">
+    <div className="h-full min-h-[300px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[500px] xl:min-h-[600px]">
       <img
         src={imageSrc}
         alt={imageAlt}
-        className="h-full w-full object-cover"
+        className="h-full w-full object-cover max-w-full max-h-full"
       />
     </div>
   );

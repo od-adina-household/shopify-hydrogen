@@ -184,16 +184,16 @@ export default function Product() {
         <div className="flex flex-col lg:flex-row lg:gap-8 xl:gap-12 relative lg:px-8 xl:px-12">
           {/* Left Column - Image Carousel */}
           <div className="w-full lg:w-[55%] bg-[#F0EBDE] flex flex-col">
-            <div className="relative min-h-64 sm:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
+            <div className="relative min-h-48 sm:min-h-64 md:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
               <Carousel setApi={setApi} className="w-full h-full" opts={{ loop: true }}>
                 <CarouselContent className="h-full ml-0">
                   {productImages.map((image: any, index: number) => (
                     <CarouselItem key={image.id || index} className="w-full h-full flex items-center justify-center p-0 pl-0">
-                      <div className="relative w-full h-full flex items-center justify-center bg-[#F0EBDE] min-h-64 sm:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
+                      <div className="relative w-full h-full flex items-center justify-center bg-[#F0EBDE] min-h-48 sm:min-h-64 md:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
                         <Image
                           data={image}
                           sizes="(min-width: 1024px) 55vw, 100vw"
-                          className="size-full object-contain mix-blend-multiply"
+                          className="size-full object-contain mix-blend-multiply max-w-full max-h-full"
                         />
                       </div>
                     </CarouselItem>
@@ -235,7 +235,7 @@ export default function Product() {
                     onClick={() => api?.scrollTo(index)}
                     aria-label={`View image ${index + 1} of ${productImages.length}`}
                     aria-current={current === index + 1 ? 'true' : 'false'}
-                    className={`flex-shrink-0 size-16 sm:size-20 border-2 transition-all ${
+                    className={`flex-shrink-0 size-12 sm:size-14 md:size-16 lg:size-20 border-2 transition-all ${
                       current === index + 1
                         ? 'border-[#3c281e] shadow-md'
                         : 'border-[#3c281e]/20 hover:border-[#3c281e]/50'
@@ -433,12 +433,12 @@ function RelatedProducts({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {products.map((product) => (
           <div key={product.id} className="bg-white border border-[#3c281e]/5 p-4 sm:p-6 group transition-all hover:shadow-sm text-left">
-            <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] mb-4 sm:mb-6 overflow-hidden bg-[#F0EBDE]">
+            <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] sm:aspect-[3/4] mb-4 sm:mb-6 overflow-hidden bg-[#F0EBDE]">
                {product.featuredImage && (
                  <Image
                    data={product.featuredImage}
-                   className="size-full object-cover mix-blend-multiply"
-                   sizes="(min-width: 1024px) 25vw, 50vw"
+                   className="size-full object-cover mix-blend-multiply max-w-full max-h-full"
+                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (min-width: 1024px) 25vw"
                  />
                )}
             </Link>

@@ -40,8 +40,8 @@ export function ProductImage({
             aspectRatio="3/4"
             data={image}
             key={image.id}
-            sizes="(min-width: 45em) 50vw, 100vw"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (min-width: 1024px) 25vw, 33vw"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 max-w-full max-h-full"
           />
         </AspectRatio>
       </CardContent>
