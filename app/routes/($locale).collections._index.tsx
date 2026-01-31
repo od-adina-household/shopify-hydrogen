@@ -48,7 +48,7 @@ export default function Collections() {
   const { collections } = useLoaderData<typeof loader>();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <div>
         <h1 className="text-3xl font-bold tracking-tight mb-4">
           Collections
@@ -59,7 +59,7 @@ export default function Collections() {
       </div>
       <PaginatedResourceSection<CollectionFragment>
         connection={collections}
-        resourcesClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         {({ node: collection, index }) => (
           <CollectionItem

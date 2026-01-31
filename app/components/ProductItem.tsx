@@ -1,5 +1,4 @@
-import { Image } from '@shopify/hydrogen';
-import { HeartIcon } from 'lucide-react';
+import { Image, Money } from '@shopify/hydrogen';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import type {
@@ -205,22 +204,15 @@ export function ProductItem({
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-semibold tracking-wide">
-            ${selectedVariant ? Math.floor(parseFloat(selectedVariant.price.amount)) : Math.floor(parseFloat(product.priceRange.minVariantPrice.amount))}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-2">
+          <span className="text-sm tracking-wide">
+            {selectedVariant ? (
+              <Money data={selectedVariant.price} />
+            ) : (
+              <Money data={product.priceRange.minVariantPrice} />
+            )}
           </span>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                // TODO: Add to wishlist functionality
-              }}
-            >
-              <HeartIcon className="h-4 w-4" />
-            </Button>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-2">
             {hasMultipleVariants && showVariantSelector ? (
               <AddToCartButton
                 disabled={!selectedVariant?.availableForSale}
@@ -247,7 +239,7 @@ export function ProductItem({
                 }
                 variant="outline"
                 size="sm"
-                className="text-xs font-semibold tracking-widest uppercase"
+                className="text-xs tracking-widest uppercase bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
               >
                 {selectedVariant?.availableForSale ? 'ADD TO CART' : 'SOLD OUT'}
               </AddToCartButton>
@@ -255,7 +247,7 @@ export function ProductItem({
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs font-semibold tracking-widest uppercase"
+                className="text-xs tracking-widest uppercase bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
                 onClick={handleAddToCartClick}
                 disabled={!isAvailable}
               >
@@ -282,7 +274,7 @@ export function ProductItem({
                 ]}
                 variant="outline"
                 size="sm"
-                className="text-xs font-semibold tracking-widest uppercase"
+                className="text-xs tracking-widest uppercase bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
               >
                 {selectedVariant.availableForSale ? 'ADD TO CART' : 'SOLD OUT'}
               </AddToCartButton>
@@ -290,7 +282,7 @@ export function ProductItem({
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs font-semibold tracking-widest uppercase"
+                className="text-xs tracking-widest uppercase bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
                 disabled
               >
                 UNAVAILABLE

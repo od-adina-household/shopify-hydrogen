@@ -115,7 +115,7 @@ export function ProductForm({
               ]
               : []
           }
-          className="w-full uppercase gap-3 tracking-wider"
+          className="w-full uppercase gap-3 tracking-wider bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
           size="lg"
         >
           <ShoppingBag className="h-5 w-5" />
