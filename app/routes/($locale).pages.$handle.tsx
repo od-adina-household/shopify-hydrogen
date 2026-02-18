@@ -60,7 +60,7 @@ export default function Page() {
   const { page } = useLoaderData<typeof loader>();
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <Card>
         <CardContent className="p-8 space-y-6">
           <div className="space-y-4">

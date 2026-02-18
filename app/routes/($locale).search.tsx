@@ -45,7 +45,7 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="search space-y-6">
+    <div className="search space-y-6 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <div>
         <h1 className="text-4xl font-bold mb-4">Search</h1>
         <Card>

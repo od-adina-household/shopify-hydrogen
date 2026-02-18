@@ -48,7 +48,7 @@ export default function Collections() {
   const { collections } = useLoaderData<typeof loader>();
 
   return (
-    <div className="space-y-8 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
+    <div className="space-y-8 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12 mt-20 md:mt-24">
       <div>
         <h1 className="text-3xl font-bold tracking-tight mb-4">
           Collections

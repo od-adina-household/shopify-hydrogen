@@ -179,7 +179,7 @@ export default function Product() {
   }, [api]);
 
   return (
-    <div className="relative min-h-screen bg-[#F0EBDE]">
+    <div className="relative min-h-screen bg-[#F0EBDE] mt-20 md:mt-24">
       <div className="mx-auto max-w-[1920px]">
         <div className="flex flex-col lg:flex-row lg:gap-8 xl:gap-12 relative lg:px-8 xl:px-12">
           {/* Left Column - Image Carousel */}

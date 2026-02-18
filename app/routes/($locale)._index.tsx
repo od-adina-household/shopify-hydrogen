@@ -155,7 +155,7 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
 
 function HeroSection() {
   return (
-    <section className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden">
+    <section className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden pt-20 md:pt-24">
       <div className="absolute inset-0">
         <img
           src="/images/hero-image.jpg"
@@ -221,11 +221,21 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
 
   const imageContent = (
     <div className="h-full min-h-[300px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[500px] xl:min-h-[600px]">
-      <img
-        src={imageSrc}
-        alt={imageAlt}
-        className="h-full w-full object-cover max-w-full max-h-full"
-      />
+      {ctaHref ? (
+        <Link to={ctaHref} className="block h-full w-full">
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            className="h-full w-full object-cover max-w-full max-h-full"
+          />
+        </Link>
+      ) : (
+        <img
+          src={imageSrc}
+          alt={imageAlt}
+          className="h-full w-full object-cover max-w-full max-h-full"
+        />
+      )}
     </div>
   );
 

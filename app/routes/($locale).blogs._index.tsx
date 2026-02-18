@@ -57,7 +57,7 @@ export default function Blogs() {
   const { blogs } = useLoaderData<typeof loader>();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <div className="space-y-2">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Blogs</h1>
         <p className="text-lg text-muted-foreground">

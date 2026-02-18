@@ -49,7 +49,7 @@ export default function AccountLayout() {
     : 'Account Details';
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <div>
         <h1 className="text-4xl font-bold mb-2">{heading}</h1>
         <p className="text-muted-foreground">
