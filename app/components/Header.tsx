@@ -85,9 +85,11 @@ export function Header({
             end
             className={`flex items-center hover:opacity-80 transition-opacity flex-shrink-0 ${textColorClass}`}
           >
-            <span className="text-2xl md:text-3xl font-serif">
-              {shop.name}
-            </span>
+            <img
+              src="/logo.svg"
+              alt={shop.name}
+              className={`h-8 md:h-10 w-auto ${isHome && !isScrolled && !isMobileMenuOpen ? 'invert' : ''}`}
+            />
           </NavLink>
           <HeaderCtas
             isLoggedIn={isLoggedIn}

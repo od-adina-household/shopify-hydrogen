@@ -23,35 +23,35 @@ export default function Homepage() {
       <CollectionCardsSection
         cards={[
           {
-            title: 'KITCHEN',
-            imageSrc: '/images/shelf.jpg',
-            imageAlt: 'Kitchen collection',
-            href: '/collections/kitchen',
+            title: 'CERAMICS',
+            imageSrc: '/images/ceramics.jpg',
+            imageAlt: 'Ceramics collection',
+            href: '/collections/ceramics',
           },
           {
-            title: 'ACCESSORIES',
-            imageSrc: '/images/flowers.jpg',
-            imageAlt: 'Accessories collection',
-            href: '/collections/accessories',
+            title: 'TABLEWARE',
+            imageSrc: '/images/tableware.jpg',
+            imageAlt: 'Tableware collection',
+            href: '/collections/tableware',
           },
           {
-            title: 'FURNITURE',
-            imageSrc: '/images/interior.jpg',
-            imageAlt: 'Furniture collection',
-            href: '/collections/furniture',
+            title: 'DRINKWARE',
+            imageSrc: '/images/drinkware.jpg',
+            imageAlt: 'Drinkware collection',
+            href: '/collections/drinkware',
           },
         ]}
       />
       <SplitSection
-        title="Shaped by light"
-        imageSrc="/images/lamps.jpeg"
-        imageAlt="Decorative lamps and objects"
+        title="Storage with intention"
+        imageSrc="/images/storageware.jpg"
+        imageAlt="Storage sets and containers"
         imageOnRight
-        description="Some lamps are made to adapt — others are made to lead. From table lamps to wall pieces, this collection plays with material, surface and light in bold, expressive ways. Ceramic, metal, plastic, textile and glass come together, each adding its own character. Use one as a statement, or let multiple pieces shape the atmosphere of a space."
+        description="From ceramic jars to glass containers, this collection brings order and beauty together. Thoughtfully designed storage pieces that keep your essentials organized while adding character to your kitchen, bathroom, or living spaces. Functional objects that deserve to be displayed."
         ctaLabel="DISCOVER COLLECTION"
-        ctaHref="/collections/lighting"
+        ctaHref="/collections/storage"
       />
-      <IntroSection
+      {/* <IntroSection
         text="Our most expressive collection — for everyone who dares to live with imagination."
         buttonLabel="COLLECTION 25-26"
         buttonHref="/collections/collection-25-26"
@@ -77,8 +77,8 @@ export default function Homepage() {
             href: '/collections/living',
           },
         ]}
-      />
-      <SplitSection
+      /> */}
+      {/* <SplitSection
         title="Cool in chrome"
         imageSrc="/images/chrome.jpeg"
         imageAlt="Chrome decorative piece"
@@ -86,7 +86,7 @@ export default function Homepage() {
         description="Whether wrapped around a light, formed into a tray or cast as a fully chromed bowl, it changes the mood of a space. Cool, sleek and unexpected — these accents catch the light and sharpen the atmosphere with their quiet intensity."
         ctaLabel="NEW CLASSICS"
         ctaHref="/collections/chrome"
-      />
+      /> */}
       <InfoColumnsSection />
     </div>
   );

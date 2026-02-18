@@ -63,7 +63,7 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    { rel: 'icon', type: 'image/x-icon', href: '/favicon.jpg' },
+    { rel: 'icon', type: 'image/jpeg', href: '/favicon.jpg' },
   ];
 }
 
