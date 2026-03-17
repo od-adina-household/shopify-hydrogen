@@ -47,6 +47,7 @@ customer-accountapi.generated.d.ts
 # framework
 .shopify
 .react-router
+.hydrogen
 
 # oxygen deployment workflows (store-specific)
 .github/workflows/oxygen-deployment-*.yml
