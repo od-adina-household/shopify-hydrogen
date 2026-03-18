@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 export function AnnouncementBanner() {
   // Banner is always visible, so we don't need state to control visibility
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 bg-accent text-accent-foreground py-2 px-4 text-center text-sm">
+    <div className="fixed top-0 left-0 right-0 z-40 bg-background text-primary py-2 px-4 text-center text-sm">
       <div className="container mx-auto flex items-center justify-center">
         <a
           href="https://otherdev.com"

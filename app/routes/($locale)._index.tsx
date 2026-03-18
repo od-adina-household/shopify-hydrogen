@@ -24,19 +24,19 @@ export default function Homepage() {
         cards={[
           {
             title: 'CERAMICS',
-            imageSrc: '/images/ceramics.jpg',
+            imageSrc: '/images/ceramics.jpeg',
             imageAlt: 'Ceramics collection',
             href: '/collections/ceramics',
           },
           {
             title: 'TABLEWARE',
-            imageSrc: '/images/tableware.jpg',
+            imageSrc: '/images/tableware.jpeg',
             imageAlt: 'Tableware collection',
             href: '/collections/tableware',
           },
           {
             title: 'DRINKWARE',
-            imageSrc: '/images/drinkware.jpg',
+            imageSrc: '/images/drinkware.jpeg',
             imageAlt: 'Drinkware collection',
             href: '/collections/drinkware',
           },
@@ -107,7 +107,7 @@ function IntroSection({ text, buttonLabel, buttonHref }: IntroSectionProps) {
         </h2>
         <Link
           to={buttonHref}
-          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 mb-8 md:mb-12"
+          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-primary underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 mb-8 md:mb-12"
         >
           {buttonLabel}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -139,11 +139,11 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
               className="h-full w-full object-cover transition-all duration-700 group-hover:opacity-90 md:group-hover:opacity-100 md:group-hover:scale-105 max-w-full max-h-full"
             />
             <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 left-4 sm:left-6 md:bottom-8 md:right-8 md:left-auto">
-              <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:bg-white">
-                <span className="text-sm font-medium tracking-wider text-background uppercase">
+              <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-primary/80 backdrop-blur-sm border border-primary/20 transition-all duration-300 group-hover:bg-primary">
+                <span className="text-sm font-medium tracking-wider text-primary-foreground uppercase">
                   {card.title}
                 </span>
-                <ArrowRight className="h-4 w-4 text-background transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRight className="h-4 w-4 text-primary-foreground transition-transform duration-300 group-hover:translate-x-1" />
               </div>
             </div>
           </Link>
@@ -173,7 +173,7 @@ function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="bg-white/90 hover:bg-white text-background hover:text-background border-white rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14"
+              className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14"
               asChild
             >
               <Link to="/collections/all">
@@ -210,7 +210,7 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
       {ctaLabel && ctaHref && (
         <Link
           to={ctaHref}
-          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 w-fit"
+          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-primary underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 w-fit"
         >
           {ctaLabel}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -240,17 +240,17 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
   );
 
   return (
-    <section className="w-full bg-accent">
+    <section className="w-full bg-secondary">
       <div className="grid grid-cols-1 md:grid-cols-2">
         {imageOnRight ? (
           <>
-            <div className="bg-accent">{textContent}</div>
+            <div className="bg-secondary">{textContent}</div>
             <div className="relative">{imageContent}</div>
           </>
         ) : (
           <>
             <div className="relative order-2 md:order-1">{imageContent}</div>
-            <div className="bg-accent order-1 md:order-2">{textContent}</div>
+            <div className="bg-background order-1 md:order-2">{textContent}</div>
           </>
         )}
       </div>

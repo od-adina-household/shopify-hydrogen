@@ -62,7 +62,7 @@ export function Header({
   const isHome = location.pathname === '/' || /^\/(en|nl|de|fr)(\/|$)/.test(location.pathname);
 
   const headerBgClass = isMobileMenuOpen
-    ? 'bg-accent shadow-sm'
+    ? 'bg-background shadow-sm'
     : isHome
       ? (isScrolled ? 'bg-background shadow-sm' : 'bg-transparent')
       : 'bg-background shadow-sm';
@@ -78,12 +78,12 @@ export function Header({
       <header
         className={`fixed top-8 left-0 right-0 z-50 px-4 sm:px-6 md:px-8 pt-4 pb-2 md:pt-5 md:pb-1.5 transition-all duration-300 ${headerBgClass}`}
       >
-        <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
+        <div className={`mx-auto max-w-7xl flex items-center justify-between gap-4 ${textColorClass}`}>
           <NavLink
             prefetch="intent"
             to="/"
             end
-            className={`flex items-center hover:opacity-80 transition-opacity flex-shrink-0 ${textColorClass}`}
+            className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
           >
             <img
               src="/logo.svg"
@@ -94,8 +94,6 @@ export function Header({
           <HeaderCtas
             isLoggedIn={isLoggedIn}
             cart={cart}
-            isScrolled={isScrolled}
-            isHome={isHome}
             isMobileMenuOpen={isMobileMenuOpen}
             setIsMobileMenuOpen={setIsMobileMenuOpen}
           />
@@ -192,24 +190,16 @@ export function HeaderMenu({
 function HeaderCtas({
   isLoggedIn,
   cart,
-  isScrolled,
-  isHome,
   isMobileMenuOpen,
   setIsMobileMenuOpen,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & {
-  isScrolled: boolean;
-  isHome: boolean;
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (open: boolean) => void;
 }) {
-  const textColorClass = isHome
-    ? (isScrolled ? 'text-foreground' : 'text-white')
-    : 'text-foreground';
-
   return (
     <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0" role="navigation">
-      <SearchToggle isScrolled={isScrolled} isHome={isHome} />
-      <Button variant="ghost" size="icon-lg" className={`h-10 w-10 p-0 ${textColorClass}`} asChild>
+      <SearchToggle />
+      <Button variant="ghost" size="icon-lg" className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground" asChild>
         <NavLink
           prefetch="intent"
           to="/account"
@@ -225,36 +215,26 @@ function HeaderCtas({
         </NavLink>
       </Button>
       <HeaderMenuMobileToggle
-        isScrolled={isScrolled}
-        isHome={isHome}
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
-      <CartToggle cart={cart} isScrolled={isScrolled} isHome={isHome} />
+      <CartToggle cart={cart} />
     </div>
   );
 }
 
 function HeaderMenuMobileToggle({
-  isScrolled,
-  isHome,
   isMobileMenuOpen,
   setIsMobileMenuOpen,
 }: {
-  isScrolled: boolean;
-  isHome: boolean;
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (open: boolean) => void;
 }) {
-  const textColorClass = isHome
-    ? (isScrolled ? 'text-foreground' : 'text-white')
-    : 'text-foreground';
-
   return (
     <Button
       variant="ghost"
       size="icon-lg"
-      className={`h-10 w-10 p-0 ${textColorClass}`}
+      className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground"
       onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
     >
       {isMobileMenuOpen ? (
@@ -267,17 +247,14 @@ function HeaderMenuMobileToggle({
   );
 }
 
-function SearchToggle({ isScrolled, isHome }: { isScrolled: boolean; isHome: boolean }) {
+function SearchToggle() {
   const { open } = useAside();
-  const textColorClass = isHome
-    ? (isScrolled ? 'text-foreground' : 'text-white')
-    : 'text-foreground';
 
   return (
     <Button
       variant="ghost"
       size="icon-lg"
-      className={`h-10 w-10 p-0 ${textColorClass}`}
+      className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground"
       onClick={() => open('search')}
     >
       <SearchIcon className="w-[20px] h-[20px]" />
@@ -286,19 +263,15 @@ function SearchToggle({ isScrolled, isHome }: { isScrolled: boolean; isHome: boo
   );
 }
 
-function CartBadge({ count, isScrolled, isHome }: { count: number | null; isScrolled: boolean; isHome: boolean }) {
+function CartBadge({ count }: { count: number | null }) {
   const { open } = useAside();
   const { publish, shop, cart, prevCart } = useAnalytics();
-  
-  const textColorClass = isHome
-    ? (isScrolled ? 'text-foreground' : 'text-white')
-    : 'text-foreground';
 
   return (
     <Button
       variant="ghost"
       size="icon-lg"
-      className={`relative h-10 w-10 ${textColorClass}`}
+      className="relative h-10 w-10 hover:bg-transparent hover:text-foreground"
       onClick={(e) => {
         e.preventDefault();
         open('cart');
@@ -326,20 +299,20 @@ function CartBadge({ count, isScrolled, isHome }: { count: number | null; isScro
   );
 }
 
-function CartToggle({ cart, isScrolled, isHome }: Pick<HeaderProps, 'cart'> & { isScrolled: boolean; isHome: boolean }) {
+function CartToggle({ cart }: Pick<HeaderProps, 'cart'>) {
   return (
-    <Suspense fallback={<CartBadge count={null} isScrolled={isScrolled} isHome={isHome} />}>
+    <Suspense fallback={<CartBadge count={null} />}>
       <Await resolve={cart}>
-        <CartBanner isScrolled={isScrolled} isHome={isHome} />
+        <CartBanner />
       </Await>
     </Suspense>
   );
 }
 
-function CartBanner({ isScrolled, isHome }: { isScrolled: boolean; isHome: boolean }) {
+function CartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} isScrolled={isScrolled} isHome={isHome} />;
+  return <CartBadge count={cart?.totalQuantity ?? 0} />;
 }
 
 const FALLBACK_HEADER_MENU = {

@@ -6,6 +6,7 @@ import {
   useOptimisticVariant,
   useSelectedOptionInUrlParam,
   Image,
+  Money,
 } from '@shopify/hydrogen';
 import {
   CheckIcon,
@@ -448,9 +449,9 @@ function RelatedProducts({
                </h3>
                <div className="flex justify-between items-end pt-1 sm:pt-2">
                   <p className="text-xs sm:text-sm text-muted-foreground font-sans">
-                    {product.variants?.nodes?.[0]?.sku || 'AAX0004'}
+                    <Money data={product.priceRange.minVariantPrice} />
                   </p>
-                  <button className="size-7 sm:size-8 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-foreground hover:text-background transition-all">
+                  <button className="size-7 sm:size-8 rounded-full border border-primary bg-primary flex items-center justify-center text-primary-foreground hover:bg-transparent hover:text-primary transition-all">
                      <span className="sr-only">Add to cart</span>
                      <span className="text-lg sm:text-xl leading-none mb-1">+</span>
                   </button>
