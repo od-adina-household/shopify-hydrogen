@@ -20,6 +20,4 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build and Publish to Oxygen
-        run: bunx shopify hydrogen deploy
-        env:
-          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000090386 }}
+        run: bunx shopify hydrogen deploy --token ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000090386 }}
