@@ -102,12 +102,12 @@ function IntroSection({ text, buttonLabel, buttonHref }: IntroSectionProps) {
   return (
     <section className="w-full px-6 md:px-8 lg:px-12">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-snug md:leading-relaxed font-serif font-normal text-[#3C281E] text-left max-w-4xl pt-16 md:pt-24 pb-6 md:pb-8">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-snug md:leading-relaxed font-serif font-normal text-foreground text-left max-w-4xl pt-16 md:pt-24 pb-6 md:pb-8">
           {text}
         </h2>
         <Link
           to={buttonHref}
-          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 mb-8 md:mb-12"
+          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 mb-8 md:mb-12"
         >
           {buttonLabel}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -131,7 +131,7 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
           <Link
             key={index}
             to={card.href}
-            className="relative aspect-[4/5] sm:aspect-[3/4] md:aspect-[3/4] overflow-hidden group block w-full bg-[#F0EBDE] md:bg-transparent"
+            className="relative aspect-[4/5] sm:aspect-[3/4] md:aspect-[3/4] overflow-hidden group block w-full bg-background md:bg-transparent"
           >
             <img
               src={card.imageSrc}
@@ -140,10 +140,10 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
             />
             <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 left-4 sm:left-6 md:bottom-8 md:right-8 md:left-auto">
               <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-white/80 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:bg-white">
-                <span className="text-sm font-medium tracking-wider text-foreground uppercase">
+                <span className="text-sm font-medium tracking-wider text-background uppercase">
                   {card.title}
                 </span>
-                <ArrowRight className="h-4 w-4 text-foreground transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRight className="h-4 w-4 text-background transition-transform duration-300 group-hover:translate-x-1" />
               </div>
             </div>
           </Link>
@@ -173,7 +173,7 @@ function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="bg-white/90 hover:bg-white text-foreground border-white rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14"
+              className="bg-white/90 hover:bg-white text-background hover:text-background border-white rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14"
               asChild
             >
               <Link to="/collections/all">
@@ -199,18 +199,18 @@ interface SplitSectionProps {
 function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ctaLabel, ctaHref }: SplitSectionProps) {
   const textContent = (
     <div className="flex flex-col justify-center h-full px-6 sm:px-10 md:px-12 lg:px-16 py-12 md:py-16 lg:py-20">
-      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-serif font-normal text-foreground leading-tight mb-6 md:mb-8 italic">
         {title}
       </h2>
       {description && (
-        <p className="text-[#3C281E] font-sans text-sm md:text-base leading-relaxed max-w-md mb-8 md:mb-10">
+        <p className="text-foreground font-sans text-sm md:text-base leading-relaxed max-w-md mb-8 md:mb-10">
           {description}
         </p>
       )}
       {ctaLabel && ctaHref && (
         <Link
           to={ctaHref}
-          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 w-fit"
+          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 w-fit"
         >
           {ctaLabel}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -240,17 +240,17 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
   );
 
   return (
-    <section className="w-full bg-[#C4A882]">
+    <section className="w-full bg-accent">
       <div className="grid grid-cols-1 md:grid-cols-2">
         {imageOnRight ? (
           <>
-            <div className="bg-[#C4A882]">{textContent}</div>
+            <div className="bg-accent">{textContent}</div>
             <div className="relative">{imageContent}</div>
           </>
         ) : (
           <>
             <div className="relative order-2 md:order-1">{imageContent}</div>
-            <div className="bg-[#C4A882] order-1 md:order-2">{textContent}</div>
+            <div className="bg-accent order-1 md:order-2">{textContent}</div>
           </>
         )}
       </div>
@@ -265,12 +265,12 @@ function InfoColumnsSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
           {/* Do you need some help? */}
           <div className="space-y-4">
-            <h3 className="text-lg md:text-2xl font-serif font-normal text-[#3C281E]">
+            <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
               Do you need some help?
             </h3>
             <div className="flex items-start gap-4">
-              <MessageCircle className="w-5 h-5 md:w-6 md:h-6 mt-1 text-[#3C281E] flex-shrink-0" strokeWidth={1.5} />
-              <p className="text-sm md:text-base text-[#3C281E] leading-relaxed">
+              <MessageCircle className="w-5 h-5 md:w-6 md:h-6 mt-1 text-foreground flex-shrink-0" strokeWidth={1.5} />
+              <p className="text-sm md:text-base text-foreground leading-relaxed">
                 Our customer service team will be happy to assist you, please click{' '}
                 <Link to="/pages/contact" className="underline underline-offset-2 hover:no-underline font-medium">
                   here
@@ -282,15 +282,15 @@ function InfoColumnsSection() {
 
           {/* Arrange it yourself */}
           <div className="space-y-4">
-            <h3 className="text-lg md:text-2xl font-serif font-normal text-[#3C281E]">
+            <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
               Arrange it yourself
             </h3>
             <div className="space-y-4">
-              <Link to="/pages/pressroom" className="flex items-center gap-4 text-sm md:text-base text-[#3C281E] hover:underline group">
+              <Link to="/pages/pressroom" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
                 <Download className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:translate-y-1" strokeWidth={1.5} />
                 Download pressroom packages
               </Link>
-              <Link to="/pages/become-a-dealer" className="flex items-center gap-4 text-sm md:text-base text-[#3C281E] hover:underline group">
+              <Link to="/pages/become-a-dealer" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
                 <Building2 className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
                 Become a dealer
               </Link>
@@ -299,10 +299,10 @@ function InfoColumnsSection() {
 
           {/* Got some questions? */}
           <div className="space-y-4">
-            <h3 className="text-lg md:text-2xl font-serif font-normal text-[#3C281E]">
+            <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
               Got some questions?
             </h3>
-            <Link to="/pages/stores" className="flex items-center gap-4 text-sm md:text-base text-[#3C281E] hover:underline group">
+            <Link to="/pages/stores" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
               <MessageCircle className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
               Where can I buy AD Household?
             </Link>

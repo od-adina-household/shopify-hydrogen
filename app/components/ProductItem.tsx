@@ -239,7 +239,7 @@ export function ProductItem({
                 }
                 variant="outline"
                 size="sm"
-                className="text-xs tracking-widest uppercase bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
+                className="text-xs tracking-widest uppercase bg-primary text-primary-foreground border-primary hover:bg-primary/90"
               >
                 {selectedVariant?.availableForSale ? 'ADD TO CART' : 'SOLD OUT'}
               </AddToCartButton>
@@ -247,7 +247,7 @@ export function ProductItem({
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs tracking-widest uppercase bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
+                className="text-xs tracking-widest uppercase bg-primary text-primary-foreground border-primary hover:bg-primary/90"
                 onClick={handleAddToCartClick}
                 disabled={!isAvailable}
               >
@@ -274,7 +274,7 @@ export function ProductItem({
                 ]}
                 variant="outline"
                 size="sm"
-                className="text-xs tracking-widest uppercase bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
+                className="text-xs tracking-widest uppercase bg-primary text-primary-foreground border-primary hover:bg-primary/90"
               >
                 {selectedVariant.availableForSale ? 'ADD TO CART' : 'SOLD OUT'}
               </AddToCartButton>
@@ -282,7 +282,7 @@ export function ProductItem({
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs tracking-widest uppercase bg-[#3c281e] text-[#f0ebde] border-[#3c281e] hover:bg-[#3c281e]/90"
+                className="text-xs tracking-widest uppercase bg-primary text-primary-foreground border-primary hover:bg-primary/90"
                 disabled
               >
                 UNAVAILABLE

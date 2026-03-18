@@ -260,22 +260,22 @@ export function ErrorBoundary() {
           <section className="w-full px-6 md:px-8 lg:px-12 py-16 md:py-24 lg:py-32">
             <div className="max-w-7xl mx-auto">
               <div className="max-w-3xl">
-                <p className="text-sm md:text-base font-medium tracking-[0.2em] uppercase text-[#3C281E] mb-6">
+                <p className="text-sm md:text-base font-medium tracking-[0.2em] uppercase text-foreground mb-6">
                   Error 404
                 </p>
 
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-foreground leading-tight mb-6 md:mb-8 italic">
                   Page not found
                 </h1>
 
-                <p className="text-[#3C281E] font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
+                <p className="text-foreground font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
                   The page you are looking for might have been removed, had its name changed, or is temporarily unavailable. Let us guide you back to discovering beautiful objects for your home.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-6 md:gap-8">
                   <Link
                     to="/"
-                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
                   >
                     Back to Home
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -283,7 +283,7 @@ export function ErrorBoundary() {
 
                   <Link
                     to="/collections/all"
-                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
                   >
                     Browse Collections
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -291,7 +291,7 @@ export function ErrorBoundary() {
 
                   <Link
                     to="/search"
-                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+                    className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
                   >
                     Search
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -317,21 +317,21 @@ export function ErrorBoundary() {
       <div className="w-full px-6 md:px-8 lg:px-12 py-16 md:py-24 lg:py-32">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-3xl">
-            <p className="text-sm md:text-base font-medium tracking-[0.2em] uppercase text-[#3C281E] mb-6">
+            <p className="text-sm md:text-base font-medium tracking-[0.2em] uppercase text-foreground mb-6">
               Error {errorStatus}
             </p>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-[#3C281E] leading-tight mb-6 md:mb-8 italic">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-foreground leading-tight mb-6 md:mb-8 italic">
               Something went wrong
             </h1>
 
-            <p className="text-[#3C281E] font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
+            <p className="text-foreground font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
               We apologize for the inconvenience. An unexpected error has occurred. Please try again or return to the homepage.
             </p>
 
             <Link
               to="/"
-              className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-[#3C281E] underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
+              className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300"
             >
               Back to Home
               <ArrowRight className="h-3.5 w-3.5" />

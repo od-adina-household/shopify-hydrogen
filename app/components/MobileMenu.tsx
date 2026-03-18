@@ -22,7 +22,7 @@ export function MobileMenu({
 
   return (
     <div
-      className="fixed inset-0 z-40 bg-[rgb(178,160,124)] pt-28 px-6 overflow-y-auto"
+      className="fixed inset-0 z-40 bg-accent pt-28 px-6 overflow-y-auto"
       onClick={onClose}
     >
       <nav className="flex flex-col" onClick={(e) => e.stopPropagation()}>
@@ -41,7 +41,7 @@ export function MobileMenu({
               key={item.id}
               to={url}
               onClick={onClose}
-              className="text-[40px] leading-[44px] font-serif font-normal text-[rgb(60,40,30)] mb-[25px] hover:opacity-70 transition-opacity"
+              className="text-[40px] leading-[44px] font-serif font-normal text-foreground mb-[25px] hover:opacity-70 transition-opacity"
             >
               {item.title}
             </NavLink>
