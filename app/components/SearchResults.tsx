@@ -181,7 +181,7 @@ function SearchResultsProducts({
             return (
               <div className="space-y-4">
                 <div className="flex justify-center">
-                  <Button variant="outline" asChild disabled={isLoading}>
+                  <Button variant="default" asChild disabled={isLoading}>
                     <PreviousLink>
                       {isLoading ? (
                         <>
@@ -199,7 +199,7 @@ function SearchResultsProducts({
                 </div>
                 <div className="space-y-2">{ItemsMarkup}</div>
                 <div className="flex justify-center">
-                  <Button variant="outline" asChild disabled={isLoading}>
+                  <Button variant="default" asChild disabled={isLoading}>
                     <NextLink>
                       {isLoading ? (
                         <>

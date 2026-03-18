@@ -106,7 +106,7 @@ function CartClearButton({ lineIds }: { lineIds: string[] }) {
       <Button
         type="submit"
         variant="ghost"
-        className="w-full text-muted-foreground hover:text-foreground py-6"
+        className="w-full text-destructive hover:text-destructive/80 py-6"
       >
         Clear cart
       </Button>

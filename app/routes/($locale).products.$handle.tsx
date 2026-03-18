@@ -18,8 +18,6 @@ import {
   Facebook,
   Twitter,
   ChevronRight,
-  ArrowLeft,
-  ArrowRight,
 } from 'lucide-react';
 import { Suspense, useState, useEffect } from 'react';
 import { Await, Link, useLoaderData } from 'react-router';
@@ -153,9 +151,13 @@ export default function Product() {
     getAdjacentAndFirstAvailableVariants(product),
   );
 
-  // Sets the search param to the selected variant without navigation
-  // only when no search params are set in the url
-  useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
+  // Sets the search param to the selected variant without navigation.
+  // Filter out Shopify's synthetic "Title / Default Title" option that exists
+  // on products with no real variants — it adds nothing to the URL.
+  const variantOptions = selectedVariant.selectedOptions.filter(
+    (opt) => !(opt.name === 'Title' && opt.value === 'Default Title'),
+  );
+  useSelectedOptionInUrlParam(variantOptions);
 
   // Get the product options array
   const productOptions = getProductOptions({
@@ -210,12 +212,8 @@ export default function Product() {
 
                 {productImages.length > 1 && (
                   <>
-                    <CarouselPrevious className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10 bg-foreground! text-background! hover:bg-background! hover:text-foreground! border border-border shadow-md p-0 flex items-center justify-center rounded-full cursor-pointer z-10 transition-all" aria-label="Previous image">
-                        <ArrowLeft className="size-4 sm:size-5 stroke-[1.5px]" />
-                    </CarouselPrevious>
-                    <CarouselNext className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10 bg-foreground! text-background! hover:bg-background! hover:text-foreground! border border-border shadow-md p-0 flex items-center justify-center rounded-full cursor-pointer z-10 transition-all" aria-label="Next image">
-                        <ArrowRight className="size-4 sm:size-5 stroke-[1.5px]" />
-                    </CarouselNext>
+                    <CarouselPrevious className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 size-8 sm:size-10 bg-primary! text-primary-foreground! hover:bg-primary/80! border-0 shadow-md rounded-full z-10" aria-label="Previous image" />
+                    <CarouselNext className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 size-8 sm:size-10 bg-primary! text-primary-foreground! hover:bg-primary/80! border-0 shadow-md rounded-full z-10" aria-label="Next image" />
                   </>
                 )}
               </Carousel>
@@ -375,22 +373,11 @@ export default function Product() {
            <Suspense fallback={<RelatedProductsSkeleton />}>
             <Await resolve={relatedProducts}>
               {(data: [ProductRecommendationsQuery | null, FallbackProductsQuery | null]) => {
-                const recommendationsData = data[0];
-                const fallbackData = data[1];
-                const recommendations = recommendationsData?.productRecommendations || [];
-                const fallbackProducts = fallbackData?.products?.nodes || [];
-                const allProducts = [...recommendations];
-                const currentProductId = product.id;
-                for (const fallbackProduct of fallbackProducts) {
-                  if (allProducts.length >= 4) break;
-                  if (
-                    fallbackProduct.id !== currentProductId &&
-                    !allProducts.find(p => p.id === fallbackProduct.id)
-                  ) {
-                    allProducts.push(fallbackProduct);
-                  }
-                }
-                const displayProducts = allProducts.slice(0, 4);
+                const recommendations = data[0]?.productRecommendations ?? [];
+                const fallbackProducts = data[1]?.products?.nodes ?? [];
+                const displayProducts = recommendations.length > 0
+                  ? recommendations
+                  : fallbackProducts.filter((p) => p.id !== product.id);
                 return <RelatedProducts products={displayProducts} />;
               }}
             </Await>
@@ -422,6 +409,8 @@ function RelatedProducts({
 }: {
   products: any[];
 }) {
+  const [api, setApi] = useState<CarouselApi>();
+
   if (!products || products.length === 0) return null;
 
   return (
@@ -431,43 +420,55 @@ function RelatedProducts({
           You might also like these
         </h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {products.map((product) => (
-          <div key={product.id} className="bg-card border border-border/20 p-4 sm:p-6 group transition-all hover:shadow-sm text-left">
-            <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] sm:aspect-[3/4] mb-4 sm:mb-6 overflow-hidden bg-background">
-               {product.featuredImage && (
-                 <Image
-                   data={product.featuredImage}
-                   className="size-full object-cover mix-blend-normal max-w-full max-h-full"
-                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (min-width: 1024px) 25vw"
-                 />
-               )}
-            </Link>
-            <div className="space-y-2 sm:space-y-3">
-               <h3 className="text-lg sm:text-xl font-medium leading-tight text-foreground font-sans">
-                 {product.title}
-               </h3>
-               <div className="flex justify-between items-end pt-1 sm:pt-2">
-                  <p className="text-xs sm:text-sm text-muted-foreground font-sans">
-                    <Money data={product.priceRange.minVariantPrice} />
-                  </p>
-                  <button className="size-7 sm:size-8 rounded-full border border-primary bg-primary flex items-center justify-center text-primary-foreground hover:bg-transparent hover:text-primary transition-all">
-                     <span className="sr-only">Add to cart</span>
-                     <span className="text-lg sm:text-xl leading-none mb-1">+</span>
-                  </button>
-               </div>
-            </div>
-          </div>
-        ))}
+      <Carousel setApi={setApi} opts={{ align: 'start' }}>
+        <CarouselContent className="-ml-4 sm:-ml-6">
+          {products.map((product) => (
+            <CarouselItem key={product.id} className="pl-4 sm:pl-6 basis-full sm:basis-1/2 lg:basis-1/4">
+              <div className="bg-card border border-border/20 p-4 sm:p-6 group transition-all hover:shadow-sm text-left">
+                <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] sm:aspect-[3/4] mb-4 sm:mb-6 overflow-hidden bg-background">
+                  {product.featuredImage && (
+                    <Image
+                      data={product.featuredImage}
+                      className="size-full object-cover mix-blend-normal max-w-full max-h-full"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (min-width: 1024px) 25vw"
+                    />
+                  )}
+                </Link>
+                <div className="space-y-2 sm:space-y-3">
+                  <h3 className="text-lg sm:text-xl font-medium leading-tight text-foreground font-sans">
+                    {product.title}
+                  </h3>
+                  <div className="flex justify-between items-end pt-1 sm:pt-2">
+                    <p className="text-xs sm:text-sm text-muted-foreground font-sans">
+                      <Money data={product.priceRange.minVariantPrice} />
+                    </p>
+                    <button className="size-7 sm:size-8 rounded-full border border-primary bg-primary flex items-center justify-center text-primary-foreground hover:bg-transparent hover:text-primary transition-all">
+                      <span className="sr-only">Add to cart</span>
+                      <span className="text-lg sm:text-xl leading-none mb-1">+</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+      <div className="flex justify-center lg:justify-end gap-3 sm:gap-4 mt-10 lg:mt-12">
+        <button
+          onClick={() => api?.scrollPrev()}
+          aria-label="Previous products"
+          className="size-10 sm:size-12 flex items-center justify-center bg-primary rounded-full transition-colors hover:bg-primary/80"
+        >
+          <ChevronRight className="rotate-180 size-5 sm:size-6 text-primary-foreground" />
+        </button>
+        <button
+          onClick={() => api?.scrollNext()}
+          aria-label="Next products"
+          className="size-10 sm:size-12 flex items-center justify-center bg-primary rounded-full transition-colors hover:bg-primary/80"
+        >
+          <ChevronRight className="size-5 sm:size-6 text-primary-foreground" />
+        </button>
       </div>
-       <div className="flex justify-center lg:justify-end gap-3 sm:gap-4 mt-10 lg:mt-12">
-         <button className="size-10 sm:size-12 flex items-center justify-center hover:bg-foreground/5 rounded-full transition-colors border border-border/40">
-            <ChevronRight className="rotate-180 size-5 sm:size-6 text-foreground" />
-         </button>
-         <button className="size-10 sm:size-12 flex items-center justify-center hover:bg-foreground/5 rounded-full transition-colors border border-border/40">
-            <ChevronRight className="size-5 sm:size-6 text-foreground" />
-         </button>
-       </div>
     </section>
   );
 }

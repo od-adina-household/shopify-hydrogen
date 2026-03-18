@@ -26,7 +26,7 @@ export function PaginatedResourceSection<NodesType>({
         return (
           <div className="space-y-6">
             <div className="flex justify-center">
-              <Button variant="outline" asChild disabled={isLoading}>
+              <Button variant="default" asChild disabled={isLoading}>
                 <PreviousLink>
                   {isLoading ? (
                     <>
@@ -48,7 +48,7 @@ export function PaginatedResourceSection<NodesType>({
               resourcesMarkup
             )}
             <div className="flex justify-center">
-              <Button variant="outline" asChild disabled={isLoading}>
+              <Button variant="default" asChild disabled={isLoading}>
                 <NextLink>
                   {isLoading ? (
                     <>
