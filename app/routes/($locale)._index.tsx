@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
-import { ArrowRight, MessageCircle, Download, Building2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+// import { MessageCircle, Download, Building2 } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import type { Route } from './+types/_index';
 
@@ -44,7 +45,7 @@ export default function Homepage() {
       />
       <SplitSection
         title="Storage with intention"
-        imageSrc="/images/storageware.jpg"
+        imageSrc="/images/storageware.jpeg"
         imageAlt="Storage sets and containers"
         imageOnRight
         description="From ceramic jars to glass containers, this collection brings order and beauty together. Thoughtfully designed storage pieces that keep your essentials organized while adding character to your kitchen, bathroom, or living spaces. Functional objects that deserve to be displayed."
@@ -87,7 +88,7 @@ export default function Homepage() {
         ctaLabel="NEW CLASSICS"
         ctaHref="/collections/chrome"
       /> */}
-      <InfoColumnsSection />
+      {/* <InfoColumnsSection /> */}
     </div>
   );
 }
@@ -158,7 +159,7 @@ function HeroSection() {
     <section className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden pt-20 md:pt-24">
       <div className="absolute inset-0">
         <img
-          src="/images/hero-image.jpg"
+          src="/images/hero-image.jpeg"
           alt="Curated home collection"
           className="h-full w-full object-cover"
         />
@@ -258,60 +259,60 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
   );
 }
 
-function InfoColumnsSection() {
-  return (
-    <section className="py-16 md:py-24 bg-background">
-      <div className="container mx-auto px-6 md:px-8 lg:px-12 max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
-          {/* Do you need some help? */}
-          <div className="space-y-4">
-            <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
-              Do you need some help?
-            </h3>
-            <div className="flex items-start gap-4">
-              <MessageCircle className="w-5 h-5 md:w-6 md:h-6 mt-1 text-foreground flex-shrink-0" strokeWidth={1.5} />
-              <p className="text-sm md:text-base text-foreground leading-relaxed">
-                Our customer service team will be happy to assist you, please click{' '}
-                <Link to="/pages/contact" className="underline underline-offset-2 hover:no-underline font-medium">
-                  here
-                </Link>{' '}
-                to get in touch with us.
-              </p>
-            </div>
-          </div>
+// function InfoColumnsSection() {
+//   return (
+//     <section className="py-16 md:py-24 bg-background">
+//       <div className="container mx-auto px-6 md:px-8 lg:px-12 max-w-7xl">
+//         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
+//           {/* Do you need some help? */}
+//           <div className="space-y-4">
+//             <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
+//               Do you need some help?
+//             </h3>
+//             <div className="flex items-start gap-4">
+//               <MessageCircle className="w-5 h-5 md:w-6 md:h-6 mt-1 text-foreground flex-shrink-0" strokeWidth={1.5} />
+//               <p className="text-sm md:text-base text-foreground leading-relaxed">
+//                 Our customer service team will be happy to assist you, please click{' '}
+//                 <Link to="/pages/contact" className="underline underline-offset-2 hover:no-underline font-medium">
+//                   here
+//                 </Link>{' '}
+//                 to get in touch with us.
+//               </p>
+//             </div>
+//           </div>
 
-          {/* Arrange it yourself */}
-          <div className="space-y-4">
-            <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
-              Arrange it yourself
-            </h3>
-            <div className="space-y-4">
-              <Link to="/pages/pressroom" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
-                <Download className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:translate-y-1" strokeWidth={1.5} />
-                Download pressroom packages
-              </Link>
-              <Link to="/pages/become-a-dealer" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
-                <Building2 className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
-                Become a dealer
-              </Link>
-            </div>
-          </div>
+//           {/* Arrange it yourself */}
+//           <div className="space-y-4">
+//             <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
+//               Arrange it yourself
+//             </h3>
+//             <div className="space-y-4">
+//               <Link to="/pages/pressroom" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
+//                 <Download className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:translate-y-1" strokeWidth={1.5} />
+//                 Download pressroom packages
+//               </Link>
+//               <Link to="/pages/become-a-dealer" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
+//                 <Building2 className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
+//                 Become a dealer
+//               </Link>
+//             </div>
+//           </div>
 
-          {/* Got some questions? */}
-          <div className="space-y-4">
-            <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
-              Got some questions?
-            </h3>
-            <Link to="/pages/stores" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
-              <MessageCircle className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
-              Where can I buy AD Household?
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+//           {/* Got some questions? */}
+//           <div className="space-y-4">
+//             <h3 className="text-lg md:text-2xl font-serif font-normal text-foreground">
+//               Got some questions?
+//             </h3>
+//             <Link to="/pages/stores" className="flex items-center gap-4 text-sm md:text-base text-foreground hover:underline group">
+//               <MessageCircle className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-transform group-hover:scale-105" strokeWidth={1.5} />
+//               Where can I buy AD Household?
+//             </Link>
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   fragment RecommendedProduct on Product {

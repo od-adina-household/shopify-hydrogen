@@ -15,6 +15,7 @@ import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
 import { Input } from '~/components/ui/input';
 import { Separator } from '~/components/ui/separator';
 import { AnnouncementBanner } from '~/components/AnnouncementBanner';
+import { WhatsAppWidget } from '~/components/WhatsAppWidget';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -53,6 +54,7 @@ export function PageLayout({
         header={header}
         publicStoreDomain={publicStoreDomain}
       />
+      <WhatsAppWidget />
     </Aside.Provider>
   );
 }
