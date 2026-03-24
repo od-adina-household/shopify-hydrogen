@@ -1,6 +1,6 @@
 export function WhatsAppWidget() {
   const phoneNumber = '923249680850';
-  const message = 'Hello, I found you through adinahousehold.com and would love some assistance on my purchase';
+  const message = 'Hello! I visited adinahousehold.com and would love some assistance with my purchase.';
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
   return (
