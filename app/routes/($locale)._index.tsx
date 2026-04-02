@@ -142,8 +142,8 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
               alt={card.imageAlt}
               className="h-full w-full object-cover transition-all duration-700 group-hover:opacity-90 md:group-hover:opacity-100 md:group-hover:scale-105 max-w-full max-h-full"
             />
-            <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 left-4 sm:left-6 md:bottom-8 md:right-8 md:left-auto">
-              <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-primary/80 backdrop-blur-sm border border-primary/20 transition-all duration-300 group-hover:bg-primary">
+            <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 md:bottom-8 md:right-8">
+              <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-primary/80 backdrop-blur-sm border border-primary/20 transition-all duration-300 group-hover:bg-primary w-fit">
                 <span className="text-sm font-medium tracking-wider text-primary-foreground uppercase">
                   {card.title}
                 </span>
