@@ -20,6 +20,8 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Suspense, useState, useEffect } from 'react';
+import { AddToCartButton } from '~/components/AddToCartButton';
+import { useAside } from '~/components/Aside';
 import { Await, Link, useLoaderData } from 'react-router';
 import type { 
   ProductVariantFragment, 
@@ -410,6 +412,7 @@ function RelatedProducts({
   products: any[];
 }) {
   const [api, setApi] = useState<CarouselApi>();
+  const { open } = useAside();
 
   if (!products || products.length === 0) return null;
 
@@ -422,35 +425,52 @@ function RelatedProducts({
       </div>
       <Carousel setApi={setApi} opts={{ align: 'start' }}>
         <CarouselContent className="-ml-4 sm:-ml-6">
-          {products.map((product) => (
-            <CarouselItem key={product.id} className="pl-4 sm:pl-6 basis-full sm:basis-1/2 lg:basis-1/4">
-              <div className="bg-card border border-border/20 p-4 sm:p-6 group transition-all hover:shadow-sm text-left">
-                <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] sm:aspect-[3/4] mb-4 sm:mb-6 overflow-hidden bg-background">
-                  {product.featuredImage && (
-                    <Image
-                      data={product.featuredImage}
-                      className="size-full object-cover mix-blend-normal max-w-full max-h-full"
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (min-width: 1024px) 25vw"
-                    />
-                  )}
-                </Link>
-                <div className="space-y-2 sm:space-y-3">
-                  <h3 className="text-lg sm:text-xl font-medium leading-tight text-foreground font-sans">
-                    {product.title}
-                  </h3>
-                  <div className="flex justify-between items-end pt-1 sm:pt-2">
-                    <p className="text-xs sm:text-sm text-muted-foreground font-sans">
-                      <Money data={product.priceRange.minVariantPrice} />
-                    </p>
-                    <button className="size-7 sm:size-8 rounded-full border border-primary bg-primary flex items-center justify-center text-primary-foreground hover:bg-transparent hover:text-primary transition-all">
-                      <span className="sr-only">Add to cart</span>
-                      <span className="text-lg sm:text-xl leading-none mb-1">+</span>
-                    </button>
+          {products.map((product) => {
+            const variants = product.variants?.nodes ?? [];
+            const firstAvailableVariant = variants.find((v: any) => v.availableForSale) ?? variants[0];
+            const isAvailable = product.availableForSale && firstAvailableVariant;
+
+            return (
+              <CarouselItem key={product.id} className="pl-4 sm:pl-6 basis-full sm:basis-1/2 lg:basis-1/4">
+                <div className="bg-card border border-border/20 p-4 sm:p-6 group transition-all hover:shadow-sm text-left">
+                  <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] sm:aspect-[3/4] mb-4 sm:mb-6 overflow-hidden bg-background">
+                    {product.featuredImage && (
+                      <Image
+                        data={product.featuredImage}
+                        className="size-full object-cover mix-blend-normal max-w-full max-h-full"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (min-width: 1024px) 25vw"
+                      />
+                    )}
+                  </Link>
+                  <div className="space-y-2 sm:space-y-3">
+                    <h3 className="text-lg sm:text-xl font-medium leading-tight text-foreground font-sans">
+                      {product.title}
+                    </h3>
+                    <div className="flex justify-between items-end pt-1 sm:pt-2">
+                      <p className="text-xs sm:text-sm text-muted-foreground font-sans">
+                        <Money data={product.priceRange.minVariantPrice} />
+                      </p>
+                      <AddToCartButton
+                        disabled={!isAvailable}
+                        onClick={() => open('cart')}
+                        lines={
+                          firstAvailableVariant
+                            ? [{ merchandiseId: firstAvailableVariant.id, quantity: 1, selectedVariant: firstAvailableVariant }]
+                            : []
+                        }
+                        variant="outline"
+                        size="icon"
+                        className="size-7 sm:size-8 rounded-full border border-primary bg-primary text-primary-foreground hover:bg-transparent hover:text-primary transition-all"
+                      >
+                        <span className="sr-only">Add to cart</span>
+                        <span className="text-lg sm:text-xl leading-none mb-1">+</span>
+                      </AddToCartButton>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CarouselItem>
-          ))}
+              </CarouselItem>
+            );
+          })}
         </CarouselContent>
       </Carousel>
       <div className="flex justify-center lg:justify-end gap-3 sm:gap-4 mt-10 lg:mt-12">
