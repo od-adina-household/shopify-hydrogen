@@ -9,18 +9,29 @@ import type { ProductFragment } from 'storefrontapi.generated';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 import { cn } from '~/lib/utils';
+import { useWishlist } from '~/lib/useWishlist';
 import { AddToCartButton } from './AddToCartButton';
 import { useAside } from './Aside';
 
 export function ProductForm({
   productOptions,
   selectedVariant,
+  productId,
+  productHandle,
+  productTitle,
+  productImage,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
+  productId: string;
+  productHandle: string;
+  productTitle: string;
+  productImage?: { url: string; altText?: string | null };
 }) {
   const navigate = useNavigate();
   const { open } = useAside();
+  const { toggle, isWishlisted } = useWishlist();
+  const wishlisted = isWishlisted(productId);
   return (
     <div className="space-y-6">
       {productOptions.map((option) => {
@@ -125,9 +136,23 @@ export function ProductForm({
           variant="outline"
           size="lg"
           type="button"
+          aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          onClick={() =>
+            toggle({
+              id: productId,
+              handle: productHandle,
+              title: productTitle,
+              image: productImage,
+              price: selectedVariant?.price ?? { amount: '0', currencyCode: 'PKR' },
+            })
+          }
         >
-          <Heart className="h-5 w-5" />
-          <span className="sr-only">Add to wishlist</span>
+          <Heart
+            className={cn('h-5 w-5', wishlisted && 'fill-primary text-primary')}
+          />
+          <span className="sr-only">
+            {wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          </span>
         </Button>
       </div>
     </div>

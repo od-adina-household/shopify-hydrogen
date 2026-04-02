@@ -167,7 +167,7 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const { title, descriptionHtml, description, images } = product;
+  const { title, descriptionHtml, description, images, general, dimensions, care_instructions, downloads } = product;
   const productImages = images.nodes.length > 0 ? images.nodes : selectedVariant?.image ? [selectedVariant.image] : [];
 
   useEffect(() => {
@@ -314,6 +314,10 @@ export default function Product() {
                 <ProductForm
                   productOptions={productOptions}
                   selectedVariant={selectedVariant}
+                  productId={product.id}
+                  productHandle={product.handle}
+                  productTitle={product.title}
+                  productImage={product.featuredImage ?? undefined}
                 />
               </div>
             </div>
@@ -333,38 +337,46 @@ export default function Product() {
                     )}
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="general" className="border-b border-border/50">
-                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                    General
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8">
-                     <p className="opacity-80">General specifications go here.</p>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="dimensions" className="border-b border-border/50">
-                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                    Dimensions
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8">
-                     <p className="opacity-80">Product dimensions go here.</p>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="care" className="border-b border-border/50">
-                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                    Care & Maintenance Instructions
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8">
-                     <p className="opacity-80">Care instructions go here.</p>
-                  </AccordionContent>
-                </AccordionItem>
-                 <AccordionItem value="downloads" className="border-b border-border/50">
-                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                    Downloads
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8">
-                     <p className="opacity-80">Downloadable content goes here.</p>
-                  </AccordionContent>
-                </AccordionItem>
+                {general?.value && (
+                  <AccordionItem value="general" className="border-b border-border/50">
+                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                      General
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
+                      <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">{general.value}</div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+                {dimensions?.value && (
+                  <AccordionItem value="dimensions" className="border-b border-border/50">
+                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                      Dimensions
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
+                      <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">{dimensions.value}</div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+                {care_instructions?.value && (
+                  <AccordionItem value="care" className="border-b border-border/50">
+                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                      Care & Maintenance Instructions
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
+                      <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">{care_instructions.value}</div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+                {downloads?.value && (
+                  <AccordionItem value="downloads" className="border-b border-border/50">
+                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                      Downloads
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
+                      <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">{downloads.value}</div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
               </Accordion>
             </div>
           </div>
@@ -557,6 +569,10 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    featuredImage {
+      url
+      altText
+    }
     images(first: 10) {
       nodes {
         id
@@ -594,6 +610,18 @@ const PRODUCT_FRAGMENT = `#graphql
     seo {
       description
       title
+    }
+    general: metafield(namespace: "custom", key: "general") {
+      value
+    }
+    dimensions: metafield(namespace: "custom", key: "dimensions") {
+      value
+    }
+    care_instructions: metafield(namespace: "custom", key: "care_instructions") {
+      value
+    }
+    downloads: metafield(namespace: "custom", key: "downloads") {
+      value
     }
   }
   ${PRODUCT_VARIANT_FRAGMENT}
