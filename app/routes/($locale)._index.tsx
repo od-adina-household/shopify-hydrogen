@@ -155,26 +155,43 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
 }
 
 function HeroSection() {
+  const text = "A collection that feels both curated and created — where every object carries intention.";
+  const words = text.split(" ");
+
   return (
     <section className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden pt-20 md:pt-24">
       <div className="absolute inset-0">
         <img
           src="/images/hero-image.jpeg"
-          alt="Curated home collection"
+          alt="White ceramic dishes with gold accents, dried flowers, and greenery arranged on neutral background"
+          width={1920}
+          height={1080}
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/40 to-transparent" />
       </div>
       <div className="relative h-full flex items-center">
         <div className="w-full">
           <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 space-y-6 md:space-y-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light leading-tight text-white max-w-xl sm:max-w-2xl">
-              A collection that feels both curated and created — where every object carries intention.
-            </h1>
+            <div>
+              <div className="flex items-center gap-3 mb-6 md:mb-8">
+                <div className="h-px w-8 md:w-12 bg-amber-50/50" />
+                <span className="text-xs md:text-sm tracking-widest uppercase text-amber-50/70 font-sans">Curated</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-tight text-amber-50 max-w-2xl" style={{ textWrap: "balance" }}>
+                {words.map((word, index) => (
+                  <span key={index}>
+                    <span className="hero-word">{word}</span>
+                    {index < words.length - 1 && " "}
+                  </span>
+                ))}
+              </h1>
+            </div>
             <Button
               variant="outline"
               size="lg"
-              className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14"
+              className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14 animate-in fade-in slide-in-from-bottom-4 duration-1000"
+              style={{ animationDelay: "2.2s" }}
               asChild
             >
               <Link to="/collections/all">
