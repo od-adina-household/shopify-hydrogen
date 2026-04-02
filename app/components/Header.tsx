@@ -198,8 +198,8 @@ function HeaderCtas({
 }) {
   return (
     <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0" role="navigation">
-      <SearchToggle />
-      <Button variant="ghost" size="icon-lg" className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground" asChild>
+      <SearchToggle className="hidden md:block" />
+      <Button variant="ghost" size="icon-lg" className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground hidden md:block" asChild>
         <NavLink
           prefetch="intent"
           to="/account"
@@ -247,14 +247,14 @@ function HeaderMenuMobileToggle({
   );
 }
 
-function SearchToggle() {
+function SearchToggle({ className }: { className?: string }) {
   const { open } = useAside();
 
   return (
     <Button
       variant="ghost"
       size="icon-lg"
-      className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground"
+      className={`h-10 w-10 p-0 hover:bg-transparent hover:text-foreground ${className || ''}`}
       onClick={() => open('search')}
     >
       <SearchIcon className="w-[20px] h-[20px]" />
