@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { Await, Link, NavLink } from 'react-router';
 import type { FooterQuery, HeaderQuery } from 'storefrontapi.generated';
 
@@ -6,6 +6,54 @@ interface FooterProps {
   footer: Promise<FooterQuery | null>;
   header: HeaderQuery;
   publicStoreDomain: string;
+}
+
+function NewsletterSignup() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus('loading');
+    try {
+      // Replace with actual endpoint
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setStatus('success');
+      setEmail('');
+      setTimeout(() => setStatus('idle'), 2000);
+    } catch {
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 2000);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-md space-y-3">
+      <p className="text-xs font-medium">Get the latest updates</p>
+      <div className="flex gap-2">
+        <input
+          type="email"
+          placeholder="Your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1 px-3 py-2 bg-transparent border border-foreground/20 text-xs focus:outline-none focus:border-foreground transition-colors"
+          disabled={status === 'loading'}
+        />
+        <button
+          type="submit"
+          disabled={status === 'loading' || !email}
+          className="px-4 py-2 border border-foreground text-xs font-medium hover:bg-foreground/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {status === 'loading' ? 'Joining...' : status === 'success' ? 'Joined' : 'Join'}
+        </button>
+      </div>
+      {status === 'error' && (
+        <p className="text-xs text-red-500">Something went wrong. Try again.</p>
+      )}
+    </form>
+  );
 }
 
 export function Footer({
@@ -19,111 +67,24 @@ export function Footer({
         {(footer) => (
           <footer className="bg-sidebar text-foreground px-4 sm:px-6 md:px-8 lg:px-12 py-16 md:py-24">
             <div className="container mx-auto max-w-7xl">
-              <div className="flex flex-wrap gap-8 lg:gap-12 items-start">
-                <div className="w-full lg:w-auto lg:flex-shrink-0 text-foreground">
-                  <svg className="w-60 h-auto" width="687.1" height="430" viewBox="0 0 687.1 430" xmlns="http://www.w3.org/2000/svg" aria-label="Logo">
+              <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start">
+                {/* Logo */}
+                <div className="col-span-12 lg:col-span-2 text-foreground">
+                  <svg className="w-40 lg:w-60 h-auto" width="687.1" height="430" viewBox="0 0 687.1 430" xmlns="http://www.w3.org/2000/svg" aria-label="Logo">
                     <rect x="237.5" fill="currentColor" width="214.5" height="430"/>
                     <rect fill="currentColor" width="214.5" height="430"/>
                     <path fill="currentColor" d="M687.1,0v430c-118.8,0-215-96.3-215-215S568.4,0,687.1,0"/>
                   </svg>
                 </div>
 
-                <div className="flex-1 min-w-0 font-sans">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 lg:gap-16">
-                    <div className="space-y-6">
-                      <h3 className="text-base font-serif font-normal">
-                        Customer service
-                      </h3>
-                      <ul className="space-y-4 text-xs font-sans">
-                        <li>
-                          <Link to="/pages/contact" className="hover:opacity-70 transition-opacity">
-                            Contact
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/pages/agents" className="hover:opacity-70 transition-opacity">
-                            Agents & Distributors
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
+                {/* Divider */}
+                <div className="hidden lg:block lg:col-span-1 h-32 border-r border-foreground/10"></div>
 
-                    <div className="space-y-6">
-                      <h3 className="text-base font-serif font-normal">
-                        About Us
-                      </h3>
-                      <ul className="space-y-4 text-xs font-sans">
-                        <li>
-                          <Link to="/pages/our-story" className="hover:opacity-70 transition-opacity">
-                            Our story
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/pages/sustainability" className="hover:opacity-70 transition-opacity">
-                            Brand Philosophy
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/pages/brand-book" className="hover:opacity-70 transition-opacity">
-                            Brand Book
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
+                {/* Newsletter & Content */}
+                <div className="col-span-12 lg:col-span-6 font-sans space-y-8">
+                  <NewsletterSignup />
 
-                    <div className="space-y-6">
-                      <h3 className="text-base font-serif font-normal">
-                        Discover
-                      </h3>
-                      <ul className="space-y-4 text-xs font-sans">
-                        <li>
-                          <Link to="/pages/stores" className="hover:opacity-70 transition-opacity">
-                            Stores
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/pages/press" className="hover:opacity-70 transition-opacity">
-                            Press
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/pages/catalogues" className="hover:opacity-70 transition-opacity">
-                            Catalogues
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/collections" className="hover:opacity-70 transition-opacity">
-                            Collection
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-
-                    <div className="space-y-6">
-                      <h3 className="text-base font-serif font-normal">
-                        Connect
-                      </h3>
-                      <ul className="space-y-4 text-xs font-sans">
-                        <li>
-                          <Link to="/pages/dealers" className="hover:opacity-70 transition-opacity">
-                            Become a dealer
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/pages/careers" className="hover:opacity-70 transition-opacity">
-                            Careers
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/account" className="hover:opacity-70 transition-opacity">
-                            Login
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="mt-16 flex flex-wrap items-center justify-between gap-4 font-sans">
+                  <div className="flex flex-wrap items-center justify-between gap-4 font-sans">
                     <p className="text-xs">
                       © {new Date().getFullYear()} AdinaHousehold with ❤️ from{' '}
                       <a
@@ -149,7 +110,11 @@ export function Footer({
                   </div>
                 </div>
 
-                <div className="hidden lg:flex flex-col gap-4 items-center">
+                {/* Divider */}
+                <div className="hidden lg:block lg:col-span-1 h-32 border-r border-foreground/10"></div>
+
+                {/* Social Icons */}
+                <div className="col-span-12 lg:col-span-2 flex lg:flex-col gap-4 items-center lg:items-end">
                   <a
                     href="https://www.instagram.com/adina.household/"
                     target="_blank"
