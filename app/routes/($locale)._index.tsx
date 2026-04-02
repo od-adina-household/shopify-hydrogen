@@ -106,13 +106,16 @@ function IntroSection({ text, buttonLabel, buttonHref }: IntroSectionProps) {
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] leading-snug md:leading-relaxed font-serif font-normal text-foreground text-left max-w-4xl pt-16 md:pt-24 pb-6 md:pb-8">
           {text}
         </h2>
-        <Link
-          to={buttonHref}
-          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-primary underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 mb-8 md:mb-12"
+        <Button
+          variant="outline"
+          size="lg"
+          className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14 mb-8 md:mb-12"
+          asChild
         >
-          {buttonLabel}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+          <Link to={buttonHref}>
+            {buttonLabel}
+          </Link>
+        </Button>
       </div>
     </section>
   );
@@ -226,13 +229,16 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
         </p>
       )}
       {ctaLabel && ctaHref && (
-        <Link
-          to={ctaHref}
-          className="inline-flex items-center gap-3 text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-primary underline underline-offset-4 decoration-1 hover:no-underline transition-all duration-300 w-fit"
+        <Button
+          variant="outline"
+          size="lg"
+          className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14 w-fit"
+          asChild
         >
-          {ctaLabel}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+          <Link to={ctaHref}>
+            {ctaLabel}
+          </Link>
+        </Button>
       )}
     </div>
   );

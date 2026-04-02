@@ -91,6 +91,10 @@ export function Footer({
   );
 }
 
+type FooterWithCollections = FooterQuery & {
+  collections?: { nodes: Array<{ title: string; handle: string }> };
+};
+
 function FooterContent({
   footer,
   header,
@@ -101,7 +105,11 @@ function FooterContent({
   publicStoreDomain: string;
 }) {
   const primaryDomainUrl = header?.shop?.primaryDomain?.url ?? '';
-  const menuItems = footer?.menu?.items ?? [];
+  const footerData = footer as FooterWithCollections | null;
+  const menuItems = (footerData?.menu?.items ?? []).filter(
+    (item) => item.title?.toLowerCase() !== 'search',
+  );
+  const collections = footerData?.collections?.nodes ?? [];
 
   function normalizeUrl(url: string) {
     if (
@@ -141,6 +149,21 @@ function FooterContent({
                         </li>
                       );
                     })}
+                  </ul>
+                )}
+                {collections.length > 0 && (
+                  <ul className="space-y-2 lg:space-y-3">
+                    {collections.map((collection) => (
+                      <li key={collection.handle}>
+                        <Link
+                          to={`/collections/${collection.handle}`}
+                          prefetch="intent"
+                          className="text-base leading-snug hover:opacity-30 transition-opacity"
+                        >
+                          {collection.title}
+                        </Link>
+                      </li>
+                    ))}
                   </ul>
                 )}
                 <ul className="space-y-2 lg:space-y-3">
@@ -218,13 +241,13 @@ function FooterContent({
               ADINA HOUSEHOLD
             </text>
           </svg>
-          <p className="text-xs pb-4 lg:pb-6 mt-1 text-right">
-            &copy; {new Date().getFullYear()} AdinaHousehold with ❤️ from{' '}
+          <p className="text-sm font-medium text-center pt-6 pb-4 lg:pb-6 opacity-80">
+            © {new Date().getFullYear()} Adina Household with ❤️ from{' '}
             <a
               href="https://otherdev.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:opacity-70 transition-opacity"
+              className="hover:opacity-100 transition-opacity underline-offset-4 hover:underline"
             >
               Otherdev
             </a>
