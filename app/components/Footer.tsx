@@ -25,21 +25,21 @@ function SpinningBadge() {
         <defs>
           <path
             id="badge-circle-path"
-            d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0"
+            d="M 50,50 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
             fill="none"
           />
         </defs>
         {/* Outer ring */}
         <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5" />
-        {/* Inner ring */}
-        <circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" strokeWidth="0.4" opacity="0.35" />
-        {/* Logo mark centered */}
-        <svg x="21" y="32" width="58" height="36" viewBox="0 0 687.1 430">
+        {/* Inner ring — frames the logo, sits below the text band */}
+        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="0.4" opacity="0.35" />
+        {/* Logo mark centered within inner ring */}
+        <svg x="24" y="35" width="52" height="30" viewBox="0 0 687.1 430">
           <rect x="237.5" fill="currentColor" width="214.5" height="430" />
           <rect fill="currentColor" width="214.5" height="430" />
           <path fill="currentColor" d="M687.1,0v430c-118.8,0-215-96.3-215-215S568.4,0,687.1,0" />
         </svg>
-        {/* Circular text */}
+        {/* Circular text — baseline at r=37, tops at ~r=45, fits between both rings */}
         <text fontSize="8" fill="currentColor" fontFamily="inherit" letterSpacing="3.8" opacity="0.75">
           <textPath href="#badge-circle-path">
             ADINA HOUSEHOLD ✦ ADINA HOUSEHOLD ✦
