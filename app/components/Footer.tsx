@@ -40,9 +40,9 @@ function SpinningBadge() {
           <path fill="currentColor" d="M687.1,0v430c-118.8,0-215-96.3-215-215S568.4,0,687.1,0" />
         </svg>
         {/* Circular text — baseline at r=37, tops at ~r=45, fits between both rings */}
-        <text fontSize="8" fill="currentColor" fontFamily="inherit" letterSpacing="3.8" opacity="0.75">
+        <text fontSize="8" fill="currentColor" fontFamily="inherit" letterSpacing="1.75" opacity="0.75">
           <textPath href="#badge-circle-path">
-            ADINA HOUSEHOLD ✦ ADINA HOUSEHOLD ✦
+            ✦ ADINA HOUSEHOLD ✦ ADINA HOUSEHOLD ✦
           </textPath>
         </text>
       </svg>
