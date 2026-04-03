@@ -198,13 +198,13 @@ function HeaderCtas({
 }) {
   return (
     <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0" role="navigation">
-      <SearchToggle className="hidden md:block" />
-      <Button variant="ghost" size="icon-lg" className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground hidden md:block" asChild>
+      <SearchToggle className="hidden md:inline-flex" />
+      <Button variant="ghost" size="icon-lg" className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground hidden md:inline-flex" asChild>
         <NavLink
           prefetch="intent"
           to="/account"
         >
-          <UserIcon className="w-[26px] h-[26px]" />
+          <UserIcon className="size-[26px]" />
           <span className="sr-only">
             <Suspense fallback="Account">
               <Await resolve={isLoggedIn} errorElement="Account">
@@ -238,9 +238,9 @@ function HeaderMenuMobileToggle({
       onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
     >
       {isMobileMenuOpen ? (
-        <X className="w-[26px] h-[26px]" />
+        <X className="size-[26px]" />
       ) : (
-        <MenuIcon className="w-[26px] h-[26px]" />
+        <MenuIcon className="size-[26px]" />
       )}
       <span className="sr-only">{isMobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
     </Button>
@@ -257,7 +257,7 @@ function SearchToggle({ className }: { className?: string }) {
       className={`h-10 w-10 p-0 hover:bg-transparent hover:text-foreground ${className || ''}`}
       onClick={() => open('search')}
     >
-      <SearchIcon className="w-[20px] h-[20px]" />
+      <SearchIcon className="size-[26px]" />
       <span className="sr-only">Search</span>
     </Button>
   );
@@ -271,7 +271,7 @@ function CartBadge({ count }: { count: number | null }) {
     <Button
       variant="ghost"
       size="icon-lg"
-      className="relative h-10 w-10 hover:bg-transparent hover:text-foreground"
+      className="relative h-10 w-10 p-0 hover:bg-transparent hover:text-foreground"
       onClick={(e) => {
         e.preventDefault();
         open('cart');
@@ -283,7 +283,7 @@ function CartBadge({ count }: { count: number | null }) {
         } as CartViewPayload);
       }}
     >
-      <ShoppingBag className="w-[26px] h-[26px]" />
+      <ShoppingBag className="size-[26px]" />
       {count !== null && count > 0 && (
         <Badge
           variant="default"
