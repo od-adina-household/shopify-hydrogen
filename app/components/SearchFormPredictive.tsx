@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   useFetcher,
   useNavigate,
@@ -33,6 +33,7 @@ export function SearchFormPredictive({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
   const aside = useAside();
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /** Reset the input value and blur the input */
   function resetInput(event: React.FormEvent<HTMLFormElement>) {
@@ -50,18 +51,24 @@ export function SearchFormPredictive({
     aside.close();
   }
 
-  /** Fetch search results based on the input value */
-  function fetchResults(event: React.ChangeEvent<HTMLInputElement>) {
-    void fetcher.submit(
-      { q: event.target.value || '', limit: 5, predictive: true },
-      { method: 'GET', action: SEARCH_ENDPOINT },
-    );
-  }
+  /** Fetch search results based on the input value (debounced 200ms) */
+  const fetchResults = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      void fetcher.submit(
+        { q: event.target.value || '', limit: 5, predictive: true },
+        { method: 'GET', action: SEARCH_ENDPOINT },
+      );
+    }, 200);
+  }, [fetcher]);
 
   // ensure the passed input has a type of search, because SearchResults
   // will select the element based on the input
   useEffect(() => {
     inputRef?.current?.setAttribute('type', 'search');
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
   }, []);
 
   if (typeof children !== 'function') {
