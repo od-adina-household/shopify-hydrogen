@@ -2,6 +2,7 @@ import { type MappedProductOptions } from '@shopify/hydrogen';
 import type {
   Maybe,
   ProductOptionValueSwatch,
+  CurrencyCode,
 } from '@shopify/hydrogen/storefront-api-types';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
@@ -143,7 +144,7 @@ export function ProductForm({
               handle: productHandle,
               title: productTitle,
               image: productImage,
-              price: selectedVariant?.price ?? { amount: '0', currencyCode: 'PKR' },
+              price: selectedVariant?.price ?? { amount: '0', currencyCode: 'PKR' as CurrencyCode },
             })
           }
         >
