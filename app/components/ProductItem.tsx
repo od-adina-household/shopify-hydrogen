@@ -101,6 +101,21 @@ export const ProductItem = memo(function ProductItem({
     }
   }, [showVariantSelector]);
 
+  // Pre-compute option availability to avoid O(variants × options) lookups in render
+  const availableOptionValues = new Map<string, Set<string>>();
+  if (hasMultipleVariants) {
+    for (const variant of variants) {
+      for (const option of variant.selectedOptions) {
+        if (!availableOptionValues.has(option.name)) {
+          availableOptionValues.set(option.name, new Set());
+        }
+        if (variant.availableForSale) {
+          availableOptionValues.get(option.name)!.add(option.value);
+        }
+      }
+    }
+  }
+
   return (
     <div className="group">
       <Link
@@ -171,11 +186,7 @@ export const ProductItem = memo(function ProductItem({
                   <div className="flex flex-wrap gap-1.5">
                     {option.optionValues.map((value) => {
                       const isSelected = selectedOptions[option.name] === value.name;
-                      // Check if this option value exists in any variant
-                      const variantWithOption = variants.find(v =>
-                        v.selectedOptions.some(o => o.name === option.name && o.value === value.name)
-                      );
-                      const isOptionAvailable = variantWithOption?.availableForSale || false;
+                      const isOptionAvailable = availableOptionValues.get(option.name)?.has(value.name) ?? false;
 
                       return (
                         <Button
