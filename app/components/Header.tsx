@@ -35,10 +35,15 @@ export function Header({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const wasScrolled = useRef(isScrolled);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const nowScrolled = window.scrollY > 50;
+      if (nowScrolled !== wasScrolled.current) {
+        setIsScrolled(nowScrolled);
+        wasScrolled.current = nowScrolled;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true } as AddEventListenerOptions);
