@@ -24,15 +24,20 @@ function AddToCartButtonInner({
   className?: string;
 }) {
   const prevStateRef = useRef(fetcher.state);
+  const onClickRef = useRef(onClick);
+
+  useEffect(() => {
+    onClickRef.current = onClick;
+  }, [onClick]);
 
   useEffect(() => {
     // Check if the fetcher just finished submitting (went from submitting/loading to idle)
     if (prevStateRef.current !== 'idle' && fetcher.state === 'idle') {
       // Form submission completed successfully, now call onClick
-      onClick?.();
+      onClickRef.current?.();
     }
     prevStateRef.current = fetcher.state;
-  }, [fetcher.state, onClick]);
+  }, [fetcher.state]);
 
   return (
     <>
