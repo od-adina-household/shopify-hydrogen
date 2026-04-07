@@ -24,17 +24,25 @@ export const meta: Route.MetaFunction = () => {
 export async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const isPredictive = url.searchParams.has('predictive');
-  const searchPromise: Promise<PredictiveSearchReturn | RegularSearchReturn> =
-    isPredictive
-      ? predictiveSearch({ request, context })
-      : regularSearch({ request, context });
+  const type = isPredictive ? 'predictive' : 'regular';
 
-  searchPromise.catch((error: Error) => {
-    console.error(error);
-    return { term: '', result: null, error: error.message };
-  });
+  try {
+    const searchPromise: Promise<PredictiveSearchReturn | RegularSearchReturn> =
+      isPredictive
+        ? predictiveSearch({ request, context })
+        : regularSearch({ request, context });
 
-  return await searchPromise;
+    return await searchPromise;
+  } catch (error) {
+    // Handle request cancellation (user typing rapidly aborts previous requests)
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return { type, term: '', result: null, error: null };
+    }
+
+    console.error('Search loader error:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return { type, term: '', result: null, error: message };
+  }
 }
 
 /**
