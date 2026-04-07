@@ -23,11 +23,11 @@ import { Suspense, useState, useEffect } from 'react';
 import { AddToCartButton } from '~/components/AddToCartButton';
 import { useAside } from '~/components/Aside';
 import { Await, Link, useLoaderData } from 'react-router';
-import type { 
-  ProductVariantFragment, 
-  ProductFragment, 
+import type {
+  ProductVariantFragment,
+  ProductFragment,
   ProductRecommendationsQuery,
-  FallbackProductsQuery
+  FallbackProductsQuery,
 } from 'storefrontapi.generated';
 import { ProductForm } from '~/components/ProductForm';
 import { ProductPrice } from '~/components/ProductPrice';
@@ -56,6 +56,14 @@ import {
 } from '~/components/ui/breadcrumb';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/products.$handle';
+
+type ProductImage = NonNullable<ProductFragment['images']['nodes'][number]>;
+
+type RelatedProduct = NonNullable<
+  ProductRecommendationsQuery['productRecommendations']
+>[number] & {
+  variants?: { nodes: Array<{ id: string; availableForSale: boolean }> };
+};
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
@@ -192,7 +200,7 @@ export default function Product() {
             <div className="relative min-h-48 sm:min-h-64 md:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
               <Carousel setApi={setApi} className="w-full h-full" opts={{ loop: true }}>
                 <CarouselContent className="h-full ml-0">
-                  {productImages.map((image: any, index: number) => (
+                  {productImages.map((image: ProductImage, index: number) => (
                     <CarouselItem key={image.id || index} className="w-full h-full flex items-center justify-center p-0 pl-0">
                       <div className="relative w-full flex items-center justify-center bg-background">
                         <Image
@@ -230,7 +238,7 @@ export default function Product() {
             {/* Thumbnail Navigation */}
             {productImages.length > 1 && (
               <div className="flex gap-2 mt-4 px-4 lg:px-0 overflow-x-auto pb-2">
-                {productImages.map((image: any, index: number) => (
+                {productImages.map((image: ProductImage, index: number) => (
                   <button
                     key={image.id || index}
                     onClick={() => api?.scrollTo(index)}
@@ -421,7 +429,7 @@ export default function Product() {
 function RelatedProducts({
   products,
 }: {
-  products: any[];
+  products: RelatedProduct[];
 }) {
   const [api, setApi] = useState<CarouselApi>();
   const { open } = useAside();
@@ -439,7 +447,7 @@ function RelatedProducts({
         <CarouselContent className="-ml-4 sm:-ml-6">
           {products.map((product) => {
             const variants = product.variants?.nodes ?? [];
-            const firstAvailableVariant = variants.find((v: any) => v.availableForSale) ?? variants[0];
+            const firstAvailableVariant = variants.find((v) => v.availableForSale) ?? variants[0];
             const isAvailable = product.availableForSale && firstAvailableVariant;
 
             return (
