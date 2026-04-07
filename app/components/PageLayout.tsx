@@ -103,7 +103,7 @@ function SearchAside() {
                     }
 
                     return (
-                      <div className="max-h-[60vh] overflow-y-auto space-y-4">
+                      <div className="max-h-[60vh] overflow-y-auto space-y-4 scrollbar-hide">
                         <SearchResultsPredictive.Products
                           products={items.products}
                           closeSearch={() => {
