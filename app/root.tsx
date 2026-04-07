@@ -1,5 +1,6 @@
 import { Analytics, getShopAnalytics, useNonce } from '@shopify/hydrogen';
 import { ArrowRight } from 'lucide-react';
+import { useRef } from 'react';
 import {
   isRouteErrorResponse,
   Link,
@@ -15,6 +16,7 @@ import {
 import { Footer } from '~/components/Footer';
 import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
 import { themeSessionResolver } from '~/lib/sessions.server';
+import { usePageTransition } from '~/hooks/usePageTransition';
 import type { Route } from './+types/root';
 import Styling from './app.css?url';
 import { PageLayout } from './components/PageLayout';
@@ -215,6 +217,13 @@ function AppWithProviders() {
 
 function AppContent() {
   const data = useRouteLoaderData<RootLoader>('root');
+  const outletRef = useRef<HTMLDivElement>(null);
+
+  usePageTransition(outletRef as React.RefObject<HTMLElement | null>, {
+    selector: "> *",
+    duration: 0.35,
+    startY: 12,
+  });
 
   if (!data) {
     return <Outlet />;
@@ -227,7 +236,9 @@ function AppContent() {
   if (!isProduction) {
     return (
       <PageLayout {...data}>
-        <Outlet />
+        <div ref={outletRef}>
+          <Outlet />
+        </div>
       </PageLayout>
     );
   }
@@ -235,7 +246,9 @@ function AppContent() {
   return (
     <Analytics.Provider cart={data.cart} shop={data.shop} consent={data.consent}>
       <PageLayout {...data}>
-        <Outlet />
+        <div ref={outletRef}>
+          <Outlet />
+        </div>
       </PageLayout>
     </Analytics.Provider>
   );

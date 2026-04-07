@@ -13,6 +13,7 @@ import { cn } from '~/lib/utils';
 import { useVariantUrl } from '~/lib/variants';
 import { AddToCartButton } from './AddToCartButton';
 import { useAside } from './Aside';
+import { useScrollReveal } from '~/hooks/useScrollReveal';
 
 export const ProductItem = memo(function ProductItem({
   product,
@@ -29,6 +30,15 @@ export const ProductItem = memo(function ProductItem({
   const isAvailable = product.availableForSale;
   const { open } = useAside();
   const variantSelectorRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useScrollReveal(rootRef as React.RefObject<HTMLElement | null>, {
+    variant: "fade-up",
+    duration: 0.6,
+    distance: 20,
+    triggerOffset: 50,
+    once: true,
+  });
 
   // Get variants and options
   const variants = 'variants' in product ? product.variants?.nodes || [] : [];
@@ -118,6 +128,7 @@ export const ProductItem = memo(function ProductItem({
 
   return (
     <div
+      ref={rootRef}
       className="group"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
     >

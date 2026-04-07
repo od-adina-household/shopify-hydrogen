@@ -1,8 +1,10 @@
 import { Analytics, getPaginationVariables } from '@shopify/hydrogen';
+import { useRef } from 'react';
 import { redirect, useLoaderData } from 'react-router';
 import type { ProductItemFragment } from 'storefrontapi.generated';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 import { ProductItem } from '~/components/ProductItem';
+import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/collections.$handle';
 
@@ -68,6 +70,14 @@ function loadDeferredData({ context }: Route.LoaderArgs) {
 export default function Collection() {
   const { collection } = useLoaderData<typeof loader>();
   const productCount = collection.products?.nodes?.length ?? 0;
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useStaggerFadeIn(gridRef as React.RefObject<HTMLElement | null>, {
+    selector: ".product-item",
+    stagger: 0.06,
+    duration: 0.5,
+    startY: 16,
+  });
 
   return (
     <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12 mt-20 md:mt-24">
@@ -82,18 +92,22 @@ export default function Collection() {
               : `Showing ${productCount} product${productCount !== 1 ? 's' : ''}`}
           </p>
         </div>
-        <PaginatedResourceSection<ProductItemFragment>
-          connection={collection.products}
-          resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 md:gap-x-8 md:gap-y-10 lg:gap-x-10 lg:gap-y-12"
-        >
-          {({ node: product, index }) => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              loading={index < 8 ? 'eager' : undefined}
-            />
-          )}
-        </PaginatedResourceSection>
+        <div ref={gridRef}>
+          <PaginatedResourceSection<ProductItemFragment>
+            connection={collection.products}
+            resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 md:gap-x-8 md:gap-y-10 lg:gap-x-10 lg:gap-y-12"
+          >
+            {({ node: product, index }) => (
+              <div className="product-item">
+                <ProductItem
+                  key={product.id}
+                  product={product}
+                  loading={index < 8 ? 'eager' : undefined}
+                />
+              </div>
+            )}
+          </PaginatedResourceSection>
+        </div>
         <Analytics.CollectionView
           data={{
             collection: {

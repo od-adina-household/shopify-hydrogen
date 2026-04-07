@@ -1,7 +1,10 @@
+import { useRef } from "react";
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 // import { MessageCircle, Download, Building2 } from 'lucide-react';
 import { Button } from '~/components/ui/button';
+import { gsap, useGSAP } from '~/lib/gsap';
+import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn';
 import type { Route } from './+types/_index';
 
 export const meta: Route.MetaFunction = () => {
@@ -128,14 +131,23 @@ interface CollectionCard {
 }
 
 function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useStaggerFadeIn(sectionRef as React.RefObject<HTMLElement | null>, {
+    selector: ".collection-card",
+    stagger: 0.1,
+    duration: 0.7,
+    startY: 30,
+  });
+
   return (
-    <section className="w-full pt-2 pb-4 md:pb-6 lg:pb-8 px-6 md:px-8 lg:px-12">
+    <section ref={sectionRef} className="w-full pt-2 pb-4 md:pb-6 lg:pb-8 px-6 md:px-8 lg:px-12">
       <div className="max-w-7xl mx-auto grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-4">
         {cards.map((card, index) => (
           <Link
             key={index}
             to={card.href}
-            className="relative aspect-[4/5] sm:aspect-[3/4] md:aspect-[3/4] overflow-hidden group block w-full bg-background md:bg-transparent"
+            className="collection-card relative aspect-[4/5] sm:aspect-[3/4] md:aspect-[3/4] overflow-hidden group block w-full bg-background md:bg-transparent"
           >
             <img
               src={card.imageSrc}
@@ -160,9 +172,59 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
 function HeroSection() {
   const text = "A collection that feels both curated and created — where every object carries intention.";
   const words = text.split(" ");
+  const heroRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add(
+      {
+        reduceMotion: "(prefers-reduced-motion: reduce)",
+      },
+      (context) => {
+        const { reduceMotion } = context.conditions!;
+
+        // Stagger word animation
+        gsap.fromTo(
+          ".hero-word",
+          {
+            opacity: reduceMotion ? 1 : 0,
+            y: reduceMotion ? 0 : 30,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: reduceMotion ? 0 : 0.8,
+            ease: "power2.out",
+            stagger: reduceMotion ? 0 : 0.06,
+            delay: reduceMotion ? 0 : 0.3,
+          }
+        );
+
+        // Button fade-in
+        if (buttonRef.current) {
+          gsap.fromTo(
+            buttonRef.current,
+            {
+              opacity: reduceMotion ? 1 : 0,
+              y: reduceMotion ? 0 : 20,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: reduceMotion ? 0 : 0.6,
+              ease: "power2.out",
+              delay: reduceMotion ? 0 : 1.2,
+            }
+          );
+        }
+      }
+    );
+  }, { scope: heroRef.current });
 
   return (
-    <section className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden pt-20 md:pt-24">
+    <section ref={heroRef} className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden pt-20 md:pt-24">
       <div className="absolute inset-0">
         <img
           src="/images/hero-image.jpeg"
@@ -184,23 +246,24 @@ function HeroSection() {
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-tight text-amber-50 max-w-2xl" style={{ textWrap: "balance" }}>
                 {words.map((word, index) => (
                   <span key={index}>
-                    <span className="hero-word">{word}</span>
+                    <span className="hero-word inline-block">{word}</span>
                     {index < words.length - 1 && " "}
                   </span>
                 ))}
               </h1>
             </div>
-            <Button
-              variant="outline"
-              size="lg"
-              className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14 animate-in fade-in slide-in-from-bottom-4 duration-1000"
-              style={{ animationDelay: "2.2s" }}
-              asChild
-            >
-              <Link to="/collections/all">
-                Shop now
-              </Link>
-            </Button>
+            <div ref={buttonRef}>
+              <Button
+                variant="outline"
+                size="lg"
+                className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14"
+                asChild
+              >
+                <Link to="/collections/all">
+                  Shop now
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -218,8 +281,71 @@ interface SplitSectionProps {
 }
 
 function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ctaLabel, ctaHref }: SplitSectionProps) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add(
+      {
+        reduceMotion: "(prefers-reduced-motion: reduce)",
+      },
+      (context) => {
+        const { reduceMotion } = context.conditions!;
+
+        // Image scale reveal
+        if (imageRef.current) {
+          gsap.fromTo(
+            imageRef.current,
+            {
+              opacity: reduceMotion ? 1 : 0,
+              scale: reduceMotion ? 1 : 0.95,
+            },
+            {
+              opacity: 1,
+              scale: 1,
+              duration: reduceMotion ? 0 : 0.8,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top+=80 bottom",
+                toggleActions: "play none none none",
+                once: true,
+              },
+            }
+          );
+        }
+
+        // Text slide in
+        if (contentRef.current) {
+          gsap.fromTo(
+            contentRef.current,
+            {
+              opacity: reduceMotion ? 1 : 0,
+              x: reduceMotion ? 0 : (imageOnRight ? -30 : 30),
+            },
+            {
+              opacity: 1,
+              x: 0,
+              duration: reduceMotion ? 0 : 0.7,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top+=80 bottom",
+                toggleActions: "play none none none",
+                once: true,
+              },
+            }
+          );
+        }
+      }
+    );
+  }, { scope: sectionRef.current });
+
   const textContent = (
-    <div className="flex flex-col justify-center h-full px-6 sm:px-10 md:px-12 lg:px-16 py-12 md:py-16 lg:py-20">
+    <div ref={contentRef} className="flex flex-col justify-center h-full px-6 sm:px-10 md:px-12 lg:px-16 py-12 md:py-16 lg:py-20">
       <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-serif font-normal text-foreground leading-tight mb-6 md:mb-8 italic">
         {title}
       </h2>
@@ -244,7 +370,7 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
   );
 
   const imageContent = (
-    <div className="h-full min-h-[300px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[500px] xl:min-h-[600px]">
+    <div ref={imageRef} className="h-full min-h-[300px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[500px] xl:min-h-[600px]">
       {ctaHref ? (
         <Link to={ctaHref} className="block h-full w-full">
           <img
@@ -264,7 +390,7 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
   );
 
   return (
-    <section className="w-full bg-secondary">
+    <section ref={sectionRef} className="w-full bg-secondary">
       <div className="grid grid-cols-1 md:grid-cols-2">
         {imageOnRight ? (
           <>
