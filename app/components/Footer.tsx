@@ -12,6 +12,7 @@ const LEGAL_LINKS = [
   { title: 'Cookie Statement', url: '/pages/cookies' },
   { title: 'Privacy Statement', url: '/pages/privacy-policy' },
   { title: 'Terms & Conditions', url: '/pages/terms-of-service' },
+  { title: 'Refund Policy', url: '/pages/refund-policy' },
 ];
 
 function SpinningBadge() {
