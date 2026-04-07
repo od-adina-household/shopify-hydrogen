@@ -117,7 +117,10 @@ export const ProductItem = memo(function ProductItem({
   }
 
   return (
-    <div className="group">
+    <div
+      className="group"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
+    >
       <Link
         prefetch="intent"
         to={variantUrl}
