@@ -293,13 +293,7 @@ export default function Product() {
             </div>
 
             {/* Social Share */}
-            <div className="flex justify-end gap-3 sm:gap-4 mb-8 lg:mb-12">
-               <button className="hover:opacity-70 transition-opacity"><Mail className="size-4 sm:size-5 text-foreground" /></button>
-               <button className="hover:opacity-70 transition-opacity"><Share2 className="size-4 sm:size-5 text-foreground" /></button>
-               <button className="hover:opacity-70 transition-opacity"><div className="size-4 sm:size-5 border border-border rounded-full flex items-center justify-center text-xs font-bold text-foreground">P</div></button>
-               <button className="hover:opacity-70 transition-opacity"><Twitter className="size-4 sm:size-5 text-foreground" /></button>
-               <button className="hover:opacity-70 transition-opacity"><Facebook className="size-4 sm:size-5 text-foreground" /></button>
-            </div>
+            <ShareButtons product={product} />
 
             {/* Product Title & Info */}
             <div className="mb-10 lg:mb-16">
@@ -436,6 +430,101 @@ export default function Product() {
           }}
         />
       </div>
+    </div>
+  );
+}
+
+function ShareButtons({ product }: { product: ProductFragment }) {
+  const shareUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/products/${product.handle}`
+    : `/products/${product.handle}`;
+  const shareTitle = product.title;
+  const shareImage = product.featuredImage?.url ?? '';
+
+  async function handleShare() {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, url: shareUrl });
+      } catch {
+        // User cancelled share
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+    }
+  }
+
+  function handleEmailShare() {
+    const subject = encodeURIComponent(`Check out: ${shareTitle}`);
+    const body = encodeURIComponent(`I thought you might like this: ${shareTitle}\n\n${shareUrl}`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
+
+  function handleFacebookShare() {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
+
+  function handleTwitterShare() {
+    window.open(
+      `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
+
+  function handlePinterestShare() {
+    window.open(
+      `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=${encodeURIComponent(shareImage)}&description=${encodeURIComponent(shareTitle)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
+
+  return (
+    <div className="flex justify-end gap-3 sm:gap-4 mb-8 lg:mb-12">
+      <button
+        type="button"
+        onClick={handleEmailShare}
+        aria-label="Share via email"
+        className="hover:opacity-70 transition-opacity"
+      >
+        <Mail className="size-4 sm:size-5 text-foreground" />
+      </button>
+      <button
+        type="button"
+        onClick={handleShare}
+        aria-label="Share this product"
+        className="hover:opacity-70 transition-opacity"
+      >
+        <Share2 className="size-4 sm:size-5 text-foreground" />
+      </button>
+      <button
+        type="button"
+        onClick={handlePinterestShare}
+        aria-label="Share on Pinterest"
+        className="hover:opacity-70 transition-opacity"
+      >
+        <div className="size-4 sm:size-5 border border-border rounded-full flex items-center justify-center text-xs font-bold text-foreground">P</div>
+      </button>
+      <button
+        type="button"
+        onClick={handleTwitterShare}
+        aria-label="Share on X (Twitter)"
+        className="hover:opacity-70 transition-opacity"
+      >
+        <Twitter className="size-4 sm:size-5 text-foreground" />
+      </button>
+      <button
+        type="button"
+        onClick={handleFacebookShare}
+        aria-label="Share on Facebook"
+        className="hover:opacity-70 transition-opacity"
+      >
+        <Facebook className="size-4 sm:size-5 text-foreground" />
+      </button>
     </div>
   );
 }
