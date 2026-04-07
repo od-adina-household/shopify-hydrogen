@@ -18,11 +18,16 @@ import {
   Facebook,
   Twitter,
   ChevronRight,
+  Heart,
 } from 'lucide-react';
 import { Suspense, useState, useEffect } from 'react';
 import { AddToCartButton } from '~/components/AddToCartButton';
 import { useAside } from '~/components/Aside';
 import { Await, Link, useLoaderData } from 'react-router';
+import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
+import { Button } from '~/components/ui/button';
+import { cn } from '~/lib/utils';
+import { useWishlist } from '~/lib/useWishlist';
 import type {
   ProductVariantFragment,
   ProductFragment,
@@ -314,11 +319,20 @@ export default function Product() {
 
               {/* Price and Add to Cart */}
               <div className="mt-8 pt-8 border-t border-border/40">
-                <ProductPrice
-                  price={selectedVariant?.price}
-                  compareAtPrice={selectedVariant?.compareAtPrice}
-                  className="text-xl sm:text-2xl font-light text-foreground mb-6 block"
-                />
+                <div className="flex items-center justify-between mb-6">
+                  <ProductPrice
+                    price={selectedVariant?.price}
+                    compareAtPrice={selectedVariant?.compareAtPrice}
+                    className="text-xl sm:text-2xl font-light text-foreground"
+                  />
+                  <WishlistButton
+                    productId={product.id}
+                    productHandle={product.handle}
+                    productTitle={product.title}
+                    productImage={product.featuredImage ?? undefined}
+                    price={selectedVariant?.price}
+                  />
+                </div>
                 <ProductForm
                   productOptions={productOptions}
                   selectedVariant={selectedVariant}
@@ -763,3 +777,42 @@ const FALLBACK_PRODUCTS_QUERY = `#graphql
     }
   }
 ` as const;
+
+function WishlistButton({
+  productId,
+  productHandle,
+  productTitle,
+  productImage,
+  price,
+}: {
+  productId: string;
+  productHandle: string;
+  productTitle: string;
+  productImage?: { url: string; altText?: string | null };
+  price?: { amount: string; currencyCode: string };
+}) {
+  const { toggle, isWishlisted } = useWishlist();
+  const wishlisted = isWishlisted(productId);
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      type="button"
+      aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+      onClick={() =>
+        toggle({
+          id: productId,
+          handle: productHandle,
+          title: productTitle,
+          image: productImage,
+          price: price ?? { amount: '0', currencyCode: 'PKR' as CurrencyCode },
+        })
+      }
+    >
+      <Heart
+        className={cn('h-5 w-5', wishlisted && 'fill-primary text-primary')}
+      />
+    </Button>
+  );
+}

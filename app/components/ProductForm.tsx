@@ -4,14 +4,14 @@ import type {
   ProductOptionValueSwatch,
   CurrencyCode,
 } from '@shopify/hydrogen/storefront-api-types';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Wallet } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import type { ProductFragment } from 'storefrontapi.generated';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 import { cn } from '~/lib/utils';
-import { useWishlist } from '~/lib/useWishlist';
 import { AddToCartButton } from './AddToCartButton';
+import { BuyNowButton } from './BuyNowButton';
 import { useAside } from './Aside';
 
 export function ProductForm({
@@ -31,8 +31,6 @@ export function ProductForm({
 }) {
   const navigate = useNavigate();
   const { open } = useAside();
-  const { toggle, isWishlisted } = useWishlist();
-  const wishlisted = isWishlisted(productId);
   return (
     <div className="space-y-6">
       {productOptions.map((option) => {
@@ -110,51 +108,50 @@ export function ProductForm({
           </div>
         );
       })}
-      <div className="grid grid-cols-[1fr_auto] gap-3">
-        <AddToCartButton
-          disabled={!selectedVariant || !selectedVariant.availableForSale}
-          onClick={() => {
-            open('cart');
-          }}
-          lines={
-            selectedVariant
-              ? [
-                {
-                  merchandiseId: selectedVariant.id,
-                  quantity: 1,
-                  selectedVariant,
-                },
-              ]
-              : []
-          }
-          className="w-full uppercase gap-3 tracking-wider bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-          size="lg"
-        >
-          <ShoppingBag className="h-5 w-5" />
-          {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
-        </AddToCartButton>
-        <Button
-          variant="outline"
-          size="lg"
-          type="button"
-          aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          onClick={() =>
-            toggle({
-              id: productId,
-              handle: productHandle,
-              title: productTitle,
-              image: productImage,
-              price: selectedVariant?.price ?? { amount: '0', currencyCode: 'PKR' as CurrencyCode },
-            })
-          }
-        >
-          <Heart
-            className={cn('h-5 w-5', wishlisted && 'fill-primary text-primary')}
-          />
-          <span className="sr-only">
-            {wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          </span>
-        </Button>
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <BuyNowButton
+            disabled={!selectedVariant || !selectedVariant.availableForSale}
+            lines={
+              selectedVariant
+                ? [
+                  {
+                    merchandiseId: selectedVariant.id,
+                    quantity: 1,
+                    selectedVariant,
+                  },
+                ]
+                : []
+            }
+            className="w-full uppercase gap-2 tracking-wider bg-primary text-primary-foreground border-primary hover:bg-primary/90"
+            size="lg"
+          >
+            <Wallet className="h-5 w-5" />
+            {selectedVariant?.availableForSale ? 'Buy now' : 'Sold out'}
+          </BuyNowButton>
+          <AddToCartButton
+            disabled={!selectedVariant || !selectedVariant.availableForSale}
+            onClick={() => {
+              open('cart');
+            }}
+            lines={
+              selectedVariant
+                ? [
+                  {
+                    merchandiseId: selectedVariant.id,
+                    quantity: 1,
+                    selectedVariant,
+                  },
+                ]
+                : []
+            }
+            className="w-full uppercase gap-2 tracking-wider bg-foreground text-background border-foreground hover:bg-foreground/90"
+            size="lg"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
+          </AddToCartButton>
+        </div>
       </div>
     </div>
   );

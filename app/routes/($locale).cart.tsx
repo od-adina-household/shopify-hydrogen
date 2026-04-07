@@ -108,6 +108,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   return data(
     {
       cart: cartResult,
+      checkoutUrl: cartResult?.checkoutUrl ?? null,
       errors,
       warnings,
       analytics: {
