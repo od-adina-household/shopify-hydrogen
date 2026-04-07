@@ -1,5 +1,5 @@
 import { Image, Money } from '@shopify/hydrogen';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, memo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import type {
   CollectionItemFragment,
@@ -14,7 +14,7 @@ import { useVariantUrl } from '~/lib/variants';
 import { AddToCartButton } from './AddToCartButton';
 import { useAside } from './Aside';
 
-export function ProductItem({
+export const ProductItem = memo(function ProductItem({
   product,
   loading,
 }: {
@@ -293,4 +293,4 @@ export function ProductItem({
       </div>
     </div>
   );
-}
+});
