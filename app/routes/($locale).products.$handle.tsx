@@ -61,7 +61,7 @@ import {
 } from '~/components/ui/breadcrumb';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import { productJsonLd, breadcrumbJsonLd } from '~/lib/seo';
-import type { Route } from './+types/products.$handle';
+import type { Route } from './+types/($locale).products.$handle';
 
 type ProductImage = NonNullable<ProductFragment['images']['nodes'][number]>;
 
@@ -930,7 +930,7 @@ function WishlistButton({
           handle: productHandle,
           title: productTitle,
           image: productImage,
-          price: price ?? { amount: '0', currencyCode: 'PKR' as CurrencyCode },
+          price: price ?? { amount: '0', currencyCode: 'PKR' },
         })
       }
     >

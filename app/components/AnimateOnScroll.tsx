@@ -21,7 +21,7 @@ interface AnimateOnScrollProps {
   /** Additional className */
   className?: string;
   /** HTML element type */
-  as?: keyof JSX.IntrinsicElements;
+  as?: "div" | "section" | "article" | "aside" | "main" | "header" | "footer" | "nav" | "span";
 }
 
 /**
@@ -42,7 +42,7 @@ export function AnimateOnScroll({
 }: AnimateOnScrollProps) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useScrollReveal(ref as React.RefObject<HTMLElement | null>, {
+  useScrollReveal(ref, {
     variant,
     duration,
     distance,

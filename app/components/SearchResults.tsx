@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Spinner } from '~/components/ui/spinner';
 import { urlWithTrackingParams, type RegularSearchReturn } from '~/lib/search';
 
-type SearchItems = RegularSearchReturn['result']['items'];
+type SearchItems = NonNullable<RegularSearchReturn['result']>['items'];
 type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
   SearchItems,
   ItemType

@@ -6,7 +6,7 @@ import { PaginatedResourceSection } from '~/components/PaginatedResourceSection'
 import { ProductItem } from '~/components/ProductItem';
 import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import type { Route } from './+types/collections.$handle';
+import type { Route } from './+types/($locale).collections.$handle';
 
 export const meta: Route.MetaFunction = ({ data, params }) => {
   const collection = data?.collection;
@@ -210,6 +210,10 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      seo {
+        title
+        description
+      }
       products(
         first: $first,
         last: $last,

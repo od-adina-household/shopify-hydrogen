@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { ArrowLeft } from 'lucide-react';
-import type { Route } from './+types/pages.refund-policy';
+import type { Route } from './+types/($locale).pages.refund-policy';
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: 'Refund Policy' }];

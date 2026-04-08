@@ -4,7 +4,7 @@ import type { CollectionFragment } from 'storefrontapi.generated';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 import { AspectRatio } from '~/components/ui/aspect-ratio';
 import { Card, CardContent } from '~/components/ui/card';
-import type { Route } from './+types/collections._index';
+import type { Route } from './+types/($locale).collections._index';
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte

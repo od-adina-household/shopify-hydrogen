@@ -65,8 +65,8 @@ export function useStaggerFadeIn(
         }
       );
 
-      mmRef.current = mm;
+      mmRef.current = mm as unknown as gsap.Context;
     },
-    { scope: scope.current }
+    { scope: scope.current ?? undefined }
   );
 }

@@ -6,7 +6,7 @@ import { Button } from '~/components/ui/button';
 import { gsap, useGSAP } from '~/lib/gsap';
 import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn';
 import { organizationJsonLd, websiteJsonLd } from '~/lib/seo';
-import type { Route } from './+types/_index';
+import type { Route } from './+types/($locale)._index';
 import type { RootLoader } from '~/root';
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -264,7 +264,7 @@ function HeroSection() {
         }
       }
     );
-  }, { scope: heroRef.current });
+  }, { scope: heroRef.current ?? undefined });
 
   return (
     <section ref={heroRef} className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden pt-20 md:pt-24">
@@ -385,7 +385,7 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
         }
       }
     );
-  }, { scope: sectionRef.current });
+  }, { scope: sectionRef.current ?? undefined });
 
   const textContent = (
     <div ref={contentRef} className="flex flex-col justify-center h-full px-6 sm:px-10 md:px-12 lg:px-16 py-12 md:py-16 lg:py-20">

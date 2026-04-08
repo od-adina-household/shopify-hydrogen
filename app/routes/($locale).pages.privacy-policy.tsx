@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { ArrowLeft } from 'lucide-react';
-import type { Route } from './+types/pages.privacy-policy';
+import type { Route } from './+types/($locale).pages.privacy-policy';
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: 'Privacy Policy' }];

@@ -5,7 +5,7 @@ import type { BlogsQuery } from 'storefrontapi.generated';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import type { Route } from './+types/blogs._index';
+import type { Route } from './+types/($locale).blogs._index';
 
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 

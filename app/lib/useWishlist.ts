@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 
 const STORAGE_KEY = 'od_wishlist';
 const STORAGE_VERSION = 1;
@@ -9,7 +8,7 @@ export type WishlistItem = {
   handle: string;
   title: string;
   image?: { url: string; altText?: string | null };
-  price: { amount: string; currencyCode: CurrencyCode };
+  price: { amount: string; currencyCode: string };
 };
 
 // Module-level cache so multiple hook instances share the same data
@@ -19,7 +18,7 @@ function loadFromStorage(): WishlistItem[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(raw) as { version?: number; items?: WishlistItem[] };
     // Version check — wipe stale data if schema changes
     if (parsed.version !== STORAGE_VERSION) {
       localStorage.removeItem(STORAGE_KEY);

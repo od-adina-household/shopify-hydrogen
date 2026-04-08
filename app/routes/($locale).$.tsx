@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
-import type { Route } from './+types/$';
+import type { Route } from './+types/($locale).$';
 
 export async function loader({ request }: Route.LoaderArgs) {
   throw new Response(`${new URL(request.url).pathname} not found`, {

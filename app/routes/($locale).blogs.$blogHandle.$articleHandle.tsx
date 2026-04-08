@@ -5,13 +5,13 @@ import { AspectRatio } from '~/components/ui/aspect-ratio';
 import { Card, CardContent } from '~/components/ui/card';
 import { Separator } from '~/components/ui/separator';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import type { Route } from './+types/blogs.$blogHandle.$articleHandle';
+import type { Route } from './+types/($locale).blogs.$blogHandle.$articleHandle';
 
 export const meta: Route.MetaFunction = ({ data, params }) => {
   const article = data?.article;
   const seoTitle = article?.seo?.title || article?.title;
   const seoDescription = article?.seo?.description;
-  const blogHandle = article?.blog?.handle || params.blogHandle;
+  const blogHandle = data?.blogHandle || params.blogHandle;
   const articleHandle = article?.handle || params.articleHandle;
 
   return [
@@ -76,7 +76,7 @@ async function loadCriticalData({ context, request, params }: Route.LoaderArgs) 
 
   const article = blog.articleByHandle;
 
-  return { article };
+  return { article, blogHandle };
 }
 
 /**

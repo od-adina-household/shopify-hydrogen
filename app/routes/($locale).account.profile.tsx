@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { CUSTOMER_UPDATE_MUTATION } from '~/graphql/customer-account/CustomerUpdateMutation';
-import type { Route } from './+types/account.profile';
+import type { Route } from './+types/($locale).account.profile';
 
 export type ActionResponse = {
   error: string | null;

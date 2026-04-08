@@ -11,7 +11,7 @@ import {
 } from '~/lib/search';
 import { useAside } from './Aside';
 
-type PredictiveSearchItems = PredictiveSearchReturn['result']['items'];
+type PredictiveSearchItems = NonNullable<PredictiveSearchReturn['result']>['items'];
 
 type UsePredictiveSearchReturn = {
   term: React.MutableRefObject<string>;
@@ -338,8 +338,9 @@ function usePredictiveSearch(): UsePredictiveSearchReturn {
     }
   }, []);
 
-  const { items, total } =
-    fetcher?.data?.result ?? getEmptyPredictiveSearchResult();
+  const result =
+    (fetcher?.data?.result as NonNullable<PredictiveSearchReturn['result']>) ?? getEmptyPredictiveSearchResult();
+  const { items, total } = result;
 
   return { items, total, inputRef, term, fetcher };
 }

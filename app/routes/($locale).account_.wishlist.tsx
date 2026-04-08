@@ -42,7 +42,7 @@ export default function WishlistPage() {
                   {item.title}
                 </Link>
                 <p className="text-sm text-muted-foreground mt-1">
-                  <Money data={item.price} />
+                  <Money data={item.price as unknown as { amount: string; currencyCode: import('@shopify/hydrogen/storefront-api-types').CurrencyCode }} />
                 </p>
               </div>
               <button

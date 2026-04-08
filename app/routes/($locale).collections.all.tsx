@@ -3,7 +3,7 @@ import { useLoaderData } from 'react-router';
 import type { CollectionItemFragment } from 'storefrontapi.generated';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 import { ProductItem } from '~/components/ProductItem';
-import type { Route } from './+types/collections.all';
+import type { Route } from './+types/($locale).collections.all';
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: 'All Products' }];

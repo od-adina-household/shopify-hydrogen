@@ -3,7 +3,7 @@ import { Link, useLoaderData } from 'react-router';
 import type { PoliciesQuery, PolicyItemFragment } from 'storefrontapi.generated';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import type { Route } from './+types/policies._index';
+import type { Route } from './+types/($locale).policies._index';
 
 export async function loader({ context }: Route.LoaderArgs) {
   const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);

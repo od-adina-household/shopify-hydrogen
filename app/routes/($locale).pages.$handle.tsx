@@ -2,7 +2,7 @@ import { useLoaderData } from 'react-router';
 import { Card, CardContent } from '~/components/ui/card';
 import { Separator } from '~/components/ui/separator';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import type { Route } from './+types/pages.$handle';
+import type { Route } from './+types/($locale).pages.$handle';
 
 export const meta: Route.MetaFunction = ({ data, params }) => {
   const page = data?.page;

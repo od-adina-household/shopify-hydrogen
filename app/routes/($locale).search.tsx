@@ -15,7 +15,7 @@ import {
   type RegularSearchReturn,
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
-import type { Route } from './+types/search';
+import type { Route } from './+types/($locale).search';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -25,7 +25,7 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export async function loader({ request, context }: Route.LoaderArgs) {
+export async function loader({ request, context }: Route.LoaderArgs): Promise<PredictiveSearchReturn | RegularSearchReturn> {
   const url = new URL(request.url);
   const isPredictive = url.searchParams.has('predictive');
   const type = isPredictive ? 'predictive' : 'regular';
@@ -40,12 +40,12 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   } catch (error) {
     // Handle request cancellation (user typing rapidly aborts previous requests)
     if (error instanceof DOMException && error.name === 'AbortError') {
-      return { type, term: '', result: null, error: null };
+      return { type, term: '', result: null, error: undefined } as unknown as PredictiveSearchReturn | RegularSearchReturn;
     }
 
     console.error('Search loader error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return { type, term: '', result: null, error: message };
+    return { type, term: '', result: null, error: message } as unknown as PredictiveSearchReturn | RegularSearchReturn;
   }
 }
 
@@ -253,28 +253,23 @@ async function regularSearch({
   const term = String(url.searchParams.get('q') || '');
 
   // Search articles, pages, and products for the `q` term
-  const {
-    errors,
-    ...items
-  }: { errors?: Array<{ message: string }> } & RegularSearchQuery =
-    await storefront.query(SEARCH_QUERY, {
-      variables: { ...variables, term },
-    });
+  const raw = await storefront.query(SEARCH_QUERY, {
+    variables: { ...variables, term },
+  });
+  const items = raw as RegularSearchQuery;
 
   if (!items) {
     throw new Error('No search data returned from Shopify API');
   }
 
   const total = Object.values(items).reduce(
-    (acc: number, { nodes }: { nodes: Array<unknown> }) => acc + nodes.length,
+    (acc, { nodes }: { nodes: Array<unknown> }) => acc + nodes.length,
     0,
   );
 
-  const error = errors
-    ? errors.map(({ message }: { message: string }) => message).join(', ')
-    : undefined;
+  const error = undefined;
 
-  return { type: 'regular', term, error, result: { total, items } };
+  return { type: 'regular', term, error, result: { total, items } } as RegularSearchReturn;
 }
 
 /**

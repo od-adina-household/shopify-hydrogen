@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { CUSTOMER_ORDER_QUERY } from '~/graphql/customer-account/CustomerOrderQuery';
-import type { Route } from './+types/account.orders.$id';
+import type { Route } from './+types/($locale).account.orders.$id';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [{ title: `Order ${data?.order?.name}` }];

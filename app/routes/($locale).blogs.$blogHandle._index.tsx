@@ -6,7 +6,7 @@ import { PaginatedResourceSection } from '~/components/PaginatedResourceSection'
 import { AspectRatio } from '~/components/ui/aspect-ratio';
 import { Card, CardContent } from '~/components/ui/card';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import type { Route } from './+types/blogs.$blogHandle._index';
+import type { Route } from './+types/($locale).blogs.$blogHandle._index';
 
 export const meta: Route.MetaFunction = ({ data, params }) => {
   const blog = data?.blog;

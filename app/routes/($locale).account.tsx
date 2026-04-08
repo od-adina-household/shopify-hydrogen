@@ -11,7 +11,7 @@ import { Card, CardContent } from '~/components/ui/card';
 import { Separator } from '~/components/ui/separator';
 import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetailsQuery';
 import { cn } from '~/lib/utils';
-import type { Route } from './+types/account';
+import type { Route } from './+types/($locale).account';
 
 export const meta: Route.MetaFunction = () => {
   return [

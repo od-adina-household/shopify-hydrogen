@@ -28,7 +28,7 @@ import {
   parseOrderFilters,
   type OrderFilterParams,
 } from '~/lib/orderFilters';
-import type { Route } from './+types/account.orders._index';
+import type { Route } from './+types/($locale).account.orders._index';
 
 type OrdersLoaderData = {
   customer: CustomerOrdersFragment;

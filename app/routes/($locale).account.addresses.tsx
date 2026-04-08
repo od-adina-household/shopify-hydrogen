@@ -23,7 +23,7 @@ import {
   DELETE_ADDRESS_MUTATION,
   UPDATE_ADDRESS_MUTATION,
 } from '~/graphql/customer-account/CustomerAddressMutations';
-import type { Route } from './+types/account.addresses';
+import type { Route } from './+types/($locale).account.addresses';
 
 export type ActionResponse = {
   addressId?: string | null;

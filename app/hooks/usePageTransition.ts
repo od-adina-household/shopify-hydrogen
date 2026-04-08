@@ -60,8 +60,8 @@ export function usePageTransition(
         }
       );
 
-      mmRef.current = mm;
+      mmRef.current = mm as unknown as gsap.Context;
     },
-    { scope: scope.current, dependencies: [location.pathname] }
+    { scope: scope.current ?? undefined, dependencies: [location.pathname] }
   );
 }

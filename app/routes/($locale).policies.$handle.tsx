@@ -4,7 +4,7 @@ import { Link, useLoaderData } from 'react-router';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
 import { Separator } from '~/components/ui/separator';
-import type { Route } from './+types/policies.$handle';
+import type { Route } from './+types/($locale).policies.$handle';
 
 type SelectedPolicies = keyof Pick<
   Shop,

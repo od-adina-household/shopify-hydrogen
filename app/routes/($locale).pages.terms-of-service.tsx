@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { ArrowLeft } from 'lucide-react';
-import type { Route } from './+types/pages.terms-of-service';
+import type { Route } from './+types/($locale).pages.terms-of-service';
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: 'Terms of Service' }];
