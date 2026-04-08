@@ -4,8 +4,24 @@ import { Separator } from '~/components/ui/separator';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/pages.$handle';
 
-export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: data?.page.title ?? 'Page' }];
+export const meta: Route.MetaFunction = ({ data, params }) => {
+  const page = data?.page;
+  const seoTitle = page?.seo?.title || page?.title;
+  const seoDescription = page?.seo?.description;
+  const handle = page?.handle || params.handle;
+
+  return [
+    { title: seoTitle ?? 'Page' },
+    { name: 'description', content: seoDescription },
+    { rel: 'canonical', href: `/pages/${handle}` },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:title', content: seoTitle },
+    { property: 'og:description', content: seoDescription },
+    { property: 'og:url', content: `/pages/${handle}` },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: seoTitle },
+    { name: 'twitter:description', content: seoDescription },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {

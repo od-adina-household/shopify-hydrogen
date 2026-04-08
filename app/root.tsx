@@ -66,6 +66,9 @@ export function links() {
       href: 'https://shop.app',
     },
     { rel: 'icon', type: 'image/jpeg', href: '/favicon.jpg' },
+    // Hreflang tags for locale-aware routes
+    { rel: 'alternate', hrefLang: 'en', href: '/en' },
+    { rel: 'alternate', hrefLang: 'x-default', href: '/en' },
   ];
 }
 

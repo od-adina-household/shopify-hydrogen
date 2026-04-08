@@ -1,14 +1,36 @@
 import { useRef } from "react";
-import { Link } from 'react-router';
+import { Link, useRouteLoaderData } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 // import { MessageCircle, Download, Building2 } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { gsap, useGSAP } from '~/lib/gsap';
 import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn';
+import { organizationJsonLd, websiteJsonLd } from '~/lib/seo';
 import type { Route } from './+types/_index';
+import type { RootLoader } from '~/root';
 
-export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Home' }];
+export const meta: Route.MetaFunction = ({ data }) => {
+  const rootData = data as unknown as { header?: { shop?: { name?: string; description?: string; primaryDomain?: { url?: string } } } } | undefined;
+  const shopName = rootData?.header?.shop?.name || 'Adina Household';
+  const description = rootData?.header?.shop?.description || 'Discover beautiful objects for your home — curated ceramics, tableware, and drinkware for modern living.';
+  const url = rootData?.header?.shop?.primaryDomain?.url || '';
+  const imageUrl = url ? `${url}/favicon.jpg` : '/favicon.jpg';
+
+  return [
+    { title: shopName },
+    { name: 'description', content: description },
+    { rel: 'canonical', href: '/' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:title', content: shopName },
+    { property: 'og:description', content: description },
+    { property: 'og:url', content: url },
+    { property: 'og:image', content: imageUrl },
+    { property: 'og:site_name', content: shopName },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: shopName },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: imageUrl },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -16,9 +38,29 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 export default function Homepage() {
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const shopName = rootData?.header?.shop?.name || 'Adina Household';
+  const url = rootData?.header?.shop?.primaryDomain?.url || '';
+  const searchUrl = url ? `${url}/search?q={search_term_string}` : '/search?q={search_term_string}';
+
   return (
-    <div className="w-full">
-      <HeroSection />
+    <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd({ name: shopName, url })),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteJsonLd({ name: shopName, url, searchUrl })),
+        }}
+      />
+
+      <div className="w-full">
+        <HeroSection />
       <IntroSection
         text="Let us guide you in the art of living — we bring ambience to your home with objects that inspire."
         buttonLabel="COLLECTION 25-26"
@@ -93,6 +135,7 @@ export default function Homepage() {
       /> */}
       {/* <InfoColumnsSection /> */}
     </div>
+    </>
   );
 }
 

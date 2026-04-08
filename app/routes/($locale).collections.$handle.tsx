@@ -8,8 +8,24 @@ import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/collections.$handle';
 
-export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: data?.collection.title ?? 'Collection' }];
+export const meta: Route.MetaFunction = ({ data, params }) => {
+  const collection = data?.collection;
+  const seoTitle = collection?.seo?.title || collection?.title;
+  const seoDescription = collection?.seo?.description;
+  const handle = collection?.handle || params.handle;
+
+  return [
+    { title: seoTitle ?? 'Collection' },
+    { name: 'description', content: seoDescription },
+    { rel: 'canonical', href: `/collections/${handle}` },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:title', content: seoTitle },
+    { property: 'og:description', content: seoDescription },
+    { property: 'og:url', content: `/collections/${handle}` },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: seoTitle },
+    { name: 'twitter:description', content: seoDescription },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {

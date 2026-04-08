@@ -8,8 +8,24 @@ import { Card, CardContent } from '~/components/ui/card';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/blogs.$blogHandle._index';
 
-export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: data?.blog.title ?? 'Blog' }];
+export const meta: Route.MetaFunction = ({ data, params }) => {
+  const blog = data?.blog;
+  const seoTitle = blog?.seo?.title || blog?.title;
+  const seoDescription = blog?.seo?.description;
+  const handle = blog?.handle || params.blogHandle;
+
+  return [
+    { title: seoTitle ?? 'Blog' },
+    { name: 'description', content: seoDescription },
+    { rel: 'canonical', href: `/blogs/${handle}` },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:title', content: seoTitle },
+    { property: 'og:description', content: seoDescription },
+    { property: 'og:url', content: `/blogs/${handle}` },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: seoTitle },
+    { name: 'twitter:description', content: seoDescription },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {

@@ -13,6 +13,13 @@ import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetai
 import { cn } from '~/lib/utils';
 import type { Route } from './+types/account';
 
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: 'Account' },
+    { name: 'robots', content: 'noindex' },
+  ];
+};
+
 export function shouldRevalidate() {
   return true;
 }

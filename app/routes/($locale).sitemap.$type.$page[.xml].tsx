@@ -10,6 +10,7 @@ export async function loader({
     storefront,
     request,
     params,
+    // Update these locales to match your store's actual enabled locales
     locales: ['EN-US', 'EN-CA', 'FR-CA'],
     getLink: ({ type, baseUrl, handle, locale }) => {
       if (!locale) return `${baseUrl}/${type}/${handle}`;

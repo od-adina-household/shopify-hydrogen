@@ -5,7 +5,11 @@ import { CartMain } from '~/components/CartMain';
 import type { Route } from './+types/cart';
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Cart' }];
+  return [
+    { title: 'Cart' },
+    { rel: 'canonical', href: '/cart' },
+    { name: 'robots', content: 'noindex' },
+  ];
 };
 
 export const headers: HeadersFunction = ({ actionHeaders }) => actionHeaders;

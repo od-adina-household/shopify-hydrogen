@@ -60,6 +60,7 @@ import {
   BreadcrumbSeparator,
 } from '~/components/ui/breadcrumb';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
+import { productJsonLd, breadcrumbJsonLd } from '~/lib/seo';
 import type { Route } from './+types/products.$handle';
 
 type ProductImage = NonNullable<ProductFragment['images']['nodes'][number]>;
@@ -70,13 +71,26 @@ type RelatedProduct = NonNullable<
   variants?: { nodes: Array<{ id: string; availableForSale: boolean }> };
 };
 
-export const meta: Route.MetaFunction = ({ data }) => {
+export const meta: Route.MetaFunction = ({ data, params }) => {
+  const product = data?.product;
+  const seoTitle = product?.seo?.title || product?.title;
+  const seoDescription = product?.seo?.description || product?.description;
+  const handle = product?.handle || params.handle;
+  const imageUrl = product?.featuredImage?.url;
+
   return [
-    { title: data?.product.title ?? 'Product' },
-    {
-      rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
-    },
+    { title: seoTitle ?? 'Product' },
+    { name: 'description', content: seoDescription },
+    { rel: 'canonical', href: `/products/${handle}` },
+    { property: 'og:type', content: 'product' },
+    { property: 'og:title', content: seoTitle },
+    { property: 'og:description', content: seoDescription },
+    { property: 'og:url', content: `/products/${handle}` },
+    ...(imageUrl ? [{ property: 'og:image', content: imageUrl }] : []),
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: seoTitle },
+    { name: 'twitter:description', content: seoDescription },
+    ...(imageUrl ? [{ name: 'twitter:image', content: imageUrl }] : []),
   ];
 };
 
@@ -197,8 +211,28 @@ export default function Product() {
   }, [api]);
 
   return (
-    <div className="relative min-h-screen bg-background mt-20 md:mt-24">
-      <div className="mx-auto max-w-[1920px]">
+    <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(productJsonLd({ product, url: `/products/${product.handle}` })),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd({
+            items: [
+              { name: 'All Products', url: '/products' },
+              { name: product.title, url: `/products/${product.handle}` },
+            ],
+          })),
+        }}
+      />
+
+      <div className="relative min-h-screen bg-background mt-20 md:mt-24">
+        <div className="mx-auto max-w-[1920px]">
         <div className="flex flex-col lg:flex-row lg:gap-8 xl:gap-12 relative lg:px-8 xl:px-12">
           {/* Left Column - Image Carousel */}
           <div className="w-full lg:w-[55%] bg-background flex flex-col">
@@ -431,6 +465,7 @@ export default function Product() {
         />
       </div>
     </div>
+    </>
   );
 }
 

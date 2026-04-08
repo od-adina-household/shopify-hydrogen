@@ -7,8 +7,27 @@ import { Separator } from '~/components/ui/separator';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { Route } from './+types/blogs.$blogHandle.$articleHandle';
 
-export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: data?.article.title ?? 'Article' }];
+export const meta: Route.MetaFunction = ({ data, params }) => {
+  const article = data?.article;
+  const seoTitle = article?.seo?.title || article?.title;
+  const seoDescription = article?.seo?.description;
+  const blogHandle = article?.blog?.handle || params.blogHandle;
+  const articleHandle = article?.handle || params.articleHandle;
+
+  return [
+    { title: seoTitle ?? 'Article' },
+    { name: 'description', content: seoDescription },
+    { rel: 'canonical', href: `/blogs/${blogHandle}/${articleHandle}` },
+    { property: 'og:type', content: 'article' },
+    { property: 'og:title', content: seoTitle },
+    { property: 'og:description', content: seoDescription },
+    { property: 'og:url', content: `/blogs/${blogHandle}/${articleHandle}` },
+    ...(article?.image?.url ? [{ property: 'og:image', content: article.image.url }] : []),
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: seoTitle },
+    { name: 'twitter:description', content: seoDescription },
+    ...(article?.image?.url ? [{ name: 'twitter:image', content: article.image.url }] : []),
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {

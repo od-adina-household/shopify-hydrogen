@@ -18,7 +18,11 @@ import {
 import type { Route } from './+types/search';
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Search' }];
+  return [
+    { title: 'Search' },
+    { rel: 'canonical', href: '/search' },
+    { name: 'robots', content: 'noindex' },
+  ];
 };
 
 export async function loader({ request, context }: Route.LoaderArgs) {
