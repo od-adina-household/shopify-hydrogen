@@ -1,23 +1,20 @@
-import { Image, Money, Pagination } from '@shopify/hydrogen';
-import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
-import { Link } from 'react-router';
-import { AspectRatio } from '~/components/ui/aspect-ratio';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { Spinner } from '~/components/ui/spinner';
-import { urlWithTrackingParams, type RegularSearchReturn } from '~/lib/search';
+import { Image, Money, Pagination } from '@shopify/hydrogen'
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
+import { Link } from 'react-router'
+import { AspectRatio } from '~/components/ui/aspect-ratio'
+import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import { Spinner } from '~/components/ui/spinner'
+import { type RegularSearchReturn, urlWithTrackingParams } from '~/lib/search'
 
-type SearchItems = NonNullable<RegularSearchReturn['result']>['items'];
-type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
-  SearchItems,
-  ItemType
-> &
-  Pick<RegularSearchReturn, 'term'>;
+type SearchItems = NonNullable<RegularSearchReturn['result']>['items']
+type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<SearchItems, ItemType> &
+  Pick<RegularSearchReturn, 'term'>
 
 type SearchResultsProps = RegularSearchReturn & {
-  children: (args: SearchItems & { term: string }) => React.ReactNode;
-};
+  children: (args: SearchItems & { term: string }) => React.ReactNode
+}
 
 export function SearchResults({
   term,
@@ -25,23 +22,20 @@ export function SearchResults({
   children,
 }: Omit<SearchResultsProps, 'error' | 'type'>) {
   if (!result?.total) {
-    return null;
+    return null
   }
 
-  return children({ ...result.items, term });
+  return children({ ...result.items, term })
 }
 
-SearchResults.Articles = SearchResultsArticles;
-SearchResults.Pages = SearchResultsPages;
-SearchResults.Products = SearchResultsProducts;
-SearchResults.Empty = SearchResultsEmpty;
+SearchResults.Articles = SearchResultsArticles
+SearchResults.Pages = SearchResultsPages
+SearchResults.Products = SearchResultsProducts
+SearchResults.Empty = SearchResultsEmpty
 
-function SearchResultsArticles({
-  term,
-  articles,
-}: PartialSearchResult<'articles'>) {
+function SearchResultsArticles({ term, articles }: PartialSearchResult<'articles'>) {
   if (!articles?.nodes.length) {
-    return null;
+    return null
   }
 
   return (
@@ -54,12 +48,12 @@ function SearchResultsArticles({
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          {articles?.nodes?.map((article) => {
+          {articles?.nodes?.map(article => {
             const articleUrl = urlWithTrackingParams({
               baseUrl: `/blogs/${article.handle}`,
               trackingParams: article.trackingParameters,
               term,
-            });
+            })
 
             return (
               <div key={article.id}>
@@ -71,17 +65,17 @@ function SearchResultsArticles({
                   <p className="font-medium">{article.title}</p>
                 </Link>
               </div>
-            );
+            )
           })}
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function SearchResultsPages({ term, pages }: PartialSearchResult<'pages'>) {
   if (!pages?.nodes.length) {
-    return null;
+    return null
   }
 
   return (
@@ -94,12 +88,12 @@ function SearchResultsPages({ term, pages }: PartialSearchResult<'pages'>) {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          {pages?.nodes?.map((page) => {
+          {pages?.nodes?.map(page => {
             const pageUrl = urlWithTrackingParams({
               baseUrl: `/pages/${page.handle}`,
               trackingParams: page.trackingParameters,
               term,
-            });
+            })
 
             return (
               <div key={page.id}>
@@ -111,20 +105,17 @@ function SearchResultsPages({ term, pages }: PartialSearchResult<'pages'>) {
                   <p className="font-medium">{page.title}</p>
                 </Link>
               </div>
-            );
+            )
           })}
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
-function SearchResultsProducts({
-  term,
-  products,
-}: PartialSearchResult<'products'>) {
+function SearchResultsProducts({ term, products }: PartialSearchResult<'products'>) {
   if (!products?.nodes.length) {
-    return null;
+    return null
   }
 
   return (
@@ -138,15 +129,15 @@ function SearchResultsProducts({
       <CardContent>
         <Pagination connection={products}>
           {({ nodes, isLoading, NextLink, PreviousLink }) => {
-            const ItemsMarkup = nodes.map((product) => {
+            const ItemsMarkup = nodes.map(product => {
               const productUrl = urlWithTrackingParams({
                 baseUrl: `/products/${product.handle}`,
                 trackingParams: product.trackingParameters,
                 term,
-              });
+              })
 
-              const price = product?.selectedOrFirstAvailableVariant?.price;
-              const image = product?.selectedOrFirstAvailableVariant?.image;
+              const price = product?.selectedOrFirstAvailableVariant?.price
+              const image = product?.selectedOrFirstAvailableVariant?.image
 
               return (
                 <Link
@@ -175,8 +166,8 @@ function SearchResultsProducts({
                     )}
                   </div>
                 </Link>
-              );
-            });
+              )
+            })
 
             return (
               <div className="space-y-4">
@@ -216,12 +207,12 @@ function SearchResultsProducts({
                   </Button>
                 </div>
               </div>
-            );
+            )
           }}
         </Pagination>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function SearchResultsEmpty() {
@@ -233,5 +224,5 @@ function SearchResultsEmpty() {
         </p>
       </CardContent>
     </Card>
-  );
+  )
 }

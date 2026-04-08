@@ -1,44 +1,40 @@
-import { ArrowRight, FileText } from 'lucide-react';
-import { Link, useLoaderData } from 'react-router';
-import type { PoliciesQuery, PolicyItemFragment } from 'storefrontapi.generated';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import type { Route } from './+types/($locale).policies._index';
+import { ArrowRight, FileText } from 'lucide-react'
+import { Link, useLoaderData } from 'react-router'
+import type { PoliciesQuery, PolicyItemFragment } from 'storefrontapi.generated'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import type { Route } from './+types/($locale).policies._index'
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);
+  const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY)
 
-  const shopPolicies = data.shop;
+  const shopPolicies = data.shop
   const policies: PolicyItemFragment[] = [
     shopPolicies?.privacyPolicy,
     shopPolicies?.shippingPolicy,
     shopPolicies?.termsOfService,
     shopPolicies?.refundPolicy,
     shopPolicies?.subscriptionPolicy,
-  ].filter((policy): policy is PolicyItemFragment => policy != null);
+  ].filter((policy): policy is PolicyItemFragment => policy != null)
 
   if (!policies.length) {
-    throw new Response('No policies found', { status: 404 });
+    throw new Response('No policies found', { status: 404 })
   }
 
-  return { policies };
+  return { policies }
 }
 
 export default function Policies() {
-  const { policies } = useLoaderData<typeof loader>();
+  const { policies } = useLoaderData<typeof loader>()
 
   return (
     <div className="space-y-8 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <div className="space-y-2">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-          Policies
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Review our store policies and terms
-        </p>
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Policies</h1>
+        <p className="text-lg text-muted-foreground">Review our store policies and terms</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
-        {policies.map((policy) => (
+        {policies.map(policy => (
           <Card key={policy.id} className="group hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-center gap-2 mb-2">
@@ -60,7 +56,7 @@ export default function Policies() {
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 const POLICIES_QUERY = `#graphql
@@ -91,4 +87,4 @@ const POLICIES_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const

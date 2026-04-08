@@ -1,11 +1,11 @@
-import { Link } from 'react-router';
-import { useWishlist } from '~/lib/useWishlist';
-import { Money } from '@shopify/hydrogen';
-import { Heart, X } from 'lucide-react';
-import { Button } from '~/components/ui/button';
+import { Money } from '@shopify/hydrogen'
+import { Heart, X } from 'lucide-react'
+import { Link } from 'react-router'
+import { Button } from '~/components/ui/button'
+import { useWishlist } from '~/lib/useWishlist'
 
 export default function WishlistPage() {
-  const { items, remove } = useWishlist();
+  const { items, remove } = useWishlist()
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-16 mt-20">
@@ -21,7 +21,7 @@ export default function WishlistPage() {
         </div>
       ) : (
         <div className="divide-y divide-border">
-          {items.map((item) => (
+          {items.map(item => (
             <div key={item.id} className="flex items-center gap-6 py-6">
               <Link to={`/products/${item.handle}`} className="flex-shrink-0">
                 {item.image ? (
@@ -42,7 +42,14 @@ export default function WishlistPage() {
                   {item.title}
                 </Link>
                 <p className="text-sm text-muted-foreground mt-1">
-                  <Money data={item.price as unknown as { amount: string; currencyCode: import('@shopify/hydrogen/storefront-api-types').CurrencyCode }} />
+                  <Money
+                    data={
+                      item.price as unknown as {
+                        amount: string
+                        currencyCode: import('@shopify/hydrogen/storefront-api-types').CurrencyCode
+                      }
+                    }
+                  />
                 </p>
               </div>
               <button
@@ -57,5 +64,5 @@ export default function WishlistPage() {
         </div>
       )}
     </div>
-  );
+  )
 }

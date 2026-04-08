@@ -1,20 +1,28 @@
-import { useRef } from "react";
-import { Link, useRouteLoaderData } from 'react-router';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react'
+import { useRef } from 'react'
+import { Link, useRouteLoaderData } from 'react-router'
 // import { MessageCircle, Download, Building2 } from 'lucide-react';
-import { Button } from '~/components/ui/button';
-import { gsap, useGSAP } from '~/lib/gsap';
-import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn';
-import { organizationJsonLd, websiteJsonLd } from '~/lib/seo';
-import type { Route } from './+types/($locale)._index';
-import type { RootLoader } from '~/root';
+import { Button } from '~/components/ui/button'
+import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn'
+import { gsap, useGSAP } from '~/lib/gsap'
+import { organizationJsonLd, websiteJsonLd } from '~/lib/seo'
+import type { RootLoader } from '~/root'
+import type { Route } from './+types/($locale)._index'
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  const rootData = data as unknown as { header?: { shop?: { name?: string; description?: string; primaryDomain?: { url?: string } } } } | undefined;
-  const shopName = rootData?.header?.shop?.name || 'Adina Household';
-  const description = rootData?.header?.shop?.description || 'Discover beautiful objects for your home — curated ceramics, tableware, and drinkware for modern living.';
-  const url = rootData?.header?.shop?.primaryDomain?.url || '';
-  const imageUrl = url ? `${url}/favicon.jpg` : '/favicon.jpg';
+  const rootData = data as unknown as
+    | {
+        header?: {
+          shop?: { name?: string; description?: string; primaryDomain?: { url?: string } }
+        }
+      }
+    | undefined
+  const shopName = rootData?.header?.shop?.name || 'Adina Household'
+  const description =
+    rootData?.header?.shop?.description ||
+    'Discover beautiful objects for your home — curated ceramics, tableware, and drinkware for modern living.'
+  const url = rootData?.header?.shop?.primaryDomain?.url || ''
+  const imageUrl = url ? `${url}/favicon.jpg` : '/favicon.jpg'
 
   return [
     { title: shopName },
@@ -30,18 +38,18 @@ export const meta: Route.MetaFunction = ({ data }) => {
     { name: 'twitter:title', content: shopName },
     { name: 'twitter:description', content: description },
     { name: 'twitter:image', content: imageUrl },
-  ];
-};
+  ]
+}
 
-export async function loader(args: Route.LoaderArgs) {
-  return {};
+export async function loader(_args: Route.LoaderArgs) {
+  return {}
 }
 
 export default function Homepage() {
-  const rootData = useRouteLoaderData<RootLoader>('root');
-  const shopName = rootData?.header?.shop?.name || 'Adina Household';
-  const url = rootData?.header?.shop?.primaryDomain?.url || '';
-  const searchUrl = url ? `${url}/search?q={search_term_string}` : '/search?q={search_term_string}';
+  const rootData = useRouteLoaderData<RootLoader>('root')
+  const shopName = rootData?.header?.shop?.name || 'Adina Household'
+  const url = rootData?.header?.shop?.primaryDomain?.url || ''
+  const searchUrl = url ? `${url}/search?q={search_term_string}` : '/search?q={search_term_string}'
 
   return (
     <>
@@ -61,43 +69,43 @@ export default function Homepage() {
 
       <div className="w-full">
         <HeroSection />
-      <IntroSection
-        text="Let us guide you in the art of living — we bring ambience to your home with objects that inspire."
-        buttonLabel="COLLECTION 25-26"
-        buttonHref="/collections/all"
-      />
-      <CollectionCardsSection
-        cards={[
-          {
-            title: 'CERAMICS',
-            imageSrc: '/images/ceramics.jpeg',
-            imageAlt: 'Ceramics collection',
-            href: '/collections/ceramics',
-          },
-          {
-            title: 'TABLEWARE',
-            imageSrc: '/images/tableware.jpeg',
-            imageAlt: 'Tableware collection',
-            href: '/collections/tableware',
-          },
-          {
-            title: 'DRINKWARE',
-            imageSrc: '/images/drinkware.jpeg',
-            imageAlt: 'Drinkware collection',
-            href: '/collections/drinkware',
-          },
-        ]}
-      />
-      <SplitSection
-        title="Storage with intention"
-        imageSrc="/images/storageware.jpeg"
-        imageAlt="Storage sets and containers"
-        imageOnRight
-        description="From ceramic jars to glass containers, this collection brings order and beauty together. Thoughtfully designed storage pieces that keep your essentials organized while adding character to your kitchen, bathroom, or living spaces. Functional objects that deserve to be displayed."
-        ctaLabel="DISCOVER COLLECTION"
-        ctaHref="/collections/storage"
-      />
-      {/* <IntroSection
+        <IntroSection
+          text="Let us guide you in the art of living — we bring ambience to your home with objects that inspire."
+          buttonLabel="COLLECTION 25-26"
+          buttonHref="/collections/all"
+        />
+        <CollectionCardsSection
+          cards={[
+            {
+              title: 'CERAMICS',
+              imageSrc: '/images/ceramics.jpeg',
+              imageAlt: 'Ceramics collection',
+              href: '/collections/ceramics',
+            },
+            {
+              title: 'TABLEWARE',
+              imageSrc: '/images/tableware.jpeg',
+              imageAlt: 'Tableware collection',
+              href: '/collections/tableware',
+            },
+            {
+              title: 'DRINKWARE',
+              imageSrc: '/images/drinkware.jpeg',
+              imageAlt: 'Drinkware collection',
+              href: '/collections/drinkware',
+            },
+          ]}
+        />
+        <SplitSection
+          title="Storage with intention"
+          imageSrc="/images/storageware.jpeg"
+          imageAlt="Storage sets and containers"
+          imageOnRight
+          description="From ceramic jars to glass containers, this collection brings order and beauty together. Thoughtfully designed storage pieces that keep your essentials organized while adding character to your kitchen, bathroom, or living spaces. Functional objects that deserve to be displayed."
+          ctaLabel="DISCOVER COLLECTION"
+          ctaHref="/collections/storage"
+        />
+        {/* <IntroSection
         text="Our most expressive collection — for everyone who dares to live with imagination."
         buttonLabel="COLLECTION 25-26"
         buttonHref="/collections/collection-25-26"
@@ -124,7 +132,7 @@ export default function Homepage() {
           },
         ]}
       /> */}
-      {/* <SplitSection
+        {/* <SplitSection
         title="Cool in chrome"
         imageSrc="/images/chrome.jpeg"
         imageAlt="Chrome decorative piece"
@@ -133,16 +141,16 @@ export default function Homepage() {
         ctaLabel="NEW CLASSICS"
         ctaHref="/collections/chrome"
       /> */}
-      {/* <InfoColumnsSection /> */}
-    </div>
+        {/* <InfoColumnsSection /> */}
+      </div>
     </>
-  );
+  )
 }
 
 interface IntroSectionProps {
-  text: string;
-  buttonLabel: string;
-  buttonHref: string;
+  text: string
+  buttonLabel: string
+  buttonHref: string
 }
 
 function IntroSection({ text, buttonLabel, buttonHref }: IntroSectionProps) {
@@ -158,30 +166,28 @@ function IntroSection({ text, buttonLabel, buttonHref }: IntroSectionProps) {
           className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14 mb-8 md:mb-12"
           asChild
         >
-          <Link to={buttonHref}>
-            {buttonLabel}
-          </Link>
+          <Link to={buttonHref}>{buttonLabel}</Link>
         </Button>
       </div>
     </section>
-  );
+  )
 }
 interface CollectionCard {
-  title: string;
-  imageSrc: string;
-  imageAlt: string;
-  href: string;
+  title: string
+  imageSrc: string
+  imageAlt: string
+  href: string
 }
 
 function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null)
 
   useStaggerFadeIn(sectionRef as React.RefObject<HTMLElement | null>, {
-    selector: ".collection-card",
+    selector: '.collection-card',
     stagger: 0.1,
     duration: 0.7,
     startY: 30,
-  });
+  })
 
   return (
     <section ref={sectionRef} className="w-full pt-2 pb-4 md:pb-6 lg:pb-8 px-6 md:px-8 lg:px-12">
@@ -209,65 +215,72 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
         ))}
       </div>
     </section>
-  );
+  )
 }
 
 function HeroSection() {
-  const text = "A collection that feels both curated and created — where every object carries intention.";
-  const words = text.split(" ");
-  const heroRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLDivElement>(null);
+  const text =
+    'A collection that feels both curated and created — where every object carries intention.'
+  const words = text.split(' ')
+  const heroRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
 
-    mm.add(
-      {
-        reduceMotion: "(prefers-reduced-motion: reduce)",
-      },
-      (context) => {
-        const { reduceMotion } = context.conditions!;
+      mm.add(
+        {
+          reduceMotion: '(prefers-reduced-motion: reduce)',
+        },
+        context => {
+          const { reduceMotion } = context.conditions!
 
-        // Stagger word animation
-        gsap.fromTo(
-          ".hero-word",
-          {
-            opacity: reduceMotion ? 1 : 0,
-            y: reduceMotion ? 0 : 30,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: reduceMotion ? 0 : 0.8,
-            ease: "power2.out",
-            stagger: reduceMotion ? 0 : 0.06,
-            delay: reduceMotion ? 0 : 0.3,
-          }
-        );
-
-        // Button fade-in
-        if (buttonRef.current) {
+          // Stagger word animation
           gsap.fromTo(
-            buttonRef.current,
+            '.hero-word',
             {
               opacity: reduceMotion ? 1 : 0,
-              y: reduceMotion ? 0 : 20,
+              y: reduceMotion ? 0 : 30,
             },
             {
               opacity: 1,
               y: 0,
-              duration: reduceMotion ? 0 : 0.6,
-              ease: "power2.out",
-              delay: reduceMotion ? 0 : 1.2,
+              duration: reduceMotion ? 0 : 0.8,
+              ease: 'power2.out',
+              stagger: reduceMotion ? 0 : 0.06,
+              delay: reduceMotion ? 0 : 0.3,
             }
-          );
+          )
+
+          // Button fade-in
+          if (buttonRef.current) {
+            gsap.fromTo(
+              buttonRef.current,
+              {
+                opacity: reduceMotion ? 1 : 0,
+                y: reduceMotion ? 0 : 20,
+              },
+              {
+                opacity: 1,
+                y: 0,
+                duration: reduceMotion ? 0 : 0.6,
+                ease: 'power2.out',
+                delay: reduceMotion ? 0 : 1.2,
+              }
+            )
+          }
         }
-      }
-    );
-  }, { scope: heroRef.current ?? undefined });
+      )
+    },
+    { scope: heroRef.current ?? undefined }
+  )
 
   return (
-    <section ref={heroRef} className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden pt-20 md:pt-24">
+    <section
+      ref={heroRef}
+      className="relative h-[70vh] md:h-[75vh] lg:h-[85vh] xl:h-[90vh] w-full overflow-hidden pt-20 md:pt-24"
+    >
       <div className="absolute inset-0">
         <img
           src="/images/hero-image.jpeg"
@@ -284,13 +297,18 @@ function HeroSection() {
             <div>
               <div className="flex items-center gap-3 mb-6 md:mb-8">
                 <div className="h-px w-8 md:w-12 bg-amber-50/50" />
-                <span className="text-xs md:text-sm tracking-widest uppercase text-amber-50/70 font-sans">Curated</span>
+                <span className="text-xs md:text-sm tracking-widest uppercase text-amber-50/70 font-sans">
+                  Curated
+                </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-tight text-amber-50 max-w-2xl" style={{ textWrap: "balance" }}>
+              <h1
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-tight text-amber-50 max-w-2xl"
+                style={{ textWrap: 'balance' }}
+              >
                 {words.map((word, index) => (
                   <span key={index}>
                     <span className="hero-word inline-block">{word}</span>
-                    {index < words.length - 1 && " "}
+                    {index < words.length - 1 && ' '}
                   </span>
                 ))}
               </h1>
@@ -302,93 +320,105 @@ function HeroSection() {
                 className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14"
                 asChild
               >
-                <Link to="/collections/all">
-                  Shop now
-                </Link>
+                <Link to="/collections/all">Shop now</Link>
               </Button>
             </div>
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }
 interface SplitSectionProps {
-  title: string;
-  imageSrc: string;
-  imageAlt: string;
-  imageOnRight: boolean;
-  description?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
+  title: string
+  imageSrc: string
+  imageAlt: string
+  imageOnRight: boolean
+  description?: string
+  ctaLabel?: string
+  ctaHref?: string
 }
 
-function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ctaLabel, ctaHref }: SplitSectionProps) {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+function SplitSection({
+  title,
+  imageSrc,
+  imageAlt,
+  imageOnRight,
+  description,
+  ctaLabel,
+  ctaHref,
+}: SplitSectionProps) {
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
 
-    mm.add(
-      {
-        reduceMotion: "(prefers-reduced-motion: reduce)",
-      },
-      (context) => {
-        const { reduceMotion } = context.conditions!;
+      mm.add(
+        {
+          reduceMotion: '(prefers-reduced-motion: reduce)',
+        },
+        context => {
+          const { reduceMotion } = context.conditions!
 
-        // Image scale reveal
-        if (imageRef.current) {
-          gsap.fromTo(
-            imageRef.current,
-            {
-              opacity: reduceMotion ? 1 : 0,
-              scale: reduceMotion ? 1 : 0.95,
-            },
-            {
-              opacity: 1,
-              scale: 1,
-              duration: reduceMotion ? 0 : 0.8,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top+=80 bottom",
-                toggleActions: "play none none none",
-                once: true,
+          // Image scale reveal
+          if (imageRef.current) {
+            gsap.fromTo(
+              imageRef.current,
+              {
+                opacity: reduceMotion ? 1 : 0,
+                scale: reduceMotion ? 1 : 0.95,
               },
-            }
-          );
-        }
+              {
+                opacity: 1,
+                scale: 1,
+                duration: reduceMotion ? 0 : 0.8,
+                ease: 'power2.out',
+                scrollTrigger: {
+                  trigger: sectionRef.current,
+                  start: 'top+=80 bottom',
+                  toggleActions: 'play none none none',
+                  once: true,
+                },
+              }
+            )
+          }
 
-        // Text slide in
-        if (contentRef.current) {
-          gsap.fromTo(
-            contentRef.current,
-            {
-              opacity: reduceMotion ? 1 : 0,
-              x: reduceMotion ? 0 : (imageOnRight ? -30 : 30),
-            },
-            {
-              opacity: 1,
-              x: 0,
-              duration: reduceMotion ? 0 : 0.7,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top+=80 bottom",
-                toggleActions: "play none none none",
-                once: true,
+          // Text slide in
+          if (contentRef.current) {
+            gsap.fromTo(
+              contentRef.current,
+              {
+                opacity: reduceMotion ? 1 : 0,
+                x: reduceMotion ? 0 : imageOnRight ? -30 : 30,
               },
-            }
-          );
+              {
+                opacity: 1,
+                x: 0,
+                duration: reduceMotion ? 0 : 0.7,
+                ease: 'power2.out',
+                scrollTrigger: {
+                  trigger: sectionRef.current,
+                  start: 'top+=80 bottom',
+                  toggleActions: 'play none none none',
+                  once: true,
+                },
+              }
+            )
+          }
         }
-      }
-    );
-  }, { scope: sectionRef.current ?? undefined });
+      )
+    },
+    { scope: sectionRef.current ?? undefined }
+  )
 
   const textContent = (
-    <div ref={contentRef} className="flex flex-col justify-center h-full px-6 sm:px-10 md:px-12 lg:px-16 py-12 md:py-16 lg:py-20">
+    <div
+      ref={contentRef}
+      className="flex flex-col justify-center h-full px-6 sm:px-10 md:px-12 lg:px-16 py-12 md:py-16 lg:py-20"
+    >
       <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-serif font-normal text-foreground leading-tight mb-6 md:mb-8 italic">
         {title}
       </h2>
@@ -404,16 +434,17 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
           className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 rounded-none px-8 tracking-widest uppercase text-xs sm:text-sm font-semibold h-12 sm:h-14 w-fit"
           asChild
         >
-          <Link to={ctaHref}>
-            {ctaLabel}
-          </Link>
+          <Link to={ctaHref}>{ctaLabel}</Link>
         </Button>
       )}
     </div>
-  );
+  )
 
   const imageContent = (
-    <div ref={imageRef} className="h-full min-h-[300px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[500px] xl:min-h-[600px]">
+    <div
+      ref={imageRef}
+      className="h-full min-h-[300px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[500px] xl:min-h-[600px]"
+    >
       {ctaHref ? (
         <Link to={ctaHref} className="block h-full w-full">
           <img
@@ -430,7 +461,7 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
         />
       )}
     </div>
-  );
+  )
 
   return (
     <section ref={sectionRef} className="w-full bg-secondary">
@@ -448,7 +479,7 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
         )}
       </div>
     </section>
-  );
+  )
 }
 
 // function InfoColumnsSection() {
@@ -506,7 +537,7 @@ function SplitSection({ title, imageSrc, imageAlt, imageOnRight, description, ct
 //   );
 // }
 
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
+const _RECOMMENDED_PRODUCTS_QUERY = `#graphql
   fragment RecommendedProduct on Product {
     id
     title
@@ -562,4 +593,4 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const

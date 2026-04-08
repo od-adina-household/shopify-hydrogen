@@ -1,7 +1,8 @@
 export function WhatsAppWidget() {
-  const phoneNumber = '923249680850';
-  const message = 'Hello! I visited adinahousehold.com and would love some assistance with my purchase.';
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  const phoneNumber = '923249680850'
+  const message =
+    'Hello! I visited adinahousehold.com and would love some assistance with my purchase.'
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
   return (
     <a
@@ -18,5 +19,5 @@ export function WhatsAppWidget() {
         suppressHydrationWarning
       />
     </a>
-  );
+  )
 }

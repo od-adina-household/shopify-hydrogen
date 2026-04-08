@@ -1,16 +1,16 @@
-import { Image } from '@shopify/hydrogen';
-import type { ProductVariantFragment } from 'storefrontapi.generated';
-import { AspectRatio } from '~/components/ui/aspect-ratio';
-import { Badge } from '~/components/ui/badge';
-import { Card, CardContent } from '~/components/ui/card';
-import { Skeleton } from '~/components/ui/skeleton';
+import { Image } from '@shopify/hydrogen'
+import type { ProductVariantFragment } from 'storefrontapi.generated'
+import { AspectRatio } from '~/components/ui/aspect-ratio'
+import { Badge } from '~/components/ui/badge'
+import { Card, CardContent } from '~/components/ui/card'
+import { Skeleton } from '~/components/ui/skeleton'
 
 export function ProductImage({
   image,
   badge,
 }: {
-  image: ProductVariantFragment['image'];
-  badge?: { label: string; variant?: 'default' | 'secondary' | 'destructive' };
+  image: ProductVariantFragment['image']
+  badge?: { label: string; variant?: 'default' | 'secondary' | 'destructive' }
 }) {
   if (!image) {
     return (
@@ -21,16 +21,13 @@ export function ProductImage({
           </AspectRatio>
         </CardContent>
       </Card>
-    );
+    )
   }
   return (
     <Card className="group overflow-hidden p-0 rounded-none">
       <CardContent className="relative p-0">
         {badge && (
-          <Badge
-            variant={badge.variant || 'default'}
-            className="absolute right-2 top-2 z-10"
-          >
+          <Badge variant={badge.variant || 'default'} className="absolute right-2 top-2 z-10">
             {badge.label}
           </Badge>
         )}
@@ -46,5 +43,5 @@ export function ProductImage({
         </AspectRatio>
       </CardContent>
     </Card>
-  );
+  )
 }

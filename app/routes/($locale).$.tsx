@@ -1,11 +1,11 @@
-import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router';
-import type { Route } from './+types/($locale).$';
+import { ArrowRight } from 'lucide-react'
+import { Link } from 'react-router'
+import type { Route } from './+types/($locale).$'
 
 export async function loader({ request }: Route.LoaderArgs) {
   throw new Response(`${new URL(request.url).pathname} not found`, {
     status: 404,
-  });
+  })
 }
 
 export default function CatchAllPage() {
@@ -23,7 +23,9 @@ export default function CatchAllPage() {
             </h1>
 
             <p className="text-foreground font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
-              The page you are looking for might have been removed, had its name changed, or is temporarily unavailable. Let us guide you back to discovering beautiful objects for your home.
+              The page you are looking for might have been removed, had its name changed, or is
+              temporarily unavailable. Let us guide you back to discovering beautiful objects for
+              your home.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 md:gap-8">
@@ -66,7 +68,7 @@ export default function CatchAllPage() {
               { title: 'KITCHEN', href: '/collections/kitchen' },
               { title: 'LIGHTING', href: '/collections/lighting' },
               { title: 'FURNITURE', href: '/collections/furniture' },
-            ].map((collection) => (
+            ].map(collection => (
               <Link
                 key={collection.title}
                 to={collection.href}
@@ -82,5 +84,5 @@ export default function CatchAllPage() {
         </div>
       </section>
     </div>
-  );
+  )
 }

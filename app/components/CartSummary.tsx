@@ -1,35 +1,30 @@
-import { CartForm, Money, type OptimisticCart } from '@shopify/hydrogen';
-import { XIcon } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import type { FetcherWithComponents } from 'react-router';
-import { Link, useFetcher } from 'react-router';
-import type { CartApiQueryFragment } from 'storefrontapi.generated';
-import type { CartLayout } from '~/components/CartMain';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
-import { Separator } from '~/components/ui/separator';
+import { CartForm, Money, type OptimisticCart } from '@shopify/hydrogen'
+import { XIcon } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import type { FetcherWithComponents } from 'react-router'
+import { Link, useFetcher } from 'react-router'
+import type { CartApiQueryFragment } from 'storefrontapi.generated'
+import type { CartLayout } from '~/components/CartMain'
+import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
+import { Separator } from '~/components/ui/separator'
 
 type CartSummaryProps = {
-  cart: OptimisticCart<CartApiQueryFragment | null>;
-  layout: CartLayout;
-};
+  cart: OptimisticCart<CartApiQueryFragment | null>
+  layout: CartLayout
+}
 
 export function CartSummary({ cart, layout }: CartSummaryProps) {
-  const className =
-    layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
+  const className = layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside'
 
   return (
     <div aria-labelledby="cart-summary" className={`space-y-4 ${className}`}>
       <div className="flex justify-between items-center text-lg">
         <span className="font-medium">Subtotal</span>
         <span className="font-semibold">
-          {cart?.cost?.subtotalAmount?.amount ? (
-            <Money data={cart?.cost?.subtotalAmount} />
-          ) : (
-            '-'
-          )}
+          {cart?.cost?.subtotalAmount?.amount ? <Money data={cart?.cost?.subtotalAmount} /> : '-'}
         </span>
       </div>
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
@@ -46,11 +41,11 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         </>
       )}
     </div>
-  );
+  )
 }
 
 function CartCheckoutActions({ checkoutUrl }: { checkoutUrl?: string }) {
-  if (!checkoutUrl) return null;
+  if (!checkoutUrl) return null
 
   return (
     <Button asChild className="w-full" size="lg">
@@ -58,18 +53,16 @@ function CartCheckoutActions({ checkoutUrl }: { checkoutUrl?: string }) {
         Checkout
       </a>
     </Button>
-  );
+  )
 }
 
 function CartDiscounts({
   discountCodes,
 }: {
-  discountCodes?: CartApiQueryFragment['discountCodes'];
+  discountCodes?: CartApiQueryFragment['discountCodes']
 }) {
   const codes: string[] =
-    discountCodes
-      ?.filter((discount) => discount.applicable)
-      ?.map(({ code }) => code) || [];
+    discountCodes?.filter(discount => discount.applicable)?.map(({ code }) => code) || []
 
   return (
     <div className="space-y-3">
@@ -79,7 +72,7 @@ function CartDiscounts({
           <Label className="text-sm font-medium mb-2">Applied Discounts</Label>
           <UpdateDiscountForm>
             <div className="flex flex-wrap gap-2 mt-2">
-              {codes.map((code) => (
+              {codes.map(code => (
                 <Badge key={code} variant="secondary" className="gap-1">
                   {code}
                   <Button
@@ -116,15 +109,15 @@ function CartDiscounts({
         </div>
       </UpdateDiscountForm>
     </div>
-  );
+  )
 }
 
 function UpdateDiscountForm({
   discountCodes,
   children,
 }: {
-  discountCodes?: string[];
-  children: React.ReactNode;
+  discountCodes?: string[]
+  children: React.ReactNode
 }) {
   return (
     <CartForm
@@ -136,29 +129,29 @@ function UpdateDiscountForm({
     >
       {children}
     </CartForm>
-  );
+  )
 }
 
 function CartGiftCard({
   giftCardCodes,
 }: {
-  giftCardCodes: CartApiQueryFragment['appliedGiftCards'] | undefined;
+  giftCardCodes: CartApiQueryFragment['appliedGiftCards'] | undefined
 }) {
-  const appliedGiftCardCodes = useRef<string[]>([]);
-  const giftCardCodeInput = useRef<HTMLInputElement>(null);
-  const giftCardAddFetcher = useFetcher({ key: 'gift-card-add' });
+  const appliedGiftCardCodes = useRef<string[]>([])
+  const giftCardCodeInput = useRef<HTMLInputElement>(null)
+  const giftCardAddFetcher = useFetcher({ key: 'gift-card-add' })
 
   // Clear the gift card code input after the gift card is added
   useEffect(() => {
     if (giftCardAddFetcher.data) {
-      giftCardCodeInput.current!.value = '';
+      giftCardCodeInput.current!.value = ''
     }
-  }, [giftCardAddFetcher.data]);
+  }, [giftCardAddFetcher.data])
 
   function saveAppliedCode(code: string) {
-    const formattedCode = code.replace(/\s/g, ''); // Remove spaces
+    const formattedCode = code.replace(/\s/g, '') // Remove spaces
     if (!appliedGiftCardCodes.current.includes(formattedCode)) {
-      appliedGiftCardCodes.current.push(formattedCode);
+      appliedGiftCardCodes.current.push(formattedCode)
     }
   }
 
@@ -169,7 +162,7 @@ function CartGiftCard({
         <div>
           <Label className="text-sm font-medium mb-2">Applied Gift Cards</Label>
           <div className="space-y-2 mt-2">
-            {giftCardCodes.map((giftCard) => (
+            {giftCardCodes.map(giftCard => (
               <RemoveGiftCardForm key={giftCard.id} giftCardId={giftCard.id}>
                 <div className="flex items-center justify-between p-2 rounded-md border">
                   <div className="flex items-center gap-2">
@@ -205,18 +198,14 @@ function CartGiftCard({
               ref={giftCardCodeInput}
               className="flex-1"
             />
-            <Button
-              type="submit"
-              variant="outline"
-              disabled={giftCardAddFetcher.state !== 'idle'}
-            >
+            <Button type="submit" variant="outline" disabled={giftCardAddFetcher.state !== 'idle'}>
               Apply
             </Button>
           </div>
         </div>
       </UpdateGiftCardForm>
     </div>
-  );
+  )
 }
 
 function UpdateGiftCardForm({
@@ -225,10 +214,10 @@ function UpdateGiftCardForm({
   fetcherKey,
   children,
 }: {
-  giftCardCodes?: string[];
-  saveAppliedCode?: (code: string) => void;
-  fetcherKey?: string;
-  children: React.ReactNode;
+  giftCardCodes?: string[]
+  saveAppliedCode?: (code: string) => void
+  fetcherKey?: string
+  children: React.ReactNode
 }) {
   return (
     <CartForm
@@ -240,22 +229,22 @@ function UpdateGiftCardForm({
       }}
     >
       {(fetcher: FetcherWithComponents<any>) => {
-        const code = fetcher.formData?.get('giftCardCode');
+        const code = fetcher.formData?.get('giftCardCode')
         if (code && saveAppliedCode) {
-          saveAppliedCode(code as string);
+          saveAppliedCode(code as string)
         }
-        return children;
+        return children
       }}
     </CartForm>
-  );
+  )
 }
 
 function RemoveGiftCardForm({
   giftCardId,
   children,
 }: {
-  giftCardId: string;
-  children: React.ReactNode;
+  giftCardId: string
+  children: React.ReactNode
 }) {
   return (
     <CartForm
@@ -267,5 +256,5 @@ function RemoveGiftCardForm({
     >
       {children}
     </CartForm>
-  );
+  )
 }

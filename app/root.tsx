@@ -1,49 +1,45 @@
-import { Analytics, getShopAnalytics, useNonce } from '@shopify/hydrogen';
-import { ArrowRight } from 'lucide-react';
-import { useRef } from 'react';
+import { Analytics, getShopAnalytics, useNonce } from '@shopify/hydrogen'
+import { ArrowRight } from 'lucide-react'
+import { useRef } from 'react'
 import {
-  isRouteErrorResponse,
   Link,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  type ShouldRevalidateFunction,
+  isRouteErrorResponse,
   useRouteError,
   useRouteLoaderData,
-  type ShouldRevalidateFunction,
-} from 'react-router';
-import { Footer } from '~/components/Footer';
-import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
-import { themeSessionResolver } from '~/lib/sessions.server';
-import { usePageTransition } from '~/hooks/usePageTransition';
-import type { Route } from './+types/root';
-import Styling from './app.css?url';
-import { PageLayout } from './components/PageLayout';
+} from 'react-router'
+import { Footer } from '~/components/Footer'
+import { usePageTransition } from '~/hooks/usePageTransition'
+import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments'
+import { themeSessionResolver } from '~/lib/sessions.server'
+import type { Route } from './+types/root'
+import Styling from './app.css?url'
+import { PageLayout } from './components/PageLayout'
 
-export type RootLoader = typeof loader;
+export type RootLoader = typeof loader
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
  */
-export const shouldRevalidate: ShouldRevalidateFunction = ({
-  formMethod,
-  currentUrl,
-  nextUrl,
-}) => {
+export const shouldRevalidate: ShouldRevalidateFunction = ({ formMethod, currentUrl, nextUrl }) => {
   // revalidate when a mutation is performed e.g add to cart, login...
-  if (formMethod && formMethod !== 'GET') return true;
+  if (formMethod && formMethod !== 'GET') return true
 
   // revalidate when manually revalidating via useRevalidator
-  if (currentUrl.toString() === nextUrl.toString()) return true;
+  if (currentUrl.toString() === nextUrl.toString()) return true
 
   // Defaulting to no revalidation for root loader data to improve performance.
   // When using this feature, you risk your UI getting out of sync with your server.
   // Use with caution. If you are uncomfortable with this optimization, update the
   // line below to `return defaultShouldRevalidate` instead.
   // For more details see: https://remix.run/docs/en/main/route/should-revalidate
-  return false;
-};
+  return false
+}
 
 /**
  * The main and reset stylesheets are added in the Layout component
@@ -69,14 +65,14 @@ export function links() {
     // Hreflang tags for locale-aware routes
     { rel: 'alternate', hrefLang: 'en', href: '/en' },
     { rel: 'alternate', hrefLang: 'x-default', href: '/en' },
-  ];
+  ]
 }
 
 export function meta({ data }: Route.MetaArgs) {
-  const title = data?.header?.shop?.name || 'Adina Household';
-  const description = data?.header?.shop?.description || 'Discover beautiful objects for your home';
-  const url = data?.header?.shop?.primaryDomain?.url || '';
-  const imageUrl = url ? `${url}/favicon.jpg` : '/favicon.jpg';
+  const title = data?.header?.shop?.name || 'Adina Household'
+  const description = data?.header?.shop?.description || 'Discover beautiful objects for your home'
+  const url = data?.header?.shop?.primaryDomain?.url || ''
+  const imageUrl = url ? `${url}/favicon.jpg` : '/favicon.jpg'
 
   return [
     { title },
@@ -94,20 +90,20 @@ export function meta({ data }: Route.MetaArgs) {
     { name: 'twitter:title', content: title },
     { name: 'twitter:description', content: description },
     { name: 'twitter:image', content: imageUrl },
-  ];
+  ]
 }
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  const deferredData = loadDeferredData(args)
 
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const criticalData = await loadCriticalData(args)
 
-  const { storefront, env } = args.context;
+  const { storefront, env } = args.context
 
   // Get theme from session
-  const { getTheme } = await themeSessionResolver(args.request);
+  const { getTheme } = await themeSessionResolver(args.request)
 
   return {
     ...deferredData,
@@ -126,7 +122,7 @@ export async function loader(args: Route.LoaderArgs) {
       language: args.context.storefront.i18n.language,
     },
     theme: getTheme(),
-  };
+  }
 }
 
 /**
@@ -134,7 +130,7 @@ export async function loader(args: Route.LoaderArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({ context }: Route.LoaderArgs) {
-  const { storefront } = context;
+  const { storefront } = context
 
   const [header] = await Promise.all([
     storefront.query(HEADER_QUERY, {
@@ -144,9 +140,9 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
       },
     }),
     // Add other queries here, so that they are loaded in parallel
-  ]);
+  ])
 
-  return { header };
+  return { header }
 }
 
 /**
@@ -155,7 +151,7 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({ context }: Route.LoaderArgs) {
-  const { storefront, customerAccount, cart } = context;
+  const { storefront, customerAccount, cart } = context
 
   // defer the footer query (below the fold)
   const footer = storefront
@@ -167,31 +163,31 @@ function loadDeferredData({ context }: Route.LoaderArgs) {
     })
     .catch((error: Error) => {
       // Log query errors, but don't throw them so the page can still render
-      console.error(error);
-      return null;
-    });
+      console.error(error)
+      return null
+    })
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
-  };
+  }
 }
 
 export function Layout({ children }: { children?: React.ReactNode }) {
-  return <>{children}</>;
+  return <>{children}</>
 }
 
 function LayoutWithTheme({ children }: { children?: React.ReactNode }) {
-  const nonce = useNonce();
-  const data = useRouteLoaderData<RootLoader>('root');
-  const theme = data?.theme ?? 'light';
+  const nonce = useNonce()
+  const data = useRouteLoaderData<RootLoader>('root')
+  const theme = data?.theme ?? 'light'
 
   return (
     <html lang="en" data-theme={theme} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="stylesheet" href={Styling}></link>
+        <link rel="stylesheet" href={Styling} />
         <Meta />
         <Links />
       </head>
@@ -201,39 +197,39 @@ function LayoutWithTheme({ children }: { children?: React.ReactNode }) {
         <Scripts nonce={nonce} />
       </body>
     </html>
-  );
+  )
 }
 
 function AppWithProviders() {
-  const data = useRouteLoaderData<RootLoader>('root');
+  const data = useRouteLoaderData<RootLoader>('root')
 
   if (!data) {
-    return <Outlet />;
+    return <Outlet />
   }
 
   return (
     <LayoutWithTheme>
       <AppContent />
     </LayoutWithTheme>
-  );
+  )
 }
 
 function AppContent() {
-  const data = useRouteLoaderData<RootLoader>('root');
-  const outletRef = useRef<HTMLDivElement>(null);
+  const data = useRouteLoaderData<RootLoader>('root')
+  const outletRef = useRef<HTMLDivElement>(null)
 
   usePageTransition(outletRef as React.RefObject<HTMLElement | null>, {
-    selector: "> *",
+    selector: '> *',
     duration: 0.35,
     startY: 12,
-  });
+  })
 
   if (!data) {
-    return <Outlet />;
+    return <Outlet />
   }
 
   // Only enable analytics in production
-  const isProduction = import.meta.env.PROD;
+  const isProduction = import.meta.env.PROD
 
   // Disable analytics in development to prevent CORS errors
   if (!isProduction) {
@@ -243,7 +239,7 @@ function AppContent() {
           <Outlet />
         </div>
       </PageLayout>
-    );
+    )
   }
 
   return (
@@ -254,20 +250,20 @@ function AppContent() {
         </div>
       </PageLayout>
     </Analytics.Provider>
-  );
+  )
 }
 
-export default AppWithProviders;
+export default AppWithProviders
 
 export function ErrorBoundary() {
-  const error = useRouteError();
-  const rootData = useRouteLoaderData<RootLoader>('root');
-  let errorStatus = 500;
-  let is404 = false;
+  const error = useRouteError()
+  const rootData = useRouteLoaderData<RootLoader>('root')
+  let errorStatus = 500
+  let is404 = false
 
   if (isRouteErrorResponse(error)) {
-    errorStatus = error.status;
-    is404 = errorStatus === 404;
+    errorStatus = error.status
+    is404 = errorStatus === 404
   }
 
   if (is404) {
@@ -286,7 +282,9 @@ export function ErrorBoundary() {
                 </h1>
 
                 <p className="text-foreground font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
-                  The page you are looking for might have been removed, had its name changed, or is temporarily unavailable. Let us guide you back to discovering beautiful objects for your home.
+                  The page you are looking for might have been removed, had its name changed, or is
+                  temporarily unavailable. Let us guide you back to discovering beautiful objects
+                  for your home.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-6 md:gap-8">
@@ -326,7 +324,7 @@ export function ErrorBoundary() {
           />
         )}
       </LayoutWithTheme>
-    );
+    )
   }
 
   return (
@@ -343,7 +341,8 @@ export function ErrorBoundary() {
             </h1>
 
             <p className="text-foreground font-sans text-base md:text-lg leading-relaxed max-w-2xl mb-8 md:mb-12">
-              We apologize for the inconvenience. An unexpected error has occurred. Please try again or return to the homepage.
+              We apologize for the inconvenience. An unexpected error has occurred. Please try again
+              or return to the homepage.
             </p>
 
             <Link
@@ -364,5 +363,5 @@ export function ErrorBoundary() {
         />
       )}
     </LayoutWithTheme>
-  );
+  )
 }

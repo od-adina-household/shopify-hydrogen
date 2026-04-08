@@ -160,7 +160,7 @@ export const CART_QUERY_FRAGMENT = `#graphql
       applicable
     }
   }
-` as const;
+` as const
 
 const MENU_FRAGMENT = `#graphql
   fragment MenuItem on MenuItem {
@@ -186,7 +186,7 @@ const MENU_FRAGMENT = `#graphql
       ...ParentMenuItem
     }
   }
-` as const;
+` as const
 
 export const HEADER_QUERY = `#graphql
   fragment Shop on Shop {
@@ -217,7 +217,7 @@ export const HEADER_QUERY = `#graphql
     }
   }
   ${MENU_FRAGMENT}
-` as const;
+` as const
 
 export const FOOTER_QUERY = `#graphql
   query Footer(
@@ -236,4 +236,4 @@ export const FOOTER_QUERY = `#graphql
     }
   }
   ${MENU_FRAGMENT}
-` as const;
+` as const

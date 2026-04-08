@@ -1,19 +1,19 @@
-import { getPaginationVariables, Image } from '@shopify/hydrogen';
-import { Link, useLoaderData } from 'react-router';
-import type { CollectionFragment } from 'storefrontapi.generated';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
-import { AspectRatio } from '~/components/ui/aspect-ratio';
-import { Card, CardContent } from '~/components/ui/card';
-import type { Route } from './+types/($locale).collections._index';
+import { Image, getPaginationVariables } from '@shopify/hydrogen'
+import { Link, useLoaderData } from 'react-router'
+import type { CollectionFragment } from 'storefrontapi.generated'
+import { PaginatedResourceSection } from '~/components/PaginatedResourceSection'
+import { AspectRatio } from '~/components/ui/aspect-ratio'
+import { Card, CardContent } from '~/components/ui/card'
+import type { Route } from './+types/($locale).collections._index'
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  const deferredData = loadDeferredData(args)
 
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const criticalData = await loadCriticalData(args)
 
-  return { ...deferredData, ...criticalData };
+  return { ...deferredData, ...criticalData }
 }
 
 /**
@@ -23,16 +23,16 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({ context, request }: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 4,
-  });
+  })
 
   const [{ collections }] = await Promise.all([
     context.storefront.query(COLLECTIONS_QUERY, {
       variables: paginationVariables,
     }),
     // Add other queries here, so that they are loaded in parallel
-  ]);
+  ])
 
-  return { collections };
+  return { collections }
 }
 
 /**
@@ -41,51 +41,39 @@ async function loadCriticalData({ context, request }: Route.LoaderArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({ context }: Route.LoaderArgs) {
-  return {};
+  return {}
 }
 
 export default function Collections() {
-  const { collections } = useLoaderData<typeof loader>();
+  const { collections } = useLoaderData<typeof loader>()
 
   return (
     <div className="space-y-8 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12 mt-20 md:mt-24">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-4">
-          Collections
-        </h1>
-        <p className="text-muted-foreground min-h-[24px]">
-          Browse our curated collections
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight mb-4">Collections</h1>
+        <p className="text-muted-foreground min-h-[24px]">Browse our curated collections</p>
       </div>
       <PaginatedResourceSection<CollectionFragment>
         connection={collections}
         resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         {({ node: collection, index }) => (
-          <CollectionItem
-            key={collection.id}
-            collection={collection}
-            index={index}
-          />
+          <CollectionItem key={collection.id} collection={collection} index={index} />
         )}
       </PaginatedResourceSection>
     </div>
-  );
+  )
 }
 
 function CollectionItem({
   collection,
   index,
 }: {
-  collection: CollectionFragment;
-  index: number;
+  collection: CollectionFragment
+  index: number
 }) {
   return (
-    <Link
-      to={`/collections/${collection.handle}`}
-      prefetch="intent"
-      className="group"
-    >
+    <Link to={`/collections/${collection.handle}`} prefetch="intent" className="group">
       <Card className="overflow-hidden transition-shadow hover:shadow-lg h-full">
         <CardContent className="p-0">
           {collection?.image && (
@@ -107,7 +95,7 @@ function CollectionItem({
         </CardContent>
       </Card>
     </Link>
-  );
+  )
 }
 
 const COLLECTIONS_QUERY = `#graphql
@@ -148,4 +136,4 @@ const COLLECTIONS_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const

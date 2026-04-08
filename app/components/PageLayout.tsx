@@ -1,29 +1,25 @@
-import { SearchIcon } from 'lucide-react';
-import { Suspense } from 'react';
-import { Await, Link } from 'react-router';
-import type {
-  CartApiQueryFragment,
-  FooterQuery,
-  HeaderQuery,
-} from 'storefrontapi.generated';
-import { Aside, useAside } from '~/components/Aside';
-import { CartMain } from '~/components/CartMain';
-import { Footer } from '~/components/Footer';
-import { Header, HeaderMenu } from '~/components/Header';
-import { SearchFormPredictive } from '~/components/SearchFormPredictive';
-import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
-import { Input } from '~/components/ui/input';
-import { Separator } from '~/components/ui/separator';
-import { AnnouncementBanner } from '~/components/AnnouncementBanner';
-import { WhatsAppWidget } from '~/components/WhatsAppWidget';
+import { SearchIcon } from 'lucide-react'
+import { Suspense } from 'react'
+import { Await, Link } from 'react-router'
+import type { CartApiQueryFragment, FooterQuery, HeaderQuery } from 'storefrontapi.generated'
+import { AnnouncementBanner } from '~/components/AnnouncementBanner'
+import { Aside, useAside } from '~/components/Aside'
+import { CartMain } from '~/components/CartMain'
+import { Footer } from '~/components/Footer'
+import { Header, HeaderMenu } from '~/components/Header'
+import { SearchFormPredictive } from '~/components/SearchFormPredictive'
+import { SearchResultsPredictive } from '~/components/SearchResultsPredictive'
+import { WhatsAppWidget } from '~/components/WhatsAppWidget'
+import { Input } from '~/components/ui/input'
+import { Separator } from '~/components/ui/separator'
 
 interface PageLayoutProps {
-  cart: Promise<CartApiQueryFragment | null>;
-  footer: Promise<FooterQuery | null>;
-  header: HeaderQuery;
-  isLoggedIn: Promise<boolean>;
-  publicStoreDomain: string;
-  children?: React.ReactNode;
+  cart: Promise<CartApiQueryFragment | null>
+  footer: Promise<FooterQuery | null>
+  header: HeaderQuery
+  isLoggedIn: Promise<boolean>
+  publicStoreDomain: string
+  children?: React.ReactNode
 }
 
 export function PageLayout({
@@ -39,7 +35,11 @@ export function PageLayout({
       <AnnouncementBanner />
       <SearchAside />
       <CartAside cart={cart} />
-      <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} isLoggedIn={isLoggedIn} />
+      <MobileMenuAside
+        header={header}
+        publicStoreDomain={publicStoreDomain}
+        isLoggedIn={isLoggedIn}
+      />
       {header && (
         <Header
           header={header}
@@ -49,24 +49,20 @@ export function PageLayout({
         />
       )}
       <main className="w-full">{children}</main>
-      <Footer
-        footer={footer}
-        header={header}
-        publicStoreDomain={publicStoreDomain}
-      />
+      <Footer footer={footer} header={header} publicStoreDomain={publicStoreDomain} />
       <WhatsAppWidget />
     </Aside.Provider>
-  );
+  )
 }
 
 function SearchAside() {
-  const { close } = useAside();
+  const { close } = useAside()
 
   return (
     <Aside type="search" heading="Search">
       <div className="p-6">
         <SearchFormPredictive>
-          {({ fetchResults, goToSearch, inputRef }) => (
+          {({ fetchResults, goToSearch: _goToSearch, inputRef }) => (
             <>
               <div className="flex items-center border border-border bg-muted px-4 py-3 rounded-md">
                 <SearchIcon className="mr-3 size-4 text-muted-foreground shrink-0" />
@@ -84,14 +80,14 @@ function SearchAside() {
               <div className="mt-4">
                 <SearchResultsPredictive>
                   {({ items, total, term, state, closeSearch }) => {
-                    if (!term.current) return null;
+                    if (!term.current) return null
 
                     if (state === 'loading') {
                       return (
                         <div className="p-4">
                           <p className="text-sm text-muted-foreground">Loading...</p>
                         </div>
-                      );
+                      )
                     }
 
                     if (!total) {
@@ -99,7 +95,7 @@ function SearchAside() {
                         <div className="p-4">
                           <SearchResultsPredictive.Empty term={term} />
                         </div>
-                      );
+                      )
                     }
 
                     return (
@@ -107,37 +103,37 @@ function SearchAside() {
                         <SearchResultsPredictive.Products
                           products={items.products}
                           closeSearch={() => {
-                            closeSearch();
-                            close();
+                            closeSearch()
+                            close()
                           }}
                           term={term}
                         />
                         <SearchResultsPredictive.Collections
                           collections={items.collections}
                           closeSearch={() => {
-                            closeSearch();
-                            close();
+                            closeSearch()
+                            close()
                           }}
                           term={term}
                         />
                         <SearchResultsPredictive.Pages
                           pages={items.pages}
                           closeSearch={() => {
-                            closeSearch();
-                            close();
+                            closeSearch()
+                            close()
                           }}
                           term={term}
                         />
                         <SearchResultsPredictive.Articles
                           articles={items.articles}
                           closeSearch={() => {
-                            closeSearch();
-                            close();
+                            closeSearch()
+                            close()
                           }}
                           term={term}
                         />
                       </div>
-                    );
+                    )
                   }}
                 </SearchResultsPredictive>
               </div>
@@ -146,39 +142,38 @@ function SearchAside() {
         </SearchFormPredictive>
       </div>
     </Aside>
-  );
+  )
 }
 
 function CartAside({ cart }: { cart: PageLayoutProps['cart'] }) {
   return (
     <Suspense fallback={<Aside type="cart" heading="Shopping Cart" />}>
       <Await resolve={cart}>
-        {(cart) => {
-          const itemCount = cart?.totalQuantity || 0;
-          const description = `${itemCount} item${itemCount !== 1 ? 's' : ''} in your cart`;
+        {cart => {
+          const itemCount = cart?.totalQuantity || 0
+          const description = `${itemCount} item${itemCount !== 1 ? 's' : ''} in your cart`
 
           return (
             <Aside type="cart" heading="Shopping Cart" description={description}>
               <CartMain cart={cart} layout="aside" />
             </Aside>
-          );
+          )
         }}
       </Await>
     </Suspense>
-  );
+  )
 }
-
 
 function MobileMenuAside({
   header,
   publicStoreDomain,
   isLoggedIn,
 }: {
-  header: PageLayoutProps['header'];
-  publicStoreDomain: PageLayoutProps['publicStoreDomain'];
-  isLoggedIn: PageLayoutProps['isLoggedIn'];
+  header: PageLayoutProps['header']
+  publicStoreDomain: PageLayoutProps['publicStoreDomain']
+  isLoggedIn: PageLayoutProps['isLoggedIn']
 }) {
-  const { close } = useAside();
+  const { close } = useAside()
 
   return (
     header.menu &&
@@ -188,7 +183,7 @@ function MobileMenuAside({
           {/* Search Input with Predictive Results */}
           <div className="relative mb-6">
             <SearchFormPredictive>
-              {({ fetchResults, goToSearch, inputRef }) => (
+              {({ fetchResults, goToSearch: _goToSearch, inputRef }) => (
                 <>
                   <div className="flex items-center border border-border bg-muted px-4 py-2 rounded-md">
                     <SearchIcon className="mr-3 size-4 text-muted-foreground shrink-0" />
@@ -207,14 +202,14 @@ function MobileMenuAside({
                   <div className="mt-2">
                     <SearchResultsPredictive>
                       {({ items, total, term, state, closeSearch }) => {
-                        if (!term.current) return null;
+                        if (!term.current) return null
 
                         if (state === 'loading') {
                           return (
                             <div className="bg-popover border rounded-md p-4 shadow-lg">
                               <p className="text-sm text-muted-foreground">Loading...</p>
                             </div>
-                          );
+                          )
                         }
 
                         if (!total) {
@@ -222,7 +217,7 @@ function MobileMenuAside({
                             <div className="bg-popover border rounded-md p-4 shadow-lg">
                               <SearchResultsPredictive.Empty term={term} />
                             </div>
-                          );
+                          )
                         }
 
                         return (
@@ -230,37 +225,37 @@ function MobileMenuAside({
                             <SearchResultsPredictive.Products
                               products={items.products}
                               closeSearch={() => {
-                                closeSearch();
-                                close();
+                                closeSearch()
+                                close()
                               }}
                               term={term}
                             />
                             <SearchResultsPredictive.Collections
                               collections={items.collections}
                               closeSearch={() => {
-                                closeSearch();
-                                close();
+                                closeSearch()
+                                close()
                               }}
                               term={term}
                             />
                             <SearchResultsPredictive.Pages
                               pages={items.pages}
                               closeSearch={() => {
-                                closeSearch();
-                                close();
+                                closeSearch()
+                                close()
                               }}
                               term={term}
                             />
                             <SearchResultsPredictive.Articles
                               articles={items.articles}
                               closeSearch={() => {
-                                closeSearch();
-                                close();
+                                closeSearch()
+                                close()
                               }}
                               term={term}
                             />
                           </div>
-                        );
+                        )
                       }}
                     </SearchResultsPredictive>
                   </div>
@@ -288,7 +283,7 @@ function MobileMenuAside({
             >
               <Suspense fallback="Account">
                 <Await resolve={isLoggedIn} errorElement="Account">
-                  {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}
+                  {isLoggedIn => (isLoggedIn ? 'Account' : 'Sign in')}
                 </Await>
               </Suspense>
             </Link>
@@ -303,5 +298,5 @@ function MobileMenuAside({
         </nav>
       </Aside>
     )
-  );
+  )
 }

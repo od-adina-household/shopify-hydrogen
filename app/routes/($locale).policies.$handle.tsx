@@ -1,29 +1,28 @@
-import { type Shop } from '@shopify/hydrogen/storefront-api-types';
-import { ArrowLeft } from 'lucide-react';
-import { Link, useLoaderData } from 'react-router';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
-import { Separator } from '~/components/ui/separator';
-import type { Route } from './+types/($locale).policies.$handle';
+import type { Shop } from '@shopify/hydrogen/storefront-api-types'
+import { ArrowLeft } from 'lucide-react'
+import { Link, useLoaderData } from 'react-router'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent } from '~/components/ui/card'
+import { Separator } from '~/components/ui/separator'
+import type { Route } from './+types/($locale).policies.$handle'
 
 type SelectedPolicies = keyof Pick<
   Shop,
   'privacyPolicy' | 'shippingPolicy' | 'termsOfService' | 'refundPolicy'
->;
+>
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: data?.policy.title ?? 'Policy' }];
-};
+  return [{ title: data?.policy.title ?? 'Policy' }]
+}
 
 export async function loader({ params, context }: Route.LoaderArgs) {
   if (!params.handle) {
-    throw new Response('No handle was passed in', { status: 404 });
+    throw new Response('No handle was passed in', { status: 404 })
   }
 
-  const policyName = params.handle.replace(
-    /-([a-z])/g,
-    (_: unknown, m1: string) => m1.toUpperCase(),
-  ) as SelectedPolicies;
+  const policyName = params.handle.replace(/-([a-z])/g, (_: unknown, m1: string) =>
+    m1.toUpperCase()
+  ) as SelectedPolicies
 
   const data = await context.storefront.query(POLICY_CONTENT_QUERY, {
     variables: {
@@ -34,19 +33,19 @@ export async function loader({ params, context }: Route.LoaderArgs) {
       [policyName]: true,
       language: context.storefront.i18n?.language,
     },
-  });
+  })
 
-  const policy = data.shop?.[policyName];
+  const policy = data.shop?.[policyName]
 
   if (!policy) {
-    throw new Response('Could not find the policy', { status: 404 });
+    throw new Response('Could not find the policy', { status: 404 })
   }
 
-  return { policy };
+  return { policy }
 }
 
 export default function Policy() {
-  const { policy } = useLoaderData<typeof loader>();
+  const { policy } = useLoaderData<typeof loader>()
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -83,7 +82,7 @@ export default function Policy() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/objects/Shop
@@ -118,4 +117,4 @@ const POLICY_CONTENT_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const

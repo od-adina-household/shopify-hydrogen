@@ -1,19 +1,19 @@
-import { useRef } from "react";
-import { gsap, useGSAP } from "~/lib/gsap";
+import { useRef } from 'react'
+import { gsap, useGSAP } from '~/lib/gsap'
 
 interface UseStaggerFadeInOptions {
   /** CSS selector for child elements to animate. Default: "> *" */
-  selector?: string;
+  selector?: string
   /** Stagger amount in seconds. Default: 0.08 */
-  stagger?: number;
+  stagger?: number
   /** Animation duration in seconds. Default: 0.6 */
-  duration?: number;
+  duration?: number
   /** Starting Y offset. Default: 24 */
-  startY?: number;
+  startY?: number
   /** Starting opacity. Default: 0 */
-  startOpacity?: number;
+  startOpacity?: number
   /** Delay before animation starts. Default: 0 */
-  delay?: number;
+  delay?: number
 }
 
 /**
@@ -26,26 +26,26 @@ export function useStaggerFadeIn(
   options: UseStaggerFadeInOptions = {}
 ) {
   const {
-    selector = "> *",
+    selector = '> *',
     stagger = 0.08,
     duration = 0.6,
     startY = 24,
     startOpacity = 0,
     delay = 0,
-  } = options;
+  } = options
 
-  const mmRef = useRef<gsap.Context | null>(null);
+  const mmRef = useRef<gsap.Context | null>(null)
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
+      const mm = gsap.matchMedia()
 
       mm.add(
         {
-          reduceMotion: "(prefers-reduced-motion: reduce)",
+          reduceMotion: '(prefers-reduced-motion: reduce)',
         },
-        (context) => {
-          const { reduceMotion } = context.conditions!;
+        context => {
+          const { reduceMotion } = context.conditions!
 
           gsap.fromTo(
             selector,
@@ -57,16 +57,16 @@ export function useStaggerFadeIn(
               y: 0,
               opacity: 1,
               duration: reduceMotion ? 0 : duration,
-              ease: "power2.out",
+              ease: 'power2.out',
               stagger: reduceMotion ? 0 : stagger,
               delay,
             }
-          );
+          )
         }
-      );
+      )
 
-      mmRef.current = mm as unknown as gsap.Context;
+      mmRef.current = mm as unknown as gsap.Context
     },
     { scope: scope.current ?? undefined }
-  );
+  )
 }

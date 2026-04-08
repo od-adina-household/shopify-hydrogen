@@ -87,4 +87,4 @@ export const CUSTOMER_ORDER_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const

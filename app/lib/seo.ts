@@ -1,18 +1,18 @@
-import type { ProductFragment } from 'storefrontapi.generated';
+import type { ProductFragment } from 'storefrontapi.generated'
 
 interface ProductJsonLdProps {
-  product: ProductFragment;
-  url: string;
+  product: ProductFragment
+  url: string
 }
 
 export function productJsonLd({ product, url }: ProductJsonLdProps) {
-  const selectedVariant = product.selectedOrFirstAvailableVariant;
+  const selectedVariant = product.selectedOrFirstAvailableVariant
   const image = product.featuredImage
     ? {
         '@type': 'ImageObject' as const,
         url: product.featuredImage.url,
       }
-    : undefined;
+    : undefined
 
   const offers = selectedVariant
     ? {
@@ -25,7 +25,7 @@ export function productJsonLd({ product, url }: ProductJsonLdProps) {
         url,
         sku: selectedVariant.sku || undefined,
       }
-    : undefined;
+    : undefined
 
   return {
     '@context': 'https://schema.org',
@@ -39,13 +39,13 @@ export function productJsonLd({ product, url }: ProductJsonLdProps) {
     },
     offers: offers ? [offers] : undefined,
     url,
-  };
+  }
 }
 
 interface OrganizationJsonLdProps {
-  name: string;
-  url: string;
-  logoUrl?: string;
+  name: string
+  url: string
+  logoUrl?: string
 }
 
 export function organizationJsonLd({ name, url, logoUrl }: OrganizationJsonLdProps) {
@@ -55,16 +55,16 @@ export function organizationJsonLd({ name, url, logoUrl }: OrganizationJsonLdPro
     name,
     url,
     logo: logoUrl ? { '@type': 'ImageObject' as const, url: logoUrl } : undefined,
-  };
+  }
 }
 
 interface BreadcrumbJsonLdItem {
-  name: string;
-  url: string;
+  name: string
+  url: string
 }
 
 interface BreadcrumbJsonLdProps {
-  items: BreadcrumbJsonLdItem[];
+  items: BreadcrumbJsonLdItem[]
 }
 
 export function breadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
@@ -77,13 +77,13 @@ export function breadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
       name: item.name,
       item: item.url,
     })),
-  };
+  }
 }
 
 interface WebSiteJsonLdProps {
-  name: string;
-  url: string;
-  searchUrl?: string;
+  name: string
+  url: string
+  searchUrl?: string
 }
 
 export function websiteJsonLd({ name, url, searchUrl }: WebSiteJsonLdProps) {
@@ -92,7 +92,7 @@ export function websiteJsonLd({ name, url, searchUrl }: WebSiteJsonLdProps) {
     '@type': 'WebSite' as const,
     name,
     url,
-  };
+  }
 
   if (searchUrl) {
     return {
@@ -102,8 +102,8 @@ export function websiteJsonLd({ name, url, searchUrl }: WebSiteJsonLdProps) {
         target: searchUrl,
         'query-input': 'required name=search_term_string',
       },
-    };
+    }
   }
 
-  return base;
+  return base
 }

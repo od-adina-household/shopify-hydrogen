@@ -1,8 +1,8 @@
-import { CartForm, type OptimisticCartLineInput } from '@shopify/hydrogen';
-import type { VariantProps } from 'class-variance-authority';
-import { useEffect, useRef } from 'react';
-import { type FetcherWithComponents } from 'react-router';
-import { Button, type buttonVariants } from '~/components/ui/button';
+import { CartForm, type OptimisticCartLineInput } from '@shopify/hydrogen'
+import type { VariantProps } from 'class-variance-authority'
+import { useEffect, useRef } from 'react'
+import type { FetcherWithComponents } from 'react-router'
+import { Button, type buttonVariants } from '~/components/ui/button'
 
 function BuyNowButtonInner({
   fetcher,
@@ -12,24 +12,24 @@ function BuyNowButtonInner({
   size,
   className,
 }: {
-  fetcher: FetcherWithComponents<{ checkoutUrl?: string | null }>;
-  children: React.ReactNode;
-  disabled?: boolean;
-  variant?: VariantProps<typeof buttonVariants>['variant'];
-  size?: VariantProps<typeof buttonVariants>['size'];
-  className?: string;
+  fetcher: FetcherWithComponents<{ checkoutUrl?: string | null }>
+  children: React.ReactNode
+  disabled?: boolean
+  variant?: VariantProps<typeof buttonVariants>['variant']
+  size?: VariantProps<typeof buttonVariants>['size']
+  className?: string
 }) {
-  const prevStateRef = useRef(fetcher.state);
+  const prevStateRef = useRef(fetcher.state)
 
   useEffect(() => {
     if (prevStateRef.current !== 'idle' && fetcher.state === 'idle') {
-      const checkoutUrl = fetcher.data?.checkoutUrl;
+      const checkoutUrl = fetcher.data?.checkoutUrl
       if (checkoutUrl) {
-        window.location.href = checkoutUrl;
+        window.location.href = checkoutUrl
       }
     }
-    prevStateRef.current = fetcher.state;
-  }, [fetcher.state, fetcher.data]);
+    prevStateRef.current = fetcher.state
+  }, [fetcher.state, fetcher.data])
 
   return (
     <Button
@@ -41,7 +41,7 @@ function BuyNowButtonInner({
     >
       {children}
     </Button>
-  );
+  )
 }
 
 export function BuyNowButton({
@@ -52,12 +52,12 @@ export function BuyNowButton({
   size = 'default',
   className,
 }: {
-  children: React.ReactNode;
-  disabled?: boolean;
-  lines: Array<OptimisticCartLineInput>;
-  variant?: VariantProps<typeof buttonVariants>['variant'];
-  size?: VariantProps<typeof buttonVariants>['size'];
-  className?: string;
+  children: React.ReactNode
+  disabled?: boolean
+  lines: Array<OptimisticCartLineInput>
+  variant?: VariantProps<typeof buttonVariants>['variant']
+  size?: VariantProps<typeof buttonVariants>['size']
+  className?: string
 }) {
   return (
     <CartForm route="/cart" inputs={{ lines }} action={CartForm.ACTIONS.LinesAdd}>
@@ -73,5 +73,5 @@ export function BuyNowButton({
         </BuyNowButtonInner>
       )}
     </CartForm>
-  );
+  )
 }

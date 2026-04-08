@@ -1,3 +1,3 @@
 export function ModeToggle() {
-  return null;
+  return null
 }

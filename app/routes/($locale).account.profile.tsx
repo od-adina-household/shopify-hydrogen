@@ -1,94 +1,85 @@
-import type { CustomerUpdateInput } from '@shopify/hydrogen/customer-account-api-types';
-import type { CustomerFragment } from 'customer-accountapi.generated';
-import { AlertCircle, Save, User } from 'lucide-react';
-import {
-  data,
-  Form,
-  useActionData,
-  useNavigation,
-  useOutletContext,
-} from 'react-router';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
-import { CUSTOMER_UPDATE_MUTATION } from '~/graphql/customer-account/CustomerUpdateMutation';
-import type { Route } from './+types/($locale).account.profile';
+import type { CustomerUpdateInput } from '@shopify/hydrogen/customer-account-api-types'
+import type { CustomerFragment } from 'customer-accountapi.generated'
+import { AlertCircle, Save, User } from 'lucide-react'
+import { Form, data, useActionData, useNavigation, useOutletContext } from 'react-router'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
+import { CUSTOMER_UPDATE_MUTATION } from '~/graphql/customer-account/CustomerUpdateMutation'
+import type { Route } from './+types/($locale).account.profile'
 
 export type ActionResponse = {
-  error: string | null;
-  customer: CustomerFragment | null;
-};
+  error: string | null
+  customer: CustomerFragment | null
+}
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Profile' }];
-};
+  return [{ title: 'Profile' }]
+}
 
 export async function loader({ context }: Route.LoaderArgs) {
-  context.customerAccount.handleAuthStatus();
+  context.customerAccount.handleAuthStatus()
 
-  return {};
+  return {}
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
-  const { customerAccount } = context;
+  const { customerAccount } = context
 
   if (request.method !== 'PUT') {
-    return data({ error: 'Method not allowed' }, { status: 405 });
+    return data({ error: 'Method not allowed' }, { status: 405 })
   }
 
-  const form = await request.formData();
+  const form = await request.formData()
 
   try {
-    const customer: CustomerUpdateInput = {};
-    const validInputKeys = ['firstName', 'lastName'] as const;
+    const customer: CustomerUpdateInput = {}
+    const validInputKeys = ['firstName', 'lastName'] as const
     for (const [key, value] of form.entries()) {
       if (!validInputKeys.includes(key as any)) {
-        continue;
+        continue
       }
       if (typeof value === 'string' && value.length) {
-        customer[key as (typeof validInputKeys)[number]] = value;
+        customer[key as (typeof validInputKeys)[number]] = value
       }
     }
 
     // update customer and possibly password
-    const { data, errors } = await customerAccount.mutate(
-      CUSTOMER_UPDATE_MUTATION,
-      {
-        variables: {
-          customer,
-          language: customerAccount.i18n.language,
-        },
+    const { data, errors } = await customerAccount.mutate(CUSTOMER_UPDATE_MUTATION, {
+      variables: {
+        customer,
+        language: customerAccount.i18n.language,
       },
-    );
+    })
 
     if (errors?.length) {
-      throw new Error(errors[0].message);
+      throw new Error(errors[0].message)
     }
 
     if (!data?.customerUpdate?.customer) {
-      throw new Error('Customer profile update failed.');
+      throw new Error('Customer profile update failed.')
     }
 
     return {
       error: null,
       customer: data?.customerUpdate?.customer,
-    };
+    }
   } catch (error: any) {
     return data(
       { error: error.message, customer: null },
       {
         status: 400,
-      },
-    );
+      }
+    )
   }
 }
 
 export default function AccountProfile() {
-  const account = useOutletContext<{ customer: CustomerFragment }>();
-  const { state } = useNavigation();
-  const action = useActionData<ActionResponse>();
-  const customer = action?.customer ?? account?.customer;
+  const account = useOutletContext<{ customer: CustomerFragment }>()
+  const { state } = useNavigation()
+  const action = useActionData<ActionResponse>()
+  const customer = action?.customer ?? account?.customer
 
   return (
     <Card>
@@ -142,9 +133,7 @@ export default function AccountProfile() {
                 disabled
                 className="bg-muted"
               />
-              <p className="text-xs text-muted-foreground">
-                Email address cannot be changed here
-              </p>
+              <p className="text-xs text-muted-foreground">Email address cannot be changed here</p>
             </div>
           </div>
 
@@ -162,5 +151,5 @@ export default function AccountProfile() {
         </Form>
       </CardContent>
     </Card>
-  );
+  )
 }

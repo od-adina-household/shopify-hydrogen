@@ -1,22 +1,22 @@
-import { getPaginationVariables } from '@shopify/hydrogen';
-import { useLoaderData } from 'react-router';
-import type { CollectionItemFragment } from 'storefrontapi.generated';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
-import { ProductItem } from '~/components/ProductItem';
-import type { Route } from './+types/($locale).collections.all';
+import { getPaginationVariables } from '@shopify/hydrogen'
+import { useLoaderData } from 'react-router'
+import type { CollectionItemFragment } from 'storefrontapi.generated'
+import { PaginatedResourceSection } from '~/components/PaginatedResourceSection'
+import { ProductItem } from '~/components/ProductItem'
+import type { Route } from './+types/($locale).collections.all'
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'All Products' }];
-};
+  return [{ title: 'All Products' }]
+}
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  const deferredData = loadDeferredData(args)
 
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const criticalData = await loadCriticalData(args)
 
-  return { ...deferredData, ...criticalData };
+  return { ...deferredData, ...criticalData }
 }
 
 /**
@@ -24,18 +24,18 @@ export async function loader(args: Route.LoaderArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({ context, request }: Route.LoaderArgs) {
-  const { storefront } = context;
+  const { storefront } = context
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
-  });
+  })
 
   const [{ products }] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
       variables: { ...paginationVariables },
     }),
     // Add other queries here, so that they are loaded in parallel
-  ]);
-  return { products };
+  ])
+  return { products }
 }
 
 /**
@@ -44,19 +44,17 @@ async function loadCriticalData({ context, request }: Route.LoaderArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({ context }: Route.LoaderArgs) {
-  return {};
+  return {}
 }
 
 export default function Collection() {
-  const { products } = useLoaderData<typeof loader>();
-  const productCount = products?.nodes?.length ?? 0;
+  const { products } = useLoaderData<typeof loader>()
+  const productCount = products?.nodes?.length ?? 0
 
   return (
     <div className="space-y-8 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-4 mt-4">
-          All Products
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight mb-4 mt-4">All Products</h1>
         <p className="text-muted-foreground min-h-[24px]">
           {productCount === 0
             ? 'No products found'
@@ -76,7 +74,7 @@ export default function Collection() {
         )}
       </PaginatedResourceSection>
     </div>
-  );
+  )
 }
 
 const COLLECTION_ITEM_FRAGMENT = `#graphql
@@ -133,7 +131,7 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
       }
     }
   }
-` as const;
+` as const
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/objects/product
 const CATALOG_QUERY = `#graphql
@@ -158,4 +156,4 @@ const CATALOG_QUERY = `#graphql
     }
   }
   ${COLLECTION_ITEM_FRAGMENT}
-` as const;
+` as const

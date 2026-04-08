@@ -1,53 +1,41 @@
-import {
-  Money,
-  flattenConnection,
-  getPaginationVariables,
-} from '@shopify/hydrogen';
-import type {
-  CustomerOrdersFragment,
-  OrderItemFragment,
-} from 'customer-accountapi.generated';
-import { ArrowRight, Package, Search, ShoppingBag, X } from 'lucide-react';
-import { useRef } from 'react';
-import {
-  Link,
-  useLoaderData,
-  useNavigation,
-  useSearchParams,
-} from 'react-router';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { Input } from '~/components/ui/input';
-import { Separator } from '~/components/ui/separator';
-import { CUSTOMER_ORDERS_QUERY } from '~/graphql/customer-account/CustomerOrdersQuery';
+import { Money, flattenConnection, getPaginationVariables } from '@shopify/hydrogen'
+import type { CustomerOrdersFragment, OrderItemFragment } from 'customer-accountapi.generated'
+import { ArrowRight, Package, Search, ShoppingBag, X } from 'lucide-react'
+import { useRef } from 'react'
+import { Link, useLoaderData, useNavigation, useSearchParams } from 'react-router'
+import { PaginatedResourceSection } from '~/components/PaginatedResourceSection'
+import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import { Input } from '~/components/ui/input'
+import { Separator } from '~/components/ui/separator'
+import { CUSTOMER_ORDERS_QUERY } from '~/graphql/customer-account/CustomerOrdersQuery'
 import {
   ORDER_FILTER_FIELDS,
+  type OrderFilterParams,
   buildOrderSearchQuery,
   parseOrderFilters,
-  type OrderFilterParams,
-} from '~/lib/orderFilters';
-import type { Route } from './+types/($locale).account.orders._index';
+} from '~/lib/orderFilters'
+import type { Route } from './+types/($locale).account.orders._index'
 
 type OrdersLoaderData = {
-  customer: CustomerOrdersFragment;
-  filters: OrderFilterParams;
-};
+  customer: CustomerOrdersFragment
+  filters: OrderFilterParams
+}
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Orders' }];
-};
+  return [{ title: 'Orders' }]
+}
 
 export async function loader({ request, context }: Route.LoaderArgs) {
-  const { customerAccount } = context;
+  const { customerAccount } = context
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 20,
-  });
+  })
 
-  const url = new URL(request.url);
-  const filters = parseOrderFilters(url.searchParams);
-  const query = buildOrderSearchQuery(filters);
+  const url = new URL(request.url)
+  const filters = parseOrderFilters(url.searchParams)
+  const query = buildOrderSearchQuery(filters)
 
   const { data, errors } = await customerAccount.query(CUSTOMER_ORDERS_QUERY, {
     variables: {
@@ -55,35 +43,35 @@ export async function loader({ request, context }: Route.LoaderArgs) {
       query,
       language: customerAccount.i18n.language,
     },
-  });
+  })
 
   if (errors?.length || !data?.customer) {
-    throw Error('Customer orders not found');
+    throw Error('Customer orders not found')
   }
 
-  return { customer: data.customer, filters };
+  return { customer: data.customer, filters }
 }
 
 export default function Orders() {
-  const { customer, filters } = useLoaderData<OrdersLoaderData>();
-  const { orders } = customer;
+  const { customer, filters } = useLoaderData<OrdersLoaderData>()
+  const { orders } = customer
 
   return (
     <div className="space-y-6">
       <OrderSearchForm currentFilters={filters} />
       <OrdersTable orders={orders} filters={filters} />
     </div>
-  );
+  )
 }
 
 function OrdersTable({
   orders,
   filters,
 }: {
-  orders: CustomerOrdersFragment['orders'];
-  filters: OrderFilterParams;
+  orders: CustomerOrdersFragment['orders']
+  filters: OrderFilterParams
 }) {
-  const hasFilters = !!(filters.name || filters.confirmationNumber);
+  const hasFilters = !!(filters.name || filters.confirmationNumber)
 
   return (
     <div className="acccount-orders" aria-live="polite">
@@ -95,7 +83,7 @@ function OrdersTable({
         <EmptyOrders hasFilters={hasFilters} />
       )}
     </div>
-  );
+  )
 }
 
 function EmptyOrders({ hasFilters = false }: { hasFilters?: boolean }) {
@@ -132,40 +120,38 @@ function EmptyOrders({ hasFilters = false }: { hasFilters?: boolean }) {
         )}
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function OrderSearchForm({
   currentFilters,
 }: {
-  currentFilters: OrderFilterParams;
+  currentFilters: OrderFilterParams
 }) {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigation = useNavigation();
+  const [_searchParams, setSearchParams] = useSearchParams()
+  const navigation = useNavigation()
   const isSearching =
-    navigation.state !== 'idle' &&
-    navigation.location?.pathname?.includes('orders');
-  const formRef = useRef<HTMLFormElement>(null);
+    navigation.state !== 'idle' && navigation.location?.pathname?.includes('orders')
+  const formRef = useRef<HTMLFormElement>(null)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const params = new URLSearchParams();
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const params = new URLSearchParams()
 
-    const name = formData.get(ORDER_FILTER_FIELDS.NAME)?.toString().trim();
+    const name = formData.get(ORDER_FILTER_FIELDS.NAME)?.toString().trim()
     const confirmationNumber = formData
       .get(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER)
       ?.toString()
-      .trim();
+      .trim()
 
-    if (name) params.set(ORDER_FILTER_FIELDS.NAME, name);
-    if (confirmationNumber)
-      params.set(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER, confirmationNumber);
+    if (name) params.set(ORDER_FILTER_FIELDS.NAME, name)
+    if (confirmationNumber) params.set(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER, confirmationNumber)
 
-    setSearchParams(params);
-  };
+    setSearchParams(params)
+  }
 
-  const hasFilters = currentFilters.name || currentFilters.confirmationNumber;
+  const hasFilters = currentFilters.name || currentFilters.confirmationNumber
 
   return (
     <Card>
@@ -210,8 +196,8 @@ function OrderSearchForm({
                 variant="outline"
                 disabled={isSearching}
                 onClick={() => {
-                  setSearchParams(new URLSearchParams());
-                  formRef.current?.reset();
+                  setSearchParams(new URLSearchParams())
+                  formRef.current?.reset()
                 }}
               >
                 <X className="h-4 w-4 mr-2" />
@@ -222,11 +208,11 @@ function OrderSearchForm({
         </form>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function OrderItem({ order }: { order: OrderItemFragment }) {
-  const fulfillmentStatus = flattenConnection(order.fulfillments)[0]?.status;
+  const fulfillmentStatus = flattenConnection(order.fulfillments)[0]?.status
   return (
     <Card>
       <CardContent className="p-6">
@@ -240,9 +226,7 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
                 #{order.number}
               </Link>
               <Badge variant="secondary">{order.financialStatus}</Badge>
-              {fulfillmentStatus && (
-                <Badge variant="outline">{fulfillmentStatus}</Badge>
-              )}
+              {fulfillmentStatus && <Badge variant="outline">{fulfillmentStatus}</Badge>}
             </div>
             <p className="text-sm text-muted-foreground">
               {new Date(order.processedAt).toDateString()}
@@ -271,5 +255,5 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

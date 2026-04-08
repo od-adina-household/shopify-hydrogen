@@ -1,15 +1,15 @@
-import { CartForm, Image, type OptimisticCartLine } from '@shopify/hydrogen';
-import type { CartLineUpdateInput } from '@shopify/hydrogen/storefront-api-types';
-import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react';
-import { Link } from 'react-router';
-import type { CartApiQueryFragment } from 'storefrontapi.generated';
-import type { CartLayout } from '~/components/CartMain';
-import { Button } from '~/components/ui/button';
-import { useVariantUrl } from '~/lib/variants';
-import { useAside } from './Aside';
-import { ProductPrice } from './ProductPrice';
+import { CartForm, Image, type OptimisticCartLine } from '@shopify/hydrogen'
+import type { CartLineUpdateInput } from '@shopify/hydrogen/storefront-api-types'
+import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { Link } from 'react-router'
+import type { CartApiQueryFragment } from 'storefrontapi.generated'
+import type { CartLayout } from '~/components/CartMain'
+import { Button } from '~/components/ui/button'
+import { useVariantUrl } from '~/lib/variants'
+import { useAside } from './Aside'
+import { ProductPrice } from './ProductPrice'
 
-type CartLine = OptimisticCartLine<CartApiQueryFragment>;
+type CartLine = OptimisticCartLine<CartApiQueryFragment>
 
 /**
  * A single line item in the cart. It displays the product image, title, price.
@@ -19,13 +19,13 @@ export function CartLineItem({
   layout,
   line,
 }: {
-  layout: CartLayout;
-  line: CartLine;
+  layout: CartLayout
+  line: CartLine
 }) {
-  const { id, merchandise } = line;
-  const { product, title, image, selectedOptions } = merchandise;
-  const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
-  const { close } = useAside();
+  const { id, merchandise } = line
+  const { product, title, image, selectedOptions } = merchandise
+  const lineItemUrl = useVariantUrl(product.handle, selectedOptions)
+  const { close } = useAside()
 
   return (
     <div key={id} className="flex gap-4 p-4 border-b last:border-b-0">
@@ -47,14 +47,12 @@ export function CartLineItem({
           to={lineItemUrl}
           onClick={() => {
             if (layout === 'aside') {
-              close();
+              close()
             }
           }}
           className="hover:underline"
         >
-          <p className="font-medium text-sm">
-            {product.title}
-          </p>
+          <p className="font-medium text-sm">{product.title}</p>
         </Link>
         {selectedOptions.length > 0 && selectedOptions[0].value !== 'Default Title' && (
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -67,7 +65,7 @@ export function CartLineItem({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 /**
@@ -76,10 +74,10 @@ export function CartLineItem({
  * hasn't yet responded that it was successfully added to the cart.
  */
 function CartLineQuantity({ line }: { line: CartLine }) {
-  if (!line || typeof line?.quantity === 'undefined') return null;
-  const { id: lineId, quantity, isOptimistic } = line;
-  const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
-  const nextQuantity = Number((quantity + 1).toFixed(0));
+  if (!line || typeof line?.quantity === 'undefined') return null
+  const { id: lineId, quantity, isOptimistic } = line
+  const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0))
+  const nextQuantity = Number((quantity + 1).toFixed(0))
 
   return (
     <div className="flex items-center gap-2">
@@ -112,7 +110,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
       </div>
       <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
     </div>
-  );
+  )
 }
 
 /**
@@ -124,8 +122,8 @@ function CartLineRemoveButton({
   lineIds,
   disabled,
 }: {
-  lineIds: string[];
-  disabled: boolean;
+  lineIds: string[]
+  disabled: boolean
 }) {
   return (
     <CartForm
@@ -145,17 +143,17 @@ function CartLineRemoveButton({
         <Trash2Icon className="h-4 w-4" />
       </Button>
     </CartForm>
-  );
+  )
 }
 
 function CartLineUpdateButton({
   children,
   lines,
 }: {
-  children: React.ReactNode;
-  lines: CartLineUpdateInput[];
+  children: React.ReactNode
+  lines: CartLineUpdateInput[]
 }) {
-  const lineIds = lines.map((line) => line.id);
+  const lineIds = lines.map(line => line.id)
 
   return (
     <CartForm
@@ -166,7 +164,7 @@ function CartLineUpdateButton({
     >
       {children}
     </CartForm>
-  );
+  )
 }
 
 /**
@@ -177,5 +175,5 @@ function CartLineUpdateButton({
  * @returns
  */
 function getUpdateKey(lineIds: string[]) {
-  return [CartForm.ACTIONS.LinesUpdate, ...lineIds].join('-');
+  return [CartForm.ACTIONS.LinesUpdate, ...lineIds].join('-')
 }

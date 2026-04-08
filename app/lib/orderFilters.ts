@@ -4,16 +4,16 @@
 export const ORDER_FILTER_FIELDS = {
   NAME: 'name',
   CONFIRMATION_NUMBER: 'confirmation_number',
-} as const;
+} as const
 
 /**
  * Parameters for filtering customer orders, see: https://shopify.dev/docs/api/customer/latest/queries/customer#returns-Customer.fields.orders.arguments.query
  */
 export interface OrderFilterParams {
   /** Order name or number (e.g., "#1001" or "1001") */
-  name?: string;
+  name?: string
   /** Order confirmation number */
-  confirmationNumber?: string;
+  confirmationNumber?: string
 }
 
 /**
@@ -25,7 +25,7 @@ export interface OrderFilterParams {
 function sanitizeFilterValue(value: string): string {
   // Only allow alphanumeric, underscore, and dash
   // Remove anything else to prevent injection
-  return value.replace(/[^a-zA-Z0-9_\-]/g, '');
+  return value.replace(/[^a-zA-Z0-9_\-]/g, '')
 }
 
 /**
@@ -36,29 +36,27 @@ function sanitizeFilterValue(value: string): string {
  * buildOrderSearchQuery(\{ name: '1001' \}) // returns "name:1001"
  * buildOrderSearchQuery(\{ name: '1001', confirmationNumber: 'ABC123' \}) // returns "name:1001 AND confirmation_number:ABC123"
  */
-export function buildOrderSearchQuery(
-  filters: OrderFilterParams,
-): string | undefined {
-  const queryParts: string[] = [];
+export function buildOrderSearchQuery(filters: OrderFilterParams): string | undefined {
+  const queryParts: string[] = []
 
   if (filters.name) {
     // Remove # if present and trim
-    const cleanName = filters.name.replace(/^#/, '').trim();
-    const sanitizedName = sanitizeFilterValue(cleanName);
+    const cleanName = filters.name.replace(/^#/, '').trim()
+    const sanitizedName = sanitizeFilterValue(cleanName)
     if (sanitizedName) {
-      queryParts.push(`name:${sanitizedName}`);
+      queryParts.push(`name:${sanitizedName}`)
     }
   }
 
   if (filters.confirmationNumber) {
-    const cleanConfirmation = filters.confirmationNumber.trim();
-    const sanitizedConfirmation = sanitizeFilterValue(cleanConfirmation);
+    const cleanConfirmation = filters.confirmationNumber.trim()
+    const sanitizedConfirmation = sanitizeFilterValue(cleanConfirmation)
     if (sanitizedConfirmation) {
-      queryParts.push(`confirmation_number:${sanitizedConfirmation}`);
+      queryParts.push(`confirmation_number:${sanitizedConfirmation}`)
     }
   }
 
-  return queryParts.length > 0 ? queryParts.join(' AND ') : undefined;
+  return queryParts.length > 0 ? queryParts.join(' AND ') : undefined
 }
 
 /**
@@ -69,22 +67,18 @@ export function buildOrderSearchQuery(
  * const url = new URL('https://example.com/orders?name=1001&confirmation_number=ABC123');
  * parseOrderFilters(url.searchParams) // returns \{ name: '1001', confirmationNumber: 'ABC123' \}
  */
-export function parseOrderFilters(
-  searchParams: URLSearchParams,
-): OrderFilterParams {
-  const filters: OrderFilterParams = {};
+export function parseOrderFilters(searchParams: URLSearchParams): OrderFilterParams {
+  const filters: OrderFilterParams = {}
 
-  const name = searchParams.get(ORDER_FILTER_FIELDS.NAME);
+  const name = searchParams.get(ORDER_FILTER_FIELDS.NAME)
   if (name) {
-    filters.name = name;
+    filters.name = name
   }
 
-  const confirmationNumber = searchParams.get(
-    ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER,
-  );
+  const confirmationNumber = searchParams.get(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER)
   if (confirmationNumber) {
-    filters.confirmationNumber = confirmationNumber;
+    filters.confirmationNumber = confirmationNumber
   }
 
-  return filters;
+  return filters
 }

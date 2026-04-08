@@ -1,18 +1,18 @@
-import { Image, getPaginationVariables } from '@shopify/hydrogen';
-import { Calendar, User } from 'lucide-react';
-import { Link, useLoaderData } from 'react-router';
-import type { ArticleItemFragment } from 'storefrontapi.generated';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
-import { AspectRatio } from '~/components/ui/aspect-ratio';
-import { Card, CardContent } from '~/components/ui/card';
-import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import type { Route } from './+types/($locale).blogs.$blogHandle._index';
+import { Image, getPaginationVariables } from '@shopify/hydrogen'
+import { Calendar, User } from 'lucide-react'
+import { Link, useLoaderData } from 'react-router'
+import type { ArticleItemFragment } from 'storefrontapi.generated'
+import { PaginatedResourceSection } from '~/components/PaginatedResourceSection'
+import { AspectRatio } from '~/components/ui/aspect-ratio'
+import { Card, CardContent } from '~/components/ui/card'
+import { redirectIfHandleIsLocalized } from '~/lib/redirect'
+import type { Route } from './+types/($locale).blogs.$blogHandle._index'
 
 export const meta: Route.MetaFunction = ({ data, params }) => {
-  const blog = data?.blog;
-  const seoTitle = blog?.seo?.title || blog?.title;
-  const seoDescription = blog?.seo?.description;
-  const handle = blog?.handle || params.blogHandle;
+  const blog = data?.blog
+  const seoTitle = blog?.seo?.title || blog?.title
+  const seoDescription = blog?.seo?.description
+  const handle = blog?.handle || params.blogHandle
 
   return [
     { title: seoTitle ?? 'Blog' },
@@ -25,17 +25,17 @@ export const meta: Route.MetaFunction = ({ data, params }) => {
     { name: 'twitter:card', content: 'summary' },
     { name: 'twitter:title', content: seoTitle },
     { name: 'twitter:description', content: seoDescription },
-  ];
-};
+  ]
+}
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  const deferredData = loadDeferredData(args)
 
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const criticalData = await loadCriticalData(args)
 
-  return { ...deferredData, ...criticalData };
+  return { ...deferredData, ...criticalData }
 }
 
 /**
@@ -45,10 +45,10 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({ context, request, params }: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 4,
-  });
+  })
 
   if (!params.blogHandle) {
-    throw new Response(`blog not found`, { status: 404 });
+    throw new Response('blog not found', { status: 404 })
   }
 
   const [{ blog }] = await Promise.all([
@@ -59,15 +59,15 @@ async function loadCriticalData({ context, request, params }: Route.LoaderArgs) 
       },
     }),
     // Add other queries here, so that they are loaded in parallel
-  ]);
+  ])
 
   if (!blog?.articles) {
-    throw new Response('Not found', { status: 404 });
+    throw new Response('Not found', { status: 404 })
   }
 
-  redirectIfHandleIsLocalized(request, { handle: params.blogHandle, data: blog });
+  redirectIfHandleIsLocalized(request, { handle: params.blogHandle, data: blog })
 
-  return { blog };
+  return { blog }
 }
 
 /**
@@ -76,23 +76,19 @@ async function loadCriticalData({ context, request, params }: Route.LoaderArgs) 
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({ context }: Route.LoaderArgs) {
-  return {};
+  return {}
 }
 
 export default function Blog() {
-  const { blog } = useLoaderData<typeof loader>();
-  const { articles } = blog;
+  const { blog } = useLoaderData<typeof loader>()
+  const { articles } = blog
 
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-          {blog.title}
-        </h1>
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{blog.title}</h1>
         {blog.seo?.description && (
-          <p className="text-lg text-muted-foreground">
-            {blog.seo.description}
-          </p>
+          <p className="text-lg text-muted-foreground">{blog.seo.description}</p>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -107,26 +103,23 @@ export default function Blog() {
         </PaginatedResourceSection>
       </div>
     </div>
-  );
+  )
 }
 
 function ArticleItem({
   article,
   loading,
 }: {
-  article: ArticleItemFragment;
-  loading?: HTMLImageElement['loading'];
+  article: ArticleItemFragment
+  loading?: HTMLImageElement['loading']
 }) {
   const publishedAt = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  }).format(new Date(article.publishedAt!));
+  }).format(new Date(article.publishedAt!))
   return (
-    <Link
-      to={`/blogs/${article.blog.handle}/${article.handle}`}
-      className="group"
-    >
+    <Link to={`/blogs/${article.blog.handle}/${article.handle}`} className="group">
       <Card className="overflow-hidden transition-shadow hover:shadow-lg h-full">
         <CardContent className="p-0">
           {article.image && (
@@ -160,7 +153,7 @@ function ArticleItem({
         </CardContent>
       </Card>
     </Link>
-  );
+  )
 }
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/objects/blog
@@ -220,4 +213,4 @@ const BLOGS_QUERY = `#graphql
       handle
     }
   }
-` as const;
+` as const

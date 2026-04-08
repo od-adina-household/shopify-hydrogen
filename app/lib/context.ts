@@ -1,7 +1,7 @@
-import {createHydrogenContext} from '@shopify/hydrogen';
-import {AppSession} from '~/lib/session';
-import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
-import {getLocaleFromRequest} from '~/lib/i18n';
+import { createHydrogenContext } from '@shopify/hydrogen'
+import { CART_QUERY_FRAGMENT } from '~/lib/fragments'
+import { getLocaleFromRequest } from '~/lib/i18n'
+import { AppSession } from '~/lib/session'
 
 // Define the additional context object
 const additionalContext = {
@@ -10,10 +10,10 @@ const additionalContext = {
   // Example of complex objects that could be added:
   // cms: await createCMSClient(env),
   // reviews: await createReviewsClient(env),
-} as const;
+} as const
 
 // Automatically augment HydrogenAdditionalContext with the additional context type
-type AdditionalContextType = typeof additionalContext;
+type AdditionalContextType = typeof additionalContext
 
 declare global {
   interface HydrogenAdditionalContext extends AdditionalContextType {}
@@ -26,20 +26,20 @@ declare global {
 export async function createHydrogenRouterContext(
   request: Request,
   env: Env,
-  executionContext: ExecutionContext,
+  executionContext: ExecutionContext
 ) {
   /**
    * Open a cache instance in the worker and a custom session instance.
    */
   if (!env?.SESSION_SECRET) {
-    throw new Error('SESSION_SECRET environment variable is not set');
+    throw new Error('SESSION_SECRET environment variable is not set')
   }
 
-  const waitUntil = executionContext.waitUntil.bind(executionContext);
+  const waitUntil = executionContext.waitUntil.bind(executionContext)
   const [cache, session] = await Promise.all([
     caches.open('hydrogen'),
     AppSession.init(request, [env.SESSION_SECRET]),
-  ]);
+  ])
 
   const hydrogenContext = createHydrogenContext(
     {
@@ -54,8 +54,8 @@ export async function createHydrogenRouterContext(
         queryFragment: CART_QUERY_FRAGMENT,
       },
     },
-    additionalContext,
-  );
+    additionalContext
+  )
 
-  return hydrogenContext;
+  return hydrogenContext
 }

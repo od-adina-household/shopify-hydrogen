@@ -1,18 +1,12 @@
-import { reactRouter } from '@react-router/dev/vite';
-import { hydrogen } from '@shopify/hydrogen/vite';
-import { oxygen } from '@shopify/mini-oxygen/vite';
-import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import { reactRouter } from '@react-router/dev/vite'
+import { hydrogen } from '@shopify/hydrogen/vite'
+import { oxygen } from '@shopify/mini-oxygen/vite'
+import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
-  plugins: [
-    tailwindcss(),
-    hydrogen(),
-    oxygen(),
-    reactRouter(),
-    tsconfigPaths(),
-  ],
+  plugins: [tailwindcss(), hydrogen(), oxygen(), reactRouter(), tsconfigPaths()],
   build: {
     // Allow a strict Content-Security-Policy
     // withtout inlining assets as base64:
@@ -36,4 +30,4 @@ export default defineConfig({
   server: {
     allowedHosts: ['.tryhydrogen.dev'],
   },
-});
+})

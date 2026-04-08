@@ -1,56 +1,31 @@
 import {
   Analytics,
+  Image,
+  Money,
   getAdjacentAndFirstAvailableVariants,
   getProductOptions,
   getSelectedProductOptions,
   useOptimisticVariant,
   useSelectedOptionInUrlParam,
-  Image,
-  Money,
-} from '@shopify/hydrogen';
-import {
-  CheckIcon,
-  PackageIcon,
-  RotateCcwIcon,
-  TruckIcon,
-  Share2,
-  Mail,
-  Facebook,
-  Twitter,
-  ChevronRight,
-  Heart,
-} from 'lucide-react';
-import { Suspense, useState, useEffect } from 'react';
-import { AddToCartButton } from '~/components/AddToCartButton';
-import { useAside } from '~/components/Aside';
-import { Await, Link, useLoaderData } from 'react-router';
-import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
-import { Button } from '~/components/ui/button';
-import { cn } from '~/lib/utils';
-import { useWishlist } from '~/lib/useWishlist';
+} from '@shopify/hydrogen'
+import { ChevronRight, Facebook, Heart, Mail, Share2, Twitter } from 'lucide-react'
+import { Suspense, useEffect, useState } from 'react'
+import { Await, Link, useLoaderData } from 'react-router'
 import type {
-  ProductVariantFragment,
+  FallbackProductsQuery,
   ProductFragment,
   ProductRecommendationsQuery,
-  FallbackProductsQuery,
-} from 'storefrontapi.generated';
-import { ProductForm } from '~/components/ProductForm';
-import { ProductPrice } from '~/components/ProductPrice';
-import { Skeleton } from '~/components/ui/skeleton';
+} from 'storefrontapi.generated'
+import { AddToCartButton } from '~/components/AddToCartButton'
+import { useAside } from '~/components/Aside'
+import { ProductForm } from '~/components/ProductForm'
+import { ProductPrice } from '~/components/ProductPrice'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '~/components/ui/accordion';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi,
-} from '~/components/ui/carousel';
+} from '~/components/ui/accordion'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -58,25 +33,35 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '~/components/ui/breadcrumb';
-import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import { productJsonLd, breadcrumbJsonLd } from '~/lib/seo';
-import type { Route } from './+types/($locale).products.$handle';
+} from '~/components/ui/breadcrumb'
+import { Button } from '~/components/ui/button'
+import {
+  Carousel,
+  type CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '~/components/ui/carousel'
+import { Skeleton } from '~/components/ui/skeleton'
+import { redirectIfHandleIsLocalized } from '~/lib/redirect'
+import { breadcrumbJsonLd, productJsonLd } from '~/lib/seo'
+import { useWishlist } from '~/lib/useWishlist'
+import { cn } from '~/lib/utils'
+import type { Route } from './+types/($locale).products.$handle'
 
-type ProductImage = NonNullable<ProductFragment['images']['nodes'][number]>;
+type ProductImage = NonNullable<ProductFragment['images']['nodes'][number]>
 
-type RelatedProduct = NonNullable<
-  ProductRecommendationsQuery['productRecommendations']
->[number] & {
-  variants?: { nodes: Array<{ id: string; availableForSale: boolean }> };
-};
+type RelatedProduct = NonNullable<ProductRecommendationsQuery['productRecommendations']>[number] & {
+  variants?: { nodes: Array<{ id: string; availableForSale: boolean }> }
+}
 
 export const meta: Route.MetaFunction = ({ data, params }) => {
-  const product = data?.product;
-  const seoTitle = product?.seo?.title || product?.title;
-  const seoDescription = product?.seo?.description || product?.description;
-  const handle = product?.handle || params.handle;
-  const imageUrl = product?.featuredImage?.url;
+  const product = data?.product
+  const seoTitle = product?.seo?.title || product?.title
+  const seoDescription = product?.seo?.description || product?.description
+  const handle = product?.handle || params.handle
+  const imageUrl = product?.featuredImage?.url
 
   return [
     { title: seoTitle ?? 'Product' },
@@ -91,17 +76,17 @@ export const meta: Route.MetaFunction = ({ data, params }) => {
     { name: 'twitter:title', content: seoTitle },
     { name: 'twitter:description', content: seoDescription },
     ...(imageUrl ? [{ name: 'twitter:image', content: imageUrl }] : []),
-  ];
-};
+  ]
+}
 
 export async function loader(args: Route.LoaderArgs) {
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const criticalData = await loadCriticalData(args)
 
   // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args, criticalData.product.id);
+  const deferredData = loadDeferredData(args, criticalData.product.id)
 
-  return { ...deferredData, ...criticalData };
+  return { ...deferredData, ...criticalData }
 }
 
 /**
@@ -109,11 +94,11 @@ export async function loader(args: Route.LoaderArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({ context, params, request }: Route.LoaderArgs) {
-  const { handle } = params;
-  const { storefront } = context;
+  const { handle } = params
+  const { storefront } = context
 
   if (!handle) {
-    throw new Error('Expected product handle to be defined');
+    throw new Error('Expected product handle to be defined')
   }
 
   const [{ product }] = await Promise.all([
@@ -121,18 +106,18 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
       variables: { handle, selectedOptions: getSelectedProductOptions(request) },
     }),
     // Add other queries here, so that they are loaded in parallel
-  ]);
+  ])
 
   if (!product?.id) {
-    throw new Response(null, { status: 404 });
+    throw new Response(null, { status: 404 })
   }
 
   // The API handle might be localized, so redirect to the localized handle
-  redirectIfHandleIsLocalized(request, { handle, data: product });
+  redirectIfHandleIsLocalized(request, { handle, data: product })
 
   return {
     product,
-  };
+  }
 }
 
 /**
@@ -144,7 +129,7 @@ function loadDeferredData({ context }: Route.LoaderArgs, productId: string) {
   // Put any API calls that is not critical to be available on first page render
   // For example: product reviews, product recommendations, social feeds.
 
-  const { storefront } = context;
+  const { storefront } = context
 
   const relatedProducts = Promise.all([
     storefront
@@ -152,63 +137,71 @@ function loadDeferredData({ context }: Route.LoaderArgs, productId: string) {
         variables: { productId },
       })
       .catch((error: Error) => {
-        console.error(error);
-        return null;
+        console.error(error)
+        return null
       }),
-    storefront
-      .query(FALLBACK_PRODUCTS_QUERY)
-      .catch((error: Error) => {
-        console.error(error);
-        return null;
-      }),
-  ]);
+    storefront.query(FALLBACK_PRODUCTS_QUERY).catch((error: Error) => {
+      console.error(error)
+      return null
+    }),
+  ])
 
   return {
     relatedProducts,
-  };
+  }
 }
 
 export default function Product() {
-  const { product, relatedProducts } = useLoaderData<typeof loader>();
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
+  const { product, relatedProducts } = useLoaderData<typeof loader>()
+  const [api, setApi] = useState<CarouselApi>()
+  const [current, setCurrent] = useState(0)
+  const [count, setCount] = useState(0)
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
-    getAdjacentAndFirstAvailableVariants(product),
-  );
+    getAdjacentAndFirstAvailableVariants(product)
+  )
 
   // Sets the search param to the selected variant without navigation.
   // Filter out Shopify's synthetic "Title / Default Title" option that exists
   // on products with no real variants — it adds nothing to the URL.
   const variantOptions = selectedVariant.selectedOptions.filter(
-    (opt) => !(opt.name === 'Title' && opt.value === 'Default Title'),
-  );
-  useSelectedOptionInUrlParam(variantOptions);
+    opt => !(opt.name === 'Title' && opt.value === 'Default Title')
+  )
+  useSelectedOptionInUrlParam(variantOptions)
 
   // Get the product options array
   const productOptions = getProductOptions({
     ...product,
     selectedOrFirstAvailableVariant: selectedVariant,
-  });
+  })
 
-  const { title, descriptionHtml, description, images, general, dimensions, care_instructions, downloads } = product;
-  const productImages = images.nodes.length > 0 ? images.nodes : selectedVariant?.image ? [selectedVariant.image] : [];
+  const {
+    title,
+    descriptionHtml,
+    description,
+    images,
+    general,
+    dimensions,
+    care_instructions,
+    downloads,
+  } = product
+  const productImages =
+    images.nodes.length > 0 ? images.nodes : selectedVariant?.image ? [selectedVariant.image] : []
 
   useEffect(() => {
     if (!api) {
-      return;
+      return
     }
 
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
+    setCount(api.scrollSnapList().length)
+    setCurrent(api.selectedScrollSnap() + 1)
 
     api.on('select', () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
+      setCurrent(api.selectedScrollSnap() + 1)
+    })
+  }, [api])
 
   return (
     <>
@@ -222,300 +215,333 @@ export default function Product() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbJsonLd({
-            items: [
-              { name: 'All Products', url: '/products' },
-              { name: product.title, url: `/products/${product.handle}` },
-            ],
-          })),
+          __html: JSON.stringify(
+            breadcrumbJsonLd({
+              items: [
+                { name: 'All Products', url: '/products' },
+                { name: product.title, url: `/products/${product.handle}` },
+              ],
+            })
+          ),
         }}
       />
 
       <div className="relative min-h-screen bg-background mt-20 md:mt-24">
         <div className="mx-auto max-w-[1920px]">
-        <div className="flex flex-col lg:flex-row lg:gap-8 xl:gap-12 relative lg:px-8 xl:px-12">
-          {/* Left Column - Image Carousel */}
-          <div className="w-full lg:w-[55%] bg-background flex flex-col">
-            <div className="relative min-h-48 sm:min-h-64 md:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
-              <Carousel setApi={setApi} className="w-full h-full" opts={{ loop: true }}>
-                <CarouselContent className="h-full ml-0">
-                  {productImages.map((image: ProductImage, index: number) => (
-                    <CarouselItem key={image.id || index} className="w-full h-full flex items-center justify-center p-0 pl-0">
-                      <div className="relative w-full flex items-center justify-center bg-background">
-                        <Image
-                          data={image}
-                          sizes="(min-width: 1024px) 55vw, 100vw"
-                          className="w-full h-auto object-contain max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]"
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                  {productImages.length === 0 && (
-                    <CarouselItem className="w-full h-full flex items-center justify-center pl-0">
-                      <div className="w-full h-full bg-background flex items-center justify-center text-gray-400 min-h-64 sm:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh]">
-                        No Image Available
-                      </div>
-                    </CarouselItem>
+          <div className="flex flex-col lg:flex-row lg:gap-8 xl:gap-12 relative lg:px-8 xl:px-12">
+            {/* Left Column - Image Carousel */}
+            <div className="w-full lg:w-[55%] bg-background flex flex-col">
+              <div className="relative min-h-48 sm:min-h-64 md:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh] max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]">
+                <Carousel setApi={setApi} className="w-full h-full" opts={{ loop: true }}>
+                  <CarouselContent className="h-full ml-0">
+                    {productImages.map((image: ProductImage, index: number) => (
+                      <CarouselItem
+                        key={image.id || index}
+                        className="w-full h-full flex items-center justify-center p-0 pl-0"
+                      >
+                        <div className="relative w-full flex items-center justify-center bg-background">
+                          <Image
+                            data={image}
+                            sizes="(min-width: 1024px) 55vw, 100vw"
+                            className="w-full h-auto object-contain max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]"
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                    {productImages.length === 0 && (
+                      <CarouselItem className="w-full h-full flex items-center justify-center pl-0">
+                        <div className="w-full h-full bg-background flex items-center justify-center text-gray-400 min-h-64 sm:min-h-80 lg:min-h-[50vh] xl:min-h-[60vh]">
+                          No Image Available
+                        </div>
+                      </CarouselItem>
+                    )}
+                  </CarouselContent>
+
+                  {productImages.length > 1 && (
+                    <>
+                      <CarouselPrevious
+                        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 size-8 sm:size-10 bg-primary! text-primary-foreground! hover:bg-primary/80! border-0 shadow-md rounded-full z-10"
+                        aria-label="Previous image"
+                      />
+                      <CarouselNext
+                        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 size-8 sm:size-10 bg-primary! text-primary-foreground! hover:bg-primary/80! border-0 shadow-md rounded-full z-10"
+                        aria-label="Next image"
+                      />
+                    </>
                   )}
-                </CarouselContent>
+                </Carousel>
 
-                {productImages.length > 1 && (
-                  <>
-                    <CarouselPrevious className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 size-8 sm:size-10 bg-primary! text-primary-foreground! hover:bg-primary/80! border-0 shadow-md rounded-full z-10" aria-label="Previous image" />
-                    <CarouselNext className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 size-8 sm:size-10 bg-primary! text-primary-foreground! hover:bg-primary/80! border-0 shadow-md rounded-full z-10" aria-label="Next image" />
-                  </>
+                {productImages.length > 0 && (
+                  <div className="absolute bottom-4 sm:bottom-5 left-3 sm:left-4 text-base sm:text-lg font-normal font-sans text-foreground leading-none z-10 px-2 py-1 rounded">
+                    {current} / {count}
+                  </div>
                 )}
-              </Carousel>
+              </div>
 
-              {productImages.length > 0 && (
-                <div className="absolute bottom-4 sm:bottom-5 left-3 sm:left-4 text-base sm:text-lg font-normal font-sans text-foreground leading-none z-10 px-2 py-1 rounded">
-                  {current} / {count}
+              {/* Thumbnail Navigation */}
+              {productImages.length > 1 && (
+                <div className="flex gap-2 mt-4 px-4 lg:px-0 overflow-x-auto pb-2">
+                  {productImages.map((image: ProductImage, index: number) => (
+                    <button
+                      key={image.id || index}
+                      onClick={() => api?.scrollTo(index)}
+                      aria-label={`View image ${index + 1} of ${productImages.length}`}
+                      aria-current={current === index + 1 ? 'true' : 'false'}
+                      className={`flex-shrink-0 size-12 sm:size-14 md:size-16 lg:size-20 border-2 transition-all ${
+                        current === index + 1
+                          ? 'border-border shadow-md'
+                          : 'border-border/50 hover:border-border/70'
+                      }`}
+                    >
+                      <Image
+                        data={image}
+                        sizes="80px"
+                        className="size-full object-cover mix-blend-normal"
+                      />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Thumbnail Navigation */}
-            {productImages.length > 1 && (
-              <div className="flex gap-2 mt-4 px-4 lg:px-0 overflow-x-auto pb-2">
-                {productImages.map((image: ProductImage, index: number) => (
-                  <button
-                    key={image.id || index}
-                    onClick={() => api?.scrollTo(index)}
-                    aria-label={`View image ${index + 1} of ${productImages.length}`}
-                    aria-current={current === index + 1 ? 'true' : 'false'}
-                    className={`flex-shrink-0 size-12 sm:size-14 md:size-16 lg:size-20 border-2 transition-all ${
-                      current === index + 1
-                        ? 'border-border shadow-md'
-                        : 'border-border/50 hover:border-border/70'
-                    }`}
-                  >
-                    <Image
-                      data={image}
-                      sizes="80px"
-                      className="size-full object-cover mix-blend-normal"
-                    />
-                  </button>
-                ))}
+            {/* Right Column - Product Information */}
+            <div className="w-full lg:w-[45%] bg-background px-6 py-10 lg:px-0 lg:py-12 flex flex-col">
+              {/* Breadcrumb */}
+              <div className="mb-8 lg:mb-12">
+                <Breadcrumb>
+                  <BreadcrumbList className="text-sm sm:text-base text-foreground font-sans">
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href="/products"
+                        className="hover:opacity-70 transition-opacity text-primary"
+                      >
+                        All Products
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="text-foreground/50">
+                      <ChevronRight className="size-3 sm:size-4" />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href="#"
+                        className="hover:opacity-70 transition-opacity text-primary"
+                      >
+                        Kitchen
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="text-foreground/50">
+                      <ChevronRight className="size-3 sm:size-4" />
+                    </BreadcrumbSeparator>
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-primary">Artist ceramics</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
               </div>
-            )}
-          </div>
 
-          {/* Right Column - Product Information */}
-          <div className="w-full lg:w-[45%] bg-background px-6 py-10 lg:px-0 lg:py-12 flex flex-col">
-            
-            {/* Breadcrumb */}
-            <div className="mb-8 lg:mb-12">
-              <Breadcrumb>
-                <BreadcrumbList className="text-sm sm:text-base text-foreground font-sans">
-                  <BreadcrumbItem>
-                    <BreadcrumbLink href="/products" className="hover:opacity-70 transition-opacity text-primary">All Products</BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="text-foreground/50">
-                    <ChevronRight className="size-3 sm:size-4" />
-                  </BreadcrumbSeparator>
-                  <BreadcrumbItem>
-                    <BreadcrumbLink href="#" className="hover:opacity-70 transition-opacity text-primary">Kitchen</BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="text-foreground/50">
-                    <ChevronRight className="size-3 sm:size-4" />
-                  </BreadcrumbSeparator>
-                  <BreadcrumbItem>
-                    <BreadcrumbPage className="text-primary">Artist ceramics</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-            </div>
+              {/* Social Share */}
+              <ShareButtons product={product} />
 
-            {/* Social Share */}
-            <ShareButtons product={product} />
+              {/* Product Title & Info */}
+              <div className="mb-10 lg:mb-16">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl leading-tight mb-4 lg:mb-6 font-serif font-normal text-foreground">
+                  {title}
+                </h1>
+                {selectedVariant?.title && selectedVariant.title !== 'Default Title' && (
+                  <p className="text-xl sm:text-2xl leading-tight text-foreground mb-4 font-sans font-light">
+                    {selectedVariant.title}
+                  </p>
+                )}
+                {selectedVariant?.sku && (
+                  <p className="text-xs sm:text-sm text-foreground font-sans opacity-80 mb-8">
+                    {selectedVariant.sku}
+                  </p>
+                )}
 
-            {/* Product Title & Info */}
-            <div className="mb-10 lg:mb-16">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl leading-tight mb-4 lg:mb-6 font-serif font-normal text-foreground">
-                {title}
-              </h1>
-              {selectedVariant?.title && selectedVariant.title !== 'Default Title' && (
-                <p className="text-xl sm:text-2xl leading-tight text-foreground mb-4 font-sans font-light">
-                  {selectedVariant.title}
-                </p>
-              )}
-              {selectedVariant?.sku && (
-                <p className="text-xs sm:text-sm text-foreground font-sans opacity-80 mb-8">
-                  {selectedVariant.sku}
-                </p>
-              )}
-
-              {/* Price and Add to Cart */}
-              <div className="mt-8 pt-8 border-t border-border/40">
-                <div className="flex items-center justify-between mb-6">
-                  <ProductPrice
-                    price={selectedVariant?.price}
-                    compareAtPrice={selectedVariant?.compareAtPrice}
-                    className="text-xl sm:text-2xl font-light text-foreground"
-                  />
-                  <WishlistButton
+                {/* Price and Add to Cart */}
+                <div className="mt-8 pt-8 border-t border-border/40">
+                  <div className="flex items-center justify-between mb-6">
+                    <ProductPrice
+                      price={selectedVariant?.price}
+                      compareAtPrice={selectedVariant?.compareAtPrice}
+                      className="text-xl sm:text-2xl font-light text-foreground"
+                    />
+                    <WishlistButton
+                      productId={product.id}
+                      productHandle={product.handle}
+                      productTitle={product.title}
+                      productImage={product.featuredImage ?? undefined}
+                      price={selectedVariant?.price}
+                    />
+                  </div>
+                  <ProductForm
+                    productOptions={productOptions}
+                    selectedVariant={selectedVariant}
                     productId={product.id}
                     productHandle={product.handle}
                     productTitle={product.title}
                     productImage={product.featuredImage ?? undefined}
-                    price={selectedVariant?.price}
                   />
                 </div>
-                <ProductForm
-                  productOptions={productOptions}
-                  selectedVariant={selectedVariant}
-                  productId={product.id}
-                  productHandle={product.handle}
-                  productTitle={product.title}
-                  productImage={product.featuredImage ?? undefined}
-                />
+              </div>
+
+              {/* Accordions */}
+              <div className="space-y-0 border-t border-border/50">
+                <Accordion type="single" collapsible className="w-full" defaultValue="description">
+                  <AccordionItem value="description" className="border-b border-border/50">
+                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                      Description
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm leading-relaxed text-foreground font-sans pb-6 lg:pb-8 pr-4">
+                      {descriptionHtml ? (
+                        <div
+                          className="prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                        />
+                      ) : (
+                        <p>{description}</p>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                  {general?.value && (
+                    <AccordionItem value="general" className="border-b border-border/50">
+                      <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                        General
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
+                        <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">
+                          {general.value}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                  {dimensions?.value && (
+                    <AccordionItem value="dimensions" className="border-b border-border/50">
+                      <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                        Dimensions
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
+                        <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">
+                          {dimensions.value}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                  {care_instructions?.value && (
+                    <AccordionItem value="care" className="border-b border-border/50">
+                      <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                        Care & Maintenance Instructions
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
+                        <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">
+                          {care_instructions.value}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                  {downloads?.value && (
+                    <AccordionItem value="downloads" className="border-b border-border/50">
+                      <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
+                        Downloads
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
+                        <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">
+                          {downloads.value}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                </Accordion>
               </div>
             </div>
-
-            {/* Accordions */}
-            <div className="space-y-0 border-t border-border/50">
-              <Accordion type="single" collapsible className="w-full" defaultValue="description">
-                <AccordionItem value="description" className="border-b border-border/50">
-                  <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                    Description
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm leading-relaxed text-foreground font-sans pb-6 lg:pb-8 pr-4">
-                    {descriptionHtml ? (
-                      <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
-                    ) : (
-                      <p>{description}</p>
-                    )}
-                  </AccordionContent>
-                </AccordionItem>
-                {general?.value && (
-                  <AccordionItem value="general" className="border-b border-border/50">
-                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                      General
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
-                      <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">{general.value}</div>
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
-                {dimensions?.value && (
-                  <AccordionItem value="dimensions" className="border-b border-border/50">
-                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                      Dimensions
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
-                      <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">{dimensions.value}</div>
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
-                {care_instructions?.value && (
-                  <AccordionItem value="care" className="border-b border-border/50">
-                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                      Care & Maintenance Instructions
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
-                      <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">{care_instructions.value}</div>
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
-                {downloads?.value && (
-                  <AccordionItem value="downloads" className="border-b border-border/50">
-                    <AccordionTrigger className="text-xl sm:text-2xl font-normal text-foreground py-6 lg:py-8 hover:no-underline font-serif text-left pr-8">
-                      Downloads
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm text-foreground pb-6 lg:pb-8 pr-4">
-                      <div className="prose prose-sm max-w-none opacity-80 whitespace-pre-line">{downloads.value}</div>
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
-              </Accordion>
-            </div>
           </div>
-        </div>
 
-        {/* You Might Also Like */}
-        <div className="bg-background px-6 py-16 lg:py-20 lg:px-12 border-t border-border/40">
-           <Suspense fallback={<RelatedProductsSkeleton />}>
-            <Await resolve={relatedProducts}>
-              {(data: [ProductRecommendationsQuery | null, FallbackProductsQuery | null]) => {
-                const recommendations = data[0]?.productRecommendations ?? [];
-                const fallbackProducts = data[1]?.products?.nodes ?? [];
-                const displayProducts = recommendations.length > 0
-                  ? recommendations
-                  : fallbackProducts.filter((p) => p.id !== product.id);
-                return <RelatedProducts products={displayProducts} />;
-              }}
-            </Await>
-          </Suspense>
-        </div>
+          {/* You Might Also Like */}
+          <div className="bg-background px-6 py-16 lg:py-20 lg:px-12 border-t border-border/40">
+            <Suspense fallback={<RelatedProductsSkeleton />}>
+              <Await resolve={relatedProducts}>
+                {(data: [ProductRecommendationsQuery | null, FallbackProductsQuery | null]) => {
+                  const recommendations = data[0]?.productRecommendations ?? []
+                  const fallbackProducts = data[1]?.products?.nodes ?? []
+                  const displayProducts =
+                    recommendations.length > 0
+                      ? recommendations
+                      : fallbackProducts.filter(p => p.id !== product.id)
+                  return <RelatedProducts products={displayProducts} />
+                }}
+              </Await>
+            </Suspense>
+          </div>
 
-        <Analytics.ProductView
-          data={{
-            products: [
-              {
-                id: product.id,
-                title: product.title,
-                price: selectedVariant?.price.amount || '0',
-                vendor: product.vendor,
-                variantId: selectedVariant?.id || '',
-                variantTitle: selectedVariant?.title || '',
-                quantity: 1,
-              },
-            ],
-          }}
-        />
+          <Analytics.ProductView
+            data={{
+              products: [
+                {
+                  id: product.id,
+                  title: product.title,
+                  price: selectedVariant?.price.amount || '0',
+                  vendor: product.vendor,
+                  variantId: selectedVariant?.id || '',
+                  variantTitle: selectedVariant?.title || '',
+                  quantity: 1,
+                },
+              ],
+            }}
+          />
+        </div>
       </div>
-    </div>
     </>
-  );
+  )
 }
 
 function ShareButtons({ product }: { product: ProductFragment }) {
-  const shareUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/products/${product.handle}`
-    : `/products/${product.handle}`;
-  const shareTitle = product.title;
-  const shareImage = product.featuredImage?.url ?? '';
+  const shareUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/products/${product.handle}`
+      : `/products/${product.handle}`
+  const shareTitle = product.title
+  const shareImage = product.featuredImage?.url ?? ''
 
   async function handleShare() {
     if (navigator.share) {
       try {
-        await navigator.share({ title: shareTitle, url: shareUrl });
+        await navigator.share({ title: shareTitle, url: shareUrl })
       } catch {
         // User cancelled share
       }
     } else {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(shareUrl)
     }
   }
 
   function handleEmailShare() {
-    const subject = encodeURIComponent(`Check out: ${shareTitle}`);
-    const body = encodeURIComponent(`I thought you might like this: ${shareTitle}\n\n${shareUrl}`);
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    const subject = encodeURIComponent(`Check out: ${shareTitle}`)
+    const body = encodeURIComponent(`I thought you might like this: ${shareTitle}\n\n${shareUrl}`)
+    window.location.href = `mailto:?subject=${subject}&body=${body}`
   }
 
   function handleFacebookShare() {
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
       '_blank',
-      'noopener,noreferrer',
-    );
+      'noopener,noreferrer'
+    )
   }
 
   function handleTwitterShare() {
     window.open(
       `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
       '_blank',
-      'noopener,noreferrer',
-    );
+      'noopener,noreferrer'
+    )
   }
 
   function handlePinterestShare() {
     window.open(
       `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=${encodeURIComponent(shareImage)}&description=${encodeURIComponent(shareTitle)}`,
       '_blank',
-      'noopener,noreferrer',
-    );
+      'noopener,noreferrer'
+    )
   }
 
   return (
@@ -542,7 +568,9 @@ function ShareButtons({ product }: { product: ProductFragment }) {
         aria-label="Share on Pinterest"
         className="hover:opacity-70 transition-opacity"
       >
-        <div className="size-4 sm:size-5 border border-border rounded-full flex items-center justify-center text-xs font-bold text-foreground">P</div>
+        <div className="size-4 sm:size-5 border border-border rounded-full flex items-center justify-center text-xs font-bold text-foreground">
+          P
+        </div>
       </button>
       <button
         type="button"
@@ -561,18 +589,18 @@ function ShareButtons({ product }: { product: ProductFragment }) {
         <Facebook className="size-4 sm:size-5 text-foreground" />
       </button>
     </div>
-  );
+  )
 }
 
 function RelatedProducts({
   products,
 }: {
-  products: RelatedProduct[];
+  products: RelatedProduct[]
 }) {
-  const [api, setApi] = useState<CarouselApi>();
-  const { open } = useAside();
+  const [api, setApi] = useState<CarouselApi>()
+  const { open } = useAside()
 
-  if (!products || products.length === 0) return null;
+  if (!products || products.length === 0) return null
 
   return (
     <section>
@@ -583,15 +611,22 @@ function RelatedProducts({
       </div>
       <Carousel setApi={setApi} opts={{ align: 'start' }}>
         <CarouselContent className="-ml-4 sm:-ml-6">
-          {products.map((product) => {
-            const variants = product.variants?.nodes ?? [];
-            const firstAvailableVariant = variants.find((v) => v.availableForSale) ?? variants[0];
-            const isAvailable = product.availableForSale && firstAvailableVariant;
+          {products.map(product => {
+            const variants = product.variants?.nodes ?? []
+            const firstAvailableVariant = variants.find(v => v.availableForSale) ?? variants[0]
+            const isAvailable = product.availableForSale && firstAvailableVariant
 
             return (
-              <CarouselItem key={product.id} className="pl-4 sm:pl-6 basis-full sm:basis-1/2 lg:basis-1/4">
+              <CarouselItem
+                key={product.id}
+                className="pl-4 sm:pl-6 basis-full sm:basis-1/2 lg:basis-1/4"
+              >
                 <div className="bg-card border border-border/20 p-4 sm:p-6 group transition-all hover:shadow-sm text-left">
-                  <Link prefetch="intent" to={`/products/${product.handle}`} className="block relative aspect-[4/5] sm:aspect-[3/4] mb-4 sm:mb-6 overflow-hidden bg-background">
+                  <Link
+                    prefetch="intent"
+                    to={`/products/${product.handle}`}
+                    className="block relative aspect-[4/5] sm:aspect-[3/4] mb-4 sm:mb-6 overflow-hidden bg-background"
+                  >
                     {product.featuredImage && (
                       <Image
                         data={product.featuredImage}
@@ -613,7 +648,13 @@ function RelatedProducts({
                         onClick={() => open('cart')}
                         lines={
                           firstAvailableVariant
-                            ? [{ merchandiseId: firstAvailableVariant.id, quantity: 1, selectedVariant: firstAvailableVariant }]
+                            ? [
+                                {
+                                  merchandiseId: firstAvailableVariant.id,
+                                  quantity: 1,
+                                  selectedVariant: firstAvailableVariant,
+                                },
+                              ]
                             : []
                         }
                         variant="outline"
@@ -627,7 +668,7 @@ function RelatedProducts({
                   </div>
                 </div>
               </CarouselItem>
-            );
+            )
           })}
         </CarouselContent>
       </Carousel>
@@ -648,7 +689,7 @@ function RelatedProducts({
         </button>
       </div>
     </section>
-  );
+  )
 }
 
 function RelatedProductsSkeleton() {
@@ -658,7 +699,7 @@ function RelatedProductsSkeleton() {
         <Skeleton className="h-10 w-64 bg-foreground/10" />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {Array.from({ length: 4 }, (_, i) => `skeleton-${i}`).map((key) => (
+        {Array.from({ length: 4 }, (_, i) => `skeleton-${i}`).map(key => (
           <div key={key} className="space-y-6 p-6 border border-border/20 bg-background">
             <Skeleton className="aspect-[4/5] w-full bg-foreground/5" />
             <Skeleton className="h-8 w-3/4 bg-foreground/5" />
@@ -667,7 +708,7 @@ function RelatedProductsSkeleton() {
         ))}
       </div>
     </section>
-  );
+  )
 }
 
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
@@ -705,7 +746,7 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
       currencyCode
     }
   }
-` as const;
+` as const
 
 const PRODUCT_FRAGMENT = `#graphql
   fragment Product on Product {
@@ -771,7 +812,7 @@ const PRODUCT_FRAGMENT = `#graphql
     }
   }
   ${PRODUCT_VARIANT_FRAGMENT}
-` as const;
+` as const
 
 const PRODUCT_QUERY = `#graphql
   query Product(
@@ -785,7 +826,7 @@ const PRODUCT_QUERY = `#graphql
     }
   }
   ${PRODUCT_FRAGMENT}
-` as const;
+` as const
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   query ProductRecommendations(
@@ -842,7 +883,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const
 
 const FALLBACK_PRODUCTS_QUERY = `#graphql
   query FallbackProducts(
@@ -900,7 +941,7 @@ const FALLBACK_PRODUCTS_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const
 
 function WishlistButton({
   productId,
@@ -909,14 +950,14 @@ function WishlistButton({
   productImage,
   price,
 }: {
-  productId: string;
-  productHandle: string;
-  productTitle: string;
-  productImage?: { url: string; altText?: string | null };
-  price?: { amount: string; currencyCode: string };
+  productId: string
+  productHandle: string
+  productTitle: string
+  productImage?: { url: string; altText?: string | null }
+  price?: { amount: string; currencyCode: string }
 }) {
-  const { toggle, isWishlisted } = useWishlist();
-  const wishlisted = isWishlisted(productId);
+  const { toggle, isWishlisted } = useWishlist()
+  const wishlisted = isWishlisted(productId)
 
   return (
     <Button
@@ -934,9 +975,7 @@ function WishlistButton({
         })
       }
     >
-      <Heart
-        className={cn('h-5 w-5', wishlisted && 'fill-primary text-primary')}
-      />
+      <Heart className={cn('h-5 w-5', wishlisted && 'fill-primary text-primary')} />
     </Button>
-  );
+  )
 }

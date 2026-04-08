@@ -1,51 +1,54 @@
-import { Analytics, getPaginationVariables } from '@shopify/hydrogen';
-import { SearchIcon } from 'lucide-react';
-import { useLoaderData } from 'react-router';
-import type {
-  PredictiveSearchQuery,
-  RegularSearchQuery,
-} from 'storefrontapi.generated';
-import { SearchForm } from '~/components/SearchForm';
-import { SearchResults } from '~/components/SearchResults';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
-import { Input } from '~/components/ui/input';
+import { Analytics, getPaginationVariables } from '@shopify/hydrogen'
+import { SearchIcon } from 'lucide-react'
+import { useLoaderData } from 'react-router'
+import type { PredictiveSearchQuery, RegularSearchQuery } from 'storefrontapi.generated'
+import { SearchForm } from '~/components/SearchForm'
+import { SearchResults } from '~/components/SearchResults'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent } from '~/components/ui/card'
+import { Input } from '~/components/ui/input'
 import {
   type PredictiveSearchReturn,
   type RegularSearchReturn,
   getEmptyPredictiveSearchResult,
-} from '~/lib/search';
-import type { Route } from './+types/($locale).search';
+} from '~/lib/search'
+import type { Route } from './+types/($locale).search'
 
 export const meta: Route.MetaFunction = () => {
   return [
     { title: 'Search' },
     { rel: 'canonical', href: '/search' },
     { name: 'robots', content: 'noindex' },
-  ];
-};
+  ]
+}
 
-export async function loader({ request, context }: Route.LoaderArgs): Promise<PredictiveSearchReturn | RegularSearchReturn> {
-  const url = new URL(request.url);
-  const isPredictive = url.searchParams.has('predictive');
-  const type = isPredictive ? 'predictive' : 'regular';
+export async function loader({
+  request,
+  context,
+}: Route.LoaderArgs): Promise<PredictiveSearchReturn | RegularSearchReturn> {
+  const url = new URL(request.url)
+  const isPredictive = url.searchParams.has('predictive')
+  const type = isPredictive ? 'predictive' : 'regular'
 
   try {
-    const searchPromise: Promise<PredictiveSearchReturn | RegularSearchReturn> =
-      isPredictive
-        ? predictiveSearch({ request, context })
-        : regularSearch({ request, context });
+    const searchPromise: Promise<PredictiveSearchReturn | RegularSearchReturn> = isPredictive
+      ? predictiveSearch({ request, context })
+      : regularSearch({ request, context })
 
-    return await searchPromise;
+    return await searchPromise
   } catch (error) {
     // Handle request cancellation (user typing rapidly aborts previous requests)
     if (error instanceof DOMException && error.name === 'AbortError') {
-      return { type, term: '', result: null, error: undefined } as unknown as PredictiveSearchReturn | RegularSearchReturn;
+      return { type, term: '', result: null, error: undefined } as unknown as
+        | PredictiveSearchReturn
+        | RegularSearchReturn
     }
 
-    console.error('Search loader error:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return { type, term: '', result: null, error: message } as unknown as PredictiveSearchReturn | RegularSearchReturn;
+    console.error('Search loader error:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    return { type, term: '', result: null, error: message } as unknown as
+      | PredictiveSearchReturn
+      | RegularSearchReturn
   }
 }
 
@@ -53,8 +56,8 @@ export async function loader({ request, context }: Route.LoaderArgs): Promise<Pr
  * Renders the /search route
  */
 export default function SearchPage() {
-  const { type, term, result, error } = useLoaderData<typeof loader>();
-  if (type === 'predictive') return null;
+  const { type, term, result, error } = useLoaderData<typeof loader>()
+  if (type === 'predictive') return null
 
   return (
     <div className="search space-y-6 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
@@ -82,9 +85,7 @@ export default function SearchPage() {
             </SearchForm>
           </CardContent>
         </Card>
-        {error && (
-          <p className="text-destructive mt-4 text-sm font-medium">{error}</p>
-        )}
+        {error && <p className="text-destructive mt-4 text-sm font-medium">{error}</p>}
       </div>
       {!term || !result?.total ? (
         <SearchResults.Empty />
@@ -101,7 +102,7 @@ export default function SearchPage() {
       )}
       <Analytics.SearchView data={{ searchTerm: term, searchResults: result }} />
     </div>
-  );
+  )
 }
 
 /**
@@ -147,7 +148,7 @@ const SEARCH_PRODUCT_FRAGMENT = `#graphql
       }
     }
   }
-` as const;
+` as const
 
 const SEARCH_PAGE_FRAGMENT = `#graphql
   fragment SearchPage on Page {
@@ -157,7 +158,7 @@ const SEARCH_PAGE_FRAGMENT = `#graphql
     title
     trackingParameters
   }
-` as const;
+` as const
 
 const SEARCH_ARTICLE_FRAGMENT = `#graphql
   fragment SearchArticle on Article {
@@ -167,7 +168,7 @@ const SEARCH_ARTICLE_FRAGMENT = `#graphql
     title
     trackingParameters
   }
-` as const;
+` as const
 
 const PAGE_INFO_FRAGMENT = `#graphql
   fragment PageInfoFragment on PageInfo {
@@ -176,7 +177,7 @@ const PAGE_INFO_FRAGMENT = `#graphql
     startCursor
     endCursor
   }
-` as const;
+` as const
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/queries/search
 export const SEARCH_QUERY = `#graphql
@@ -235,7 +236,7 @@ export const SEARCH_QUERY = `#graphql
   ${SEARCH_PAGE_FRAGMENT}
   ${SEARCH_ARTICLE_FRAGMENT}
   ${PAGE_INFO_FRAGMENT}
-` as const;
+` as const
 
 /**
  * Regular search fetcher
@@ -243,33 +244,30 @@ export const SEARCH_QUERY = `#graphql
 async function regularSearch({
   request,
   context,
-}: Pick<
-  Route.LoaderArgs,
-  'request' | 'context'
->): Promise<RegularSearchReturn> {
-  const { storefront } = context;
-  const url = new URL(request.url);
-  const variables = getPaginationVariables(request, { pageBy: 8 });
-  const term = String(url.searchParams.get('q') || '');
+}: Pick<Route.LoaderArgs, 'request' | 'context'>): Promise<RegularSearchReturn> {
+  const { storefront } = context
+  const url = new URL(request.url)
+  const variables = getPaginationVariables(request, { pageBy: 8 })
+  const term = String(url.searchParams.get('q') || '')
 
   // Search articles, pages, and products for the `q` term
   const raw = await storefront.query(SEARCH_QUERY, {
     variables: { ...variables, term },
-  });
-  const items = raw as RegularSearchQuery;
+  })
+  const items = raw as RegularSearchQuery
 
   if (!items) {
-    throw new Error('No search data returned from Shopify API');
+    throw new Error('No search data returned from Shopify API')
   }
 
   const total = Object.values(items).reduce(
     (acc, { nodes }: { nodes: Array<unknown> }) => acc + nodes.length,
-    0,
-  );
+    0
+  )
 
-  const error = undefined;
+  const error = undefined
 
-  return { type: 'regular', term, error, result: { total, items } } as RegularSearchReturn;
+  return { type: 'regular', term, error, result: { total, items } } as RegularSearchReturn
 }
 
 /**
@@ -293,7 +291,7 @@ const PREDICTIVE_SEARCH_ARTICLE_FRAGMENT = `#graphql
     }
     trackingParameters
   }
-` as const;
+` as const
 
 const PREDICTIVE_SEARCH_COLLECTION_FRAGMENT = `#graphql
   fragment PredictiveCollection on Collection {
@@ -309,7 +307,7 @@ const PREDICTIVE_SEARCH_COLLECTION_FRAGMENT = `#graphql
     }
     trackingParameters
   }
-` as const;
+` as const
 
 const PREDICTIVE_SEARCH_PAGE_FRAGMENT = `#graphql
   fragment PredictivePage on Page {
@@ -319,7 +317,7 @@ const PREDICTIVE_SEARCH_PAGE_FRAGMENT = `#graphql
     handle
     trackingParameters
   }
-` as const;
+` as const
 
 const PREDICTIVE_SEARCH_PRODUCT_FRAGMENT = `#graphql
   fragment PredictiveProduct on Product {
@@ -346,7 +344,7 @@ const PREDICTIVE_SEARCH_PRODUCT_FRAGMENT = `#graphql
       }
     }
   }
-` as const;
+` as const
 
 const PREDICTIVE_SEARCH_QUERY_FRAGMENT = `#graphql
   fragment PredictiveQuery on SearchQuerySuggestion {
@@ -355,7 +353,7 @@ const PREDICTIVE_SEARCH_QUERY_FRAGMENT = `#graphql
     styledText
     trackingParameters
   }
-` as const;
+` as const
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/queries/predictiveSearch
 const PREDICTIVE_SEARCH_QUERY = `#graphql
@@ -395,7 +393,7 @@ const PREDICTIVE_SEARCH_QUERY = `#graphql
   ${PREDICTIVE_SEARCH_PAGE_FRAGMENT}
   ${PREDICTIVE_SEARCH_PRODUCT_FRAGMENT}
   ${PREDICTIVE_SEARCH_QUERY_FRAGMENT}
-` as const;
+` as const
 
 /**
  * Predictive search fetcher
@@ -403,48 +401,45 @@ const PREDICTIVE_SEARCH_QUERY = `#graphql
 async function predictiveSearch({
   request,
   context,
-}: Pick<
-  Route.ActionArgs,
-  'request' | 'context'
->): Promise<PredictiveSearchReturn> {
-  const { storefront } = context;
-  const url = new URL(request.url);
-  const term = String(url.searchParams.get('q') || '').trim();
-  const limit = Number(url.searchParams.get('limit') || 10);
-  const type = 'predictive';
+}: Pick<Route.ActionArgs, 'request' | 'context'>): Promise<PredictiveSearchReturn> {
+  const { storefront } = context
+  const url = new URL(request.url)
+  const term = String(url.searchParams.get('q') || '').trim()
+  const limit = Number(url.searchParams.get('limit') || 10)
+  const type = 'predictive'
 
-  if (!term) return { type, term, result: getEmptyPredictiveSearchResult() };
+  if (!term) return { type, term, result: getEmptyPredictiveSearchResult() }
 
   // Predictively search articles, collections, pages, products, and queries (suggestions)
   const {
     predictiveSearch: items,
     errors,
-  }: PredictiveSearchQuery & { errors?: Array<{ message: string }> } =
-    await storefront.query(PREDICTIVE_SEARCH_QUERY, {
+  }: PredictiveSearchQuery & { errors?: Array<{ message: string }> } = await storefront.query(
+    PREDICTIVE_SEARCH_QUERY,
+    {
       variables: {
         // customize search options as needed
         limit,
         limitScope: 'EACH',
         term,
       },
-    });
+    }
+  )
 
   if (errors) {
     throw new Error(
-      `Shopify API errors: ${errors
-        .map(({ message }: { message: string }) => message)
-        .join(', ')}`,
-    );
+      `Shopify API errors: ${errors.map(({ message }: { message: string }) => message).join(', ')}`
+    )
   }
 
   if (!items) {
-    throw new Error('No predictive search data returned from Shopify API');
+    throw new Error('No predictive search data returned from Shopify API')
   }
 
   const total = Object.values(items).reduce(
     (acc: number, item: Array<unknown>) => acc + item.length,
-    0,
-  );
+    0
+  )
 
-  return { type, term, result: { items, total } };
+  return { type, term, result: { items, total } }
 }

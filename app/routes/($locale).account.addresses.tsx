@@ -1,77 +1,72 @@
-import type { CustomerAddressInput } from '@shopify/hydrogen/customer-account-api-types';
-import type {
-  AddressFragment,
-  CustomerFragment,
-} from 'customer-accountapi.generated';
-import { AlertCircle, Plus, Trash2 } from 'lucide-react';
+import type { CustomerAddressInput } from '@shopify/hydrogen/customer-account-api-types'
+import type { AddressFragment, CustomerFragment } from 'customer-accountapi.generated'
+import { AlertCircle, Plus, Trash2 } from 'lucide-react'
 import {
-  data,
+  type Fetcher,
   Form,
+  data,
   useActionData,
   useNavigation,
   useOutletContext,
-  type Fetcher,
-} from 'react-router';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { Checkbox } from '~/components/ui/checkbox';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
+} from 'react-router'
+import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import { Checkbox } from '~/components/ui/checkbox'
+import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
 import {
   CREATE_ADDRESS_MUTATION,
   DELETE_ADDRESS_MUTATION,
   UPDATE_ADDRESS_MUTATION,
-} from '~/graphql/customer-account/CustomerAddressMutations';
-import type { Route } from './+types/($locale).account.addresses';
+} from '~/graphql/customer-account/CustomerAddressMutations'
+import type { Route } from './+types/($locale).account.addresses'
 
 export type ActionResponse = {
-  addressId?: string | null;
-  createdAddress?: AddressFragment;
-  defaultAddress?: string | null;
-  deletedAddress?: string | null;
-  error: Record<AddressFragment['id'], string> | null;
-  updatedAddress?: AddressFragment;
-};
+  addressId?: string | null
+  createdAddress?: AddressFragment
+  defaultAddress?: string | null
+  deletedAddress?: string | null
+  error: Record<AddressFragment['id'], string> | null
+  updatedAddress?: AddressFragment
+}
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Addresses' }];
-};
+  return [{ title: 'Addresses' }]
+}
 
 export async function loader({ context }: Route.LoaderArgs) {
-  context.customerAccount.handleAuthStatus();
+  context.customerAccount.handleAuthStatus()
 
-  return {};
+  return {}
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
-  const { customerAccount } = context;
+  const { customerAccount } = context
 
   try {
-    const form = await request.formData();
+    const form = await request.formData()
 
-    const addressId = form.has('addressId')
-      ? String(form.get('addressId'))
-      : null;
+    const addressId = form.has('addressId') ? String(form.get('addressId')) : null
     if (!addressId) {
-      throw new Error('You must provide an address id.');
+      throw new Error('You must provide an address id.')
     }
 
     // this will ensure redirecting to login never happen for mutatation
-    const isLoggedIn = await customerAccount.isLoggedIn();
+    const isLoggedIn = await customerAccount.isLoggedIn()
     if (!isLoggedIn) {
       return data(
         { error: { [addressId]: 'Unauthorized' } },
         {
           status: 401,
-        },
-      );
+        }
+      )
     }
 
     const defaultAddress = form.has('defaultAddress')
       ? String(form.get('defaultAddress')) === 'on'
-      : false;
-    const address: CustomerAddressInput = {};
+      : false
+    const address: CustomerAddressInput = {}
     const keys: (keyof CustomerAddressInput)[] = [
       'address1',
       'address2',
@@ -83,12 +78,12 @@ export async function action({ request, context }: Route.ActionArgs) {
       'phoneNumber',
       'zoneCode',
       'zip',
-    ];
+    ]
 
     for (const key of keys) {
-      const value = form.get(key);
+      const value = form.get(key)
       if (typeof value === 'string') {
-        address[key] = value;
+        address[key] = value
       }
     }
 
@@ -96,143 +91,134 @@ export async function action({ request, context }: Route.ActionArgs) {
       case 'POST': {
         // handle new address creation
         try {
-          const { data, errors } = await customerAccount.mutate(
-            CREATE_ADDRESS_MUTATION,
-            {
-              variables: {
-                address,
-                defaultAddress,
-                language: customerAccount.i18n.language,
-              },
+          const { data, errors } = await customerAccount.mutate(CREATE_ADDRESS_MUTATION, {
+            variables: {
+              address,
+              defaultAddress,
+              language: customerAccount.i18n.language,
             },
-          );
+          })
 
           if (errors?.length) {
-            throw new Error(errors[0].message);
+            throw new Error(errors[0].message)
           }
 
           if (data?.customerAddressCreate?.userErrors?.length) {
-            throw new Error(data?.customerAddressCreate?.userErrors[0].message);
+            throw new Error(data?.customerAddressCreate?.userErrors[0].message)
           }
 
           if (!data?.customerAddressCreate?.customerAddress) {
-            throw new Error('Customer address create failed.');
+            throw new Error('Customer address create failed.')
           }
 
           return {
             error: null,
             createdAddress: data?.customerAddressCreate?.customerAddress,
             defaultAddress,
-          };
+          }
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
               { error: { [addressId]: error.message } },
               {
                 status: 400,
-              },
-            );
+              }
+            )
           }
           return data(
             { error: { [addressId]: error } },
             {
               status: 400,
-            },
-          );
+            }
+          )
         }
       }
 
       case 'PUT': {
         // handle address updates
         try {
-          const { data, errors } = await customerAccount.mutate(
-            UPDATE_ADDRESS_MUTATION,
-            {
-              variables: {
-                address,
-                addressId: decodeURIComponent(addressId),
-                defaultAddress,
-                language: customerAccount.i18n.language,
-              },
+          const { data, errors } = await customerAccount.mutate(UPDATE_ADDRESS_MUTATION, {
+            variables: {
+              address,
+              addressId: decodeURIComponent(addressId),
+              defaultAddress,
+              language: customerAccount.i18n.language,
             },
-          );
+          })
 
           if (errors?.length) {
-            throw new Error(errors[0].message);
+            throw new Error(errors[0].message)
           }
 
           if (data?.customerAddressUpdate?.userErrors?.length) {
-            throw new Error(data?.customerAddressUpdate?.userErrors[0].message);
+            throw new Error(data?.customerAddressUpdate?.userErrors[0].message)
           }
 
           if (!data?.customerAddressUpdate?.customerAddress) {
-            throw new Error('Customer address update failed.');
+            throw new Error('Customer address update failed.')
           }
 
           return {
             error: null,
             updatedAddress: address,
             defaultAddress,
-          };
+          }
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
               { error: { [addressId]: error.message } },
               {
                 status: 400,
-              },
-            );
+              }
+            )
           }
           return data(
             { error: { [addressId]: error } },
             {
               status: 400,
-            },
-          );
+            }
+          )
         }
       }
 
       case 'DELETE': {
         // handles address deletion
         try {
-          const { data, errors } = await customerAccount.mutate(
-            DELETE_ADDRESS_MUTATION,
-            {
-              variables: {
-                addressId: decodeURIComponent(addressId),
-                language: customerAccount.i18n.language,
-              },
+          const { data, errors } = await customerAccount.mutate(DELETE_ADDRESS_MUTATION, {
+            variables: {
+              addressId: decodeURIComponent(addressId),
+              language: customerAccount.i18n.language,
             },
-          );
+          })
 
           if (errors?.length) {
-            throw new Error(errors[0].message);
+            throw new Error(errors[0].message)
           }
 
           if (data?.customerAddressDelete?.userErrors?.length) {
-            throw new Error(data?.customerAddressDelete?.userErrors[0].message);
+            throw new Error(data?.customerAddressDelete?.userErrors[0].message)
           }
 
           if (!data?.customerAddressDelete?.deletedAddressId) {
-            throw new Error('Customer address delete failed.');
+            throw new Error('Customer address delete failed.')
           }
 
-          return { error: null, deletedAddress: addressId };
+          return { error: null, deletedAddress: addressId }
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
               { error: { [addressId]: error.message } },
               {
                 status: 400,
-              },
-            );
+              }
+            )
           }
           return data(
             { error: { [addressId]: error } },
             {
               status: 400,
-            },
-          );
+            }
+          )
         }
       }
 
@@ -241,8 +227,8 @@ export async function action({ request, context }: Route.ActionArgs) {
           { error: { [addressId]: 'Method not allowed' } },
           {
             status: 405,
-          },
-        );
+          }
+        )
       }
     }
   } catch (error: unknown) {
@@ -251,21 +237,21 @@ export async function action({ request, context }: Route.ActionArgs) {
         { error: error.message },
         {
           status: 400,
-        },
-      );
+        }
+      )
     }
     return data(
       { error },
       {
         status: 400,
-      },
-    );
+      }
+    )
   }
 }
 
 export default function Addresses() {
-  const { customer } = useOutletContext<{ customer: CustomerFragment }>();
-  const { defaultAddress, addresses } = customer;
+  const { customer } = useOutletContext<{ customer: CustomerFragment }>()
+  const { defaultAddress, addresses } = customer
 
   return (
     <div className="space-y-8">
@@ -275,9 +261,7 @@ export default function Addresses() {
             <CardTitle>Addresses</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-6">
-              You have no addresses saved.
-            </p>
+            <p className="text-muted-foreground mb-6">You have no addresses saved.</p>
             <NewAddressForm />
           </CardContent>
         </Card>
@@ -297,15 +281,12 @@ export default function Addresses() {
 
           <div>
             <h2 className="text-2xl font-bold mb-4">Saved Addresses</h2>
-            <ExistingAddresses
-              addresses={addresses}
-              defaultAddress={defaultAddress}
-            />
+            <ExistingAddresses addresses={addresses} defaultAddress={defaultAddress} />
           </div>
         </>
       )}
     </div>
-  );
+  )
 }
 
 function NewAddressForm() {
@@ -321,14 +302,10 @@ function NewAddressForm() {
     phoneNumber: '',
     zoneCode: '',
     zip: '',
-  } as CustomerAddressInput;
+  } as CustomerAddressInput
 
   return (
-    <AddressForm
-      addressId={'NEW_ADDRESS_ID'}
-      address={newAddress}
-      defaultAddress={null}
-    >
+    <AddressForm addressId={'NEW_ADDRESS_ID'} address={newAddress} defaultAddress={null}>
       {({ stateForMethod }) => (
         <Button
           disabled={stateForMethod('POST') !== 'idle'}
@@ -342,7 +319,7 @@ function NewAddressForm() {
         </Button>
       )}
     </AddressForm>
-  );
+  )
 }
 
 function ExistingAddresses({
@@ -351,24 +328,18 @@ function ExistingAddresses({
 }: Pick<CustomerFragment, 'addresses' | 'defaultAddress'>) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {addresses.nodes.map((address) => (
+      {addresses.nodes.map(address => (
         <Card key={address.id}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">
                 {address.firstName} {address.lastName}
               </CardTitle>
-              {defaultAddress?.id === address.id && (
-                <Badge>Default</Badge>
-              )}
+              {defaultAddress?.id === address.id && <Badge>Default</Badge>}
             </div>
           </CardHeader>
           <CardContent>
-            <AddressForm
-              addressId={address.id}
-              address={address}
-              defaultAddress={defaultAddress}
-            >
+            <AddressForm addressId={address.id} address={address} defaultAddress={defaultAddress}>
               {({ stateForMethod }) => (
                 <div className="flex gap-2">
                   <Button
@@ -394,7 +365,7 @@ function ExistingAddresses({
         </Card>
       ))}
     </div>
-  );
+  )
 }
 
 export function AddressForm({
@@ -403,17 +374,17 @@ export function AddressForm({
   defaultAddress,
   children,
 }: {
-  addressId: AddressFragment['id'];
-  address: CustomerAddressInput;
-  defaultAddress: CustomerFragment['defaultAddress'];
+  addressId: AddressFragment['id']
+  address: CustomerAddressInput
+  defaultAddress: CustomerFragment['defaultAddress']
   children: (props: {
-    stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state'];
-  }) => React.ReactNode;
+    stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state']
+  }) => React.ReactNode
 }) {
-  const { state, formMethod } = useNavigation();
-  const action = useActionData<ActionResponse>();
-  const error = action?.error?.[addressId];
-  const isDefaultAddress = defaultAddress?.id === addressId;
+  const { state, formMethod } = useNavigation()
+  const action = useActionData<ActionResponse>()
+  const error = action?.error?.[addressId]
+  const isDefaultAddress = defaultAddress?.id === addressId
   return (
     <Form id={addressId} className="space-y-4">
       <input type="hidden" name="addressId" defaultValue={addressId} />
@@ -566,8 +537,8 @@ export function AddressForm({
       )}
 
       {children({
-        stateForMethod: (method) => (formMethod === method ? state : 'idle'),
+        stateForMethod: method => (formMethod === method ? state : 'idle'),
       })}
     </Form>
-  );
+  )
 }

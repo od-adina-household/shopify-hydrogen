@@ -1,13 +1,13 @@
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
 
 // Register GSAP plugins
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(useGSAP)
 
 // Set project-wide defaults
 gsap.defaults({
   duration: 0.6,
-  ease: "power2.out",
-});
+  ease: 'power2.out',
+})
 
-export { gsap, useGSAP };
+export { gsap, useGSAP }

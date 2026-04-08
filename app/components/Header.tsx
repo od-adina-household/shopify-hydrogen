@@ -1,89 +1,82 @@
-import {
-  type CartViewPayload,
-  useAnalytics,
-  useOptimisticCart,
-} from '@shopify/hydrogen';
-import { HeartIcon, MenuIcon, SearchIcon, ShoppingBag, UserIcon, X } from 'lucide-react';
-import { Suspense, useEffect, useId, useRef, useState } from 'react';
-import { Await, NavLink, useAsyncValue, useLocation } from 'react-router';
-import type { CartApiQueryFragment, HeaderQuery } from 'storefrontapi.generated';
-import { useAside } from '~/components/Aside';
-import { MobileMenu } from '~/components/MobileMenu';
-import { ModeToggle } from '~/components/mode-toggle';
-import { SearchFormPredictive } from '~/components/SearchFormPredictive';
-import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
+import { type CartViewPayload, useAnalytics, useOptimisticCart } from '@shopify/hydrogen'
+import { MenuIcon, SearchIcon, ShoppingBag, UserIcon, X } from 'lucide-react'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { Await, NavLink, useAsyncValue, useLocation } from 'react-router'
+import type { CartApiQueryFragment, HeaderQuery } from 'storefrontapi.generated'
+import { useAside } from '~/components/Aside'
+import { MobileMenu } from '~/components/MobileMenu'
+import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
 
 interface HeaderProps {
-  header: HeaderQuery;
-  cart: Promise<CartApiQueryFragment | null>;
-  isLoggedIn: Promise<boolean>;
-  publicStoreDomain: string;
+  header: HeaderQuery
+  cart: Promise<CartApiQueryFragment | null>
+  isLoggedIn: Promise<boolean>
+  publicStoreDomain: string
 }
 
-type Viewport = 'desktop' | 'mobile';
+type Viewport = 'desktop' | 'mobile'
 
-export function Header({
-  header,
-  isLoggedIn,
-  cart,
-  publicStoreDomain,
-}: HeaderProps) {
-  const { shop, menu } = header;
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
-  const wasScrolled = useRef(isScrolled);
+export function Header({ header, isLoggedIn, cart, publicStoreDomain }: HeaderProps) {
+  const { shop, menu } = header
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const location = useLocation()
+  const wasScrolled = useRef(isScrolled)
 
   useEffect(() => {
     const handleScroll = () => {
-      const nowScrolled = window.scrollY > 50;
+      const nowScrolled = window.scrollY > 50
       if (nowScrolled !== wasScrolled.current) {
-        setIsScrolled(nowScrolled);
-        wasScrolled.current = nowScrolled;
+        setIsScrolled(nowScrolled)
+        wasScrolled.current = nowScrolled
       }
-    };
+    }
 
-    window.addEventListener('scroll', handleScroll, { passive: true } as AddEventListenerOptions);
-    handleScroll(); // Check initial state
+    window.addEventListener('scroll', handleScroll, { passive: true } as AddEventListenerOptions)
+    handleScroll() // Check initial state
 
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
     if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = 'unset'
     }
     return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMobileMenuOpen]);
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMobileMenuOpen])
 
   // Determine if we are on the homepage (handling potential locale prefixes)
-  const isHome = location.pathname === '/' || /^\/(en|nl|de|fr)(\/|$)/.test(location.pathname);
+  const isHome = location.pathname === '/' || /^\/(en|nl|de|fr)(\/|$)/.test(location.pathname)
 
   const headerBgClass = isMobileMenuOpen
     ? 'bg-background shadow-sm'
     : isHome
-      ? (isScrolled ? 'bg-background shadow-sm' : 'bg-transparent')
-      : 'bg-background shadow-sm';
+      ? isScrolled
+        ? 'bg-background shadow-sm'
+        : 'bg-transparent'
+      : 'bg-background shadow-sm'
 
   const textColorClass = isMobileMenuOpen
     ? 'text-foreground'
     : isHome
-      ? (isScrolled ? 'text-foreground' : 'text-white')
-      : 'text-foreground';
+      ? isScrolled
+        ? 'text-foreground'
+        : 'text-white'
+      : 'text-foreground'
 
   return (
     <>
       <header
         className={`fixed top-8 left-0 right-0 z-50 px-5 sm:px-6 md:px-8 pt-4 pb-2 md:pt-5 md:pb-1.5 transition-all duration-300 ${headerBgClass}`}
       >
-        <div className={`mx-auto max-w-7xl flex items-center justify-between gap-4 ${textColorClass}`}>
+        <div
+          className={`mx-auto max-w-7xl flex items-center justify-between gap-4 ${textColorClass}`}
+        >
           <NavLink
             prefetch="intent"
             to="/"
@@ -112,7 +105,7 @@ export function Header({
         publicStoreDomain={publicStoreDomain}
       />
     </>
-  );
+  )
 }
 
 export function HeaderMenu({
@@ -121,55 +114,53 @@ export function HeaderMenu({
   viewport,
   publicStoreDomain,
 }: {
-  menu: HeaderProps['header']['menu'];
-  primaryDomainUrl: HeaderProps['header']['shop']['primaryDomain']['url'];
-  viewport: Viewport;
-  publicStoreDomain: HeaderProps['publicStoreDomain'];
+  menu: HeaderProps['header']['menu']
+  primaryDomainUrl: HeaderProps['header']['shop']['primaryDomain']['url']
+  viewport: Viewport
+  publicStoreDomain: HeaderProps['publicStoreDomain']
 }) {
-  const { close } = useAside();
+  const { close } = useAside()
 
   const navClassName =
-    viewport === 'desktop'
-      ? 'hidden md:flex items-center gap-x-8'
-      : 'flex flex-col space-y-1';
+    viewport === 'desktop' ? 'hidden md:flex items-center gap-x-8' : 'flex flex-col space-y-1'
 
   // Progressive hiding breakpoints for each menu item (from right to left)
   const getItemBreakpoint = (index: number, total: number) => {
-    if (viewport !== 'desktop') return '';
+    if (viewport !== 'desktop') return ''
 
     // Hide items progressively: last item first, first item last
-    const reverseIndex = total - 1 - index;
+    const reverseIndex = total - 1 - index
 
     switch (reverseIndex) {
       case 0: // Last item (About) - hide at xl breakpoint (1280px) instead of 980px
-        return 'max-xl:hidden';
+        return 'max-xl:hidden'
       case 1: // Third item (Policies) - hide at lg breakpoint (1024px) instead of 900px
-        return 'max-lg:hidden';
+        return 'max-lg:hidden'
       case 2: // Second item (Blog) - hide at md breakpoint (768px) instead of 820px
-        return 'max-md:hidden';
+        return 'max-md:hidden'
       case 3: // First item (Collections) - stays visible
-        return '';
+        return ''
       default:
-        return '';
+        return ''
     }
-  };
+  }
 
-  const menuItems = (menu || FALLBACK_HEADER_MENU).items;
+  const menuItems = (menu || FALLBACK_HEADER_MENU).items
 
   return (
-    <nav className={navClassName} role="navigation">
+    <nav className={navClassName}>
       {menuItems.map((item, index) => {
-        if (!item.url) return null;
+        if (!item.url) return null
 
         // if the url is internal, we strip the domain
         const url =
           item.url.includes('myshopify.com') ||
-            item.url.includes(publicStoreDomain) ||
-            item.url.includes(primaryDomainUrl)
+          item.url.includes(publicStoreDomain) ||
+          item.url.includes(primaryDomainUrl)
             ? new URL(item.url).pathname
-            : item.url;
+            : item.url
 
-        const breakpointClass = getItemBreakpoint(index, menuItems.length);
+        const breakpointClass = getItemBreakpoint(index, menuItems.length)
 
         return (
           <NavLink
@@ -186,10 +177,10 @@ export function HeaderMenu({
           >
             {item.title}
           </NavLink>
-        );
+        )
       })}
     </nav>
-  );
+  )
 }
 
 function HeaderCtas({
@@ -198,22 +189,24 @@ function HeaderCtas({
   isMobileMenuOpen,
   setIsMobileMenuOpen,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & {
-  isMobileMenuOpen: boolean;
-  setIsMobileMenuOpen: (open: boolean) => void;
+  isMobileMenuOpen: boolean
+  setIsMobileMenuOpen: (open: boolean) => void
 }) {
   return (
-    <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0" role="navigation">
+    <nav className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0">
       <SearchToggle className="hidden md:inline-flex" />
-      <Button variant="ghost" size="icon-lg" className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground hidden md:inline-flex" asChild>
-        <NavLink
-          prefetch="intent"
-          to="/account"
-        >
+      <Button
+        variant="ghost"
+        size="icon-lg"
+        className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground hidden md:inline-flex"
+        asChild
+      >
+        <NavLink prefetch="intent" to="/account">
           <UserIcon className="size-[26px]" />
           <span className="sr-only">
             <Suspense fallback="Account">
               <Await resolve={isLoggedIn} errorElement="Account">
-                {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}
+                {isLoggedIn => (isLoggedIn ? 'Account' : 'Sign in')}
               </Await>
             </Suspense>
           </span>
@@ -224,16 +217,16 @@ function HeaderCtas({
         setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
       <CartToggle cart={cart} />
-    </div>
-  );
+    </nav>
+  )
 }
 
 function HeaderMenuMobileToggle({
   isMobileMenuOpen,
   setIsMobileMenuOpen,
 }: {
-  isMobileMenuOpen: boolean;
-  setIsMobileMenuOpen: (open: boolean) => void;
+  isMobileMenuOpen: boolean
+  setIsMobileMenuOpen: (open: boolean) => void
 }) {
   return (
     <Button
@@ -242,18 +235,14 @@ function HeaderMenuMobileToggle({
       className="h-10 w-10 p-0 hover:bg-transparent hover:text-foreground"
       onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
     >
-      {isMobileMenuOpen ? (
-        <X className="size-[26px]" />
-      ) : (
-        <MenuIcon className="size-[26px]" />
-      )}
+      {isMobileMenuOpen ? <X className="size-[26px]" /> : <MenuIcon className="size-[26px]" />}
       <span className="sr-only">{isMobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
     </Button>
-  );
+  )
 }
 
 function SearchToggle({ className }: { className?: string }) {
-  const { open } = useAside();
+  const { open } = useAside()
 
   return (
     <Button
@@ -265,27 +254,27 @@ function SearchToggle({ className }: { className?: string }) {
       <SearchIcon className="size-[26px]" />
       <span className="sr-only">Search</span>
     </Button>
-  );
+  )
 }
 
 function CartBadge({ count }: { count: number | null }) {
-  const { open } = useAside();
-  const { publish, shop, cart, prevCart } = useAnalytics();
+  const { open } = useAside()
+  const { publish, shop, cart, prevCart } = useAnalytics()
 
   return (
     <Button
       variant="ghost"
       size="icon-lg"
       className="relative h-10 w-10 p-0 hover:bg-transparent hover:text-foreground"
-      onClick={(e) => {
-        e.preventDefault();
-        open('cart');
+      onClick={e => {
+        e.preventDefault()
+        open('cart')
         publish('cart_viewed', {
           cart,
           prevCart,
           shop,
           url: window.location.href || '',
-        } as CartViewPayload);
+        } as CartViewPayload)
       }}
     >
       <ShoppingBag className="size-[26px]" />
@@ -297,11 +286,9 @@ function CartBadge({ count }: { count: number | null }) {
           {count > 99 ? '99+' : count}
         </Badge>
       )}
-      <span className="sr-only">
-        Cart {count === null ? '' : `(${count} items)`}
-      </span>
+      <span className="sr-only">Cart {count === null ? '' : `(${count} items)`}</span>
     </Button>
-  );
+  )
 }
 
 function CartToggle({ cart }: Pick<HeaderProps, 'cart'>) {
@@ -311,13 +298,13 @@ function CartToggle({ cart }: Pick<HeaderProps, 'cart'>) {
         <CartBanner />
       </Await>
     </Suspense>
-  );
+  )
 }
 
 function CartBanner() {
-  const originalCart = useAsyncValue() as CartApiQueryFragment | null;
-  const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
+  const originalCart = useAsyncValue() as CartApiQueryFragment | null
+  const cart = useOptimisticCart(originalCart)
+  return <CartBadge count={cart?.totalQuantity ?? 0} />
 }
 
 const FALLBACK_HEADER_MENU = {
@@ -360,4 +347,4 @@ const FALLBACK_HEADER_MENU = {
       items: [],
     },
   ],
-};
+}

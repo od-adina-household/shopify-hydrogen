@@ -1,126 +1,129 @@
-import { Image, Money } from '@shopify/hydrogen';
-import { useEffect, memo, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Image, Money } from '@shopify/hydrogen'
+import { memo, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router'
 import type {
   CollectionItemFragment,
   ProductItemFragment,
   RecommendedProductFragment,
-} from 'storefrontapi.generated';
-import { AspectRatio } from '~/components/ui/aspect-ratio';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { cn } from '~/lib/utils';
-import { useVariantUrl } from '~/lib/variants';
-import { AddToCartButton } from './AddToCartButton';
-import { useAside } from './Aside';
-import { useScrollReveal } from '~/hooks/useScrollReveal';
+} from 'storefrontapi.generated'
+import { AspectRatio } from '~/components/ui/aspect-ratio'
+import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
+import { useScrollReveal } from '~/hooks/useScrollReveal'
+import { cn } from '~/lib/utils'
+import { useVariantUrl } from '~/lib/variants'
+import { AddToCartButton } from './AddToCartButton'
+import { useAside } from './Aside'
 
 export const ProductItem = memo(function ProductItem({
   product,
   loading,
 }: {
-  product:
-  | CollectionItemFragment
-  | ProductItemFragment
-  | RecommendedProductFragment;
-  loading?: 'eager' | 'lazy';
+  product: CollectionItemFragment | ProductItemFragment | RecommendedProductFragment
+  loading?: 'eager' | 'lazy'
 }) {
-  const variantUrl = useVariantUrl(product.handle);
-  const image = product.featuredImage;
-  const isAvailable = product.availableForSale;
-  const { open } = useAside();
-  const variantSelectorRef = useRef<HTMLDivElement>(null);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const variantUrl = useVariantUrl(product.handle)
+  const image = product.featuredImage
+  const isAvailable = product.availableForSale
+  const { open } = useAside()
+  const variantSelectorRef = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
 
   useScrollReveal(rootRef as React.RefObject<HTMLElement | null>, {
-    variant: "fade-up",
+    variant: 'fade-up',
     duration: 0.6,
     distance: 20,
     triggerOffset: 50,
     once: true,
-  });
+  })
 
   // Get variants and options
-  const variants = 'variants' in product ? product.variants?.nodes || [] : [];
-  const options = 'options' in product ? product.options || [] : [];
+  const variants = 'variants' in product ? product.variants?.nodes || [] : []
+  const options = 'options' in product ? product.options || [] : []
 
   // Get primary collection for category label
-  const collections = 'collections' in product ? product.collections?.nodes || [] : [];
-  const primaryCollection = collections.find(c =>
-    ['women', 'men', 'kids', 'accessories'].includes(c.handle.toLowerCase())
-  ) || collections[0];
-  const categoryLabel = primaryCollection?.title.toUpperCase() || 'SHOP';
+  const collections = 'collections' in product ? product.collections?.nodes || [] : []
+  const primaryCollection =
+    collections.find(c =>
+      ['women', 'men', 'kids', 'accessories'].includes(c.handle.toLowerCase())
+    ) || collections[0]
+  const categoryLabel = primaryCollection?.title.toUpperCase() || 'SHOP'
 
   // State for selected options
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
     // Initialize with first available variant's options
-    const firstAvailableVariant = variants.find(v => v.availableForSale) || variants[0];
-    if (!firstAvailableVariant) return {};
+    const firstAvailableVariant = variants.find(v => v.availableForSale) || variants[0]
+    if (!firstAvailableVariant) return {}
 
-    return firstAvailableVariant.selectedOptions.reduce((acc, option) => {
-      acc[option.name] = option.value;
-      return acc;
-    }, {} as Record<string, string>);
-  });
+    return firstAvailableVariant.selectedOptions.reduce(
+      (acc, option) => {
+        acc[option.name] = option.value
+        return acc
+      },
+      {} as Record<string, string>
+    )
+  })
 
   // State for showing variant selector
-  const [showVariantSelector, setShowVariantSelector] = useState(false);
+  const [showVariantSelector, setShowVariantSelector] = useState(false)
 
   // Find the currently selected variant based on selected options
-  const selectedVariant = variants.find(variant =>
-    variant.selectedOptions.every(option =>
-      selectedOptions[option.name] === option.value
-    )
-  ) || variants[0];
+  const selectedVariant =
+    variants.find(variant =>
+      variant.selectedOptions.every(option => selectedOptions[option.name] === option.value)
+    ) || variants[0]
 
-  const hasMultipleVariants = variants.length > 1;
+  const hasMultipleVariants = variants.length > 1
 
   const handleOptionChange = (optionName: string, value: string) => {
     setSelectedOptions(prev => ({
       ...prev,
-      [optionName]: value
-    }));
-  };
+      [optionName]: value,
+    }))
+  }
 
   const handleAddToCartClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
     if (hasMultipleVariants && !showVariantSelector) {
       // Show variant selector if there are multiple variants
-      setShowVariantSelector(true);
+      setShowVariantSelector(true)
     } else if (!hasMultipleVariants) {
       // If only one variant, add directly to cart
       // The AddToCartButton will handle this
     }
-  };
+  }
 
   // Handle click outside to close variant selector
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (variantSelectorRef.current && !variantSelectorRef.current.contains(event.target as Node)) {
-        setShowVariantSelector(false);
+      if (
+        variantSelectorRef.current &&
+        !variantSelectorRef.current.contains(event.target as Node)
+      ) {
+        setShowVariantSelector(false)
       }
-    };
+    }
 
     if (showVariantSelector) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside)
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
     }
-  }, [showVariantSelector]);
+  }, [showVariantSelector])
 
   // Pre-compute option availability to avoid O(variants × options) lookups in render
-  const availableOptionValues = new Map<string, Set<string>>();
+  const availableOptionValues = new Map<string, Set<string>>()
   if (hasMultipleVariants) {
     for (const variant of variants) {
       for (const option of variant.selectedOptions) {
         if (!availableOptionValues.has(option.name)) {
-          availableOptionValues.set(option.name, new Set());
+          availableOptionValues.set(option.name, new Set())
         }
         if (variant.availableForSale) {
-          availableOptionValues.get(option.name)!.add(option.value);
+          availableOptionValues.get(option.name)!.add(option.value)
         }
       }
     }
@@ -132,17 +135,12 @@ export const ProductItem = memo(function ProductItem({
       className="group"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
     >
-      <Link
-        prefetch="intent"
-        to={variantUrl}
-        className="cursor-pointer block"
-      >
+      <Link prefetch="intent" to={variantUrl} className="cursor-pointer block">
         <AspectRatio ratio={3 / 4} className="mb-4 overflow-hidden relative rounded-none">
           <div
             className={cn(
               'absolute inset-0 transition-all duration-500',
-              !isAvailable &&
-              'grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100',
+              !isAvailable && 'grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100'
             )}
           >
             {image && (
@@ -192,39 +190,41 @@ export const ProductItem = memo(function ProductItem({
         >
           <div className="overflow-hidden">
             <div className="py-4 space-y-4">
-              {hasMultipleVariants && options.map((option) => (
-                <div key={option.name} className="space-y-2">
-                  <p className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
-                    {option.name}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {option.optionValues.map((value) => {
-                      const isSelected = selectedOptions[option.name] === value.name;
-                      const isOptionAvailable = availableOptionValues.get(option.name)?.has(value.name) ?? false;
+              {hasMultipleVariants &&
+                options.map(option => (
+                  <div key={option.name} className="space-y-2">
+                    <p className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
+                      {option.name}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {option.optionValues.map(value => {
+                        const isSelected = selectedOptions[option.name] === value.name
+                        const isOptionAvailable =
+                          availableOptionValues.get(option.name)?.has(value.name) ?? false
 
-                      return (
-                        <Button
-                          key={value.name}
-                          variant={isSelected ? 'default' : 'outline'}
-                          size="sm"
-                          className={cn(
-                            'text-xs h-7 px-2',
-                            !isOptionAvailable && 'opacity-50 cursor-not-allowed'
-                          )}
-                          disabled={!isOptionAvailable}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleOptionChange(option.name, value.name);
-                          }}
-                        >
-                          {value.name}
-                        </Button>
-                      );
-                    })}
+                        return (
+                          <Button
+                            key={value.name}
+                            variant={isSelected ? 'default' : 'outline'}
+                            size="sm"
+                            className={cn(
+                              'text-xs h-7 px-2',
+                              !isOptionAvailable && 'opacity-50 cursor-not-allowed'
+                            )}
+                            disabled={!isOptionAvailable}
+                            onClick={e => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleOptionChange(option.name, value.name)
+                            }}
+                          >
+                            {value.name}
+                          </Button>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
@@ -242,24 +242,24 @@ export const ProductItem = memo(function ProductItem({
               <AddToCartButton
                 disabled={!selectedVariant?.availableForSale}
                 onClick={() => {
-                  open('cart');
-                  setShowVariantSelector(false);
+                  open('cart')
+                  setShowVariantSelector(false)
                 }}
                 lines={
                   selectedVariant
                     ? [
-                      {
-                        merchandiseId: selectedVariant.id,
-                        quantity: 1,
-                        selectedVariant: {
-                          id: selectedVariant.id,
-                          title: selectedVariant.title,
-                          availableForSale: selectedVariant.availableForSale,
-                          price: selectedVariant.price,
-                          selectedOptions: selectedVariant.selectedOptions,
+                        {
+                          merchandiseId: selectedVariant.id,
+                          quantity: 1,
+                          selectedVariant: {
+                            id: selectedVariant.id,
+                            title: selectedVariant.title,
+                            availableForSale: selectedVariant.availableForSale,
+                            price: selectedVariant.price,
+                            selectedOptions: selectedVariant.selectedOptions,
+                          },
                         },
-                      },
-                    ]
+                      ]
                     : []
                 }
                 variant="outline"
@@ -282,7 +282,7 @@ export const ProductItem = memo(function ProductItem({
               <AddToCartButton
                 disabled={!selectedVariant.availableForSale}
                 onClick={() => {
-                  open('cart');
+                  open('cart')
                 }}
                 lines={[
                   {
@@ -317,5 +317,5 @@ export const ProductItem = memo(function ProductItem({
         </div>
       </div>
     </div>
-  );
-});
+  )
+})

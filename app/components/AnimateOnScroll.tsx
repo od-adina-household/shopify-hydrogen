@@ -1,27 +1,27 @@
-import { useRef } from "react";
-import { cn } from "~/lib/utils";
-import { useScrollReveal } from "~/hooks/useScrollReveal";
+import { useRef } from 'react'
+import { useScrollReveal } from '~/hooks/useScrollReveal'
+import { cn } from '~/lib/utils'
 
-type AnimationVariant = "fade-up" | "fade-in" | "slide-left" | "slide-right" | "scale-in";
+type AnimationVariant = 'fade-up' | 'fade-in' | 'slide-left' | 'slide-right' | 'scale-in'
 
 interface AnimateOnScrollProps {
-  children: React.ReactNode;
+  children: React.ReactNode
   /** Animation variant */
-  variant?: AnimationVariant;
+  variant?: AnimationVariant
   /** Animation duration in seconds */
-  duration?: number;
+  duration?: number
   /** Delay before animation starts */
-  delay?: number;
+  delay?: number
   /** Distance for slide/scale animations */
-  distance?: number;
+  distance?: number
   /** ScrollTrigger offset from element top */
-  triggerOffset?: number;
+  triggerOffset?: number
   /** Whether to animate only once */
-  once?: boolean;
+  once?: boolean
   /** Additional className */
-  className?: string;
+  className?: string
   /** HTML element type */
-  as?: "div" | "section" | "article" | "aside" | "main" | "header" | "footer" | "nav" | "span";
+  as?: 'div' | 'section' | 'article' | 'aside' | 'main' | 'header' | 'footer' | 'nav' | 'span'
 }
 
 /**
@@ -31,16 +31,16 @@ interface AnimateOnScrollProps {
  */
 export function AnimateOnScroll({
   children,
-  variant = "fade-up",
+  variant = 'fade-up',
   duration = 0.7,
   delay = 0,
   distance = 40,
   triggerOffset = 100,
   once = true,
   className,
-  as: Component = "div",
+  as: Component = 'div',
 }: AnimateOnScrollProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null)
 
   useScrollReveal(ref, {
     variant,
@@ -49,11 +49,11 @@ export function AnimateOnScroll({
     triggerOffset,
     once,
     delay,
-  });
+  })
 
   return (
     <Component ref={ref} className={cn(className)}>
       {children}
     </Component>
-  );
+  )
 }

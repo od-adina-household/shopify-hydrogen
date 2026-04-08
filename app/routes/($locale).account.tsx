@@ -1,39 +1,30 @@
-import { LogOut, MapPin, Package, User } from 'lucide-react';
-import {
-  Form,
-  NavLink,
-  Outlet,
-  data as remixData,
-  useLoaderData,
-} from 'react-router';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
-import { Separator } from '~/components/ui/separator';
-import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetailsQuery';
-import { cn } from '~/lib/utils';
-import type { Route } from './+types/($locale).account';
+import { LogOut, MapPin, Package, User } from 'lucide-react'
+import { Form, NavLink, Outlet, data as remixData, useLoaderData } from 'react-router'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent } from '~/components/ui/card'
+import { Separator } from '~/components/ui/separator'
+import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetailsQuery'
+import { cn } from '~/lib/utils'
+import type { Route } from './+types/($locale).account'
 
 export const meta: Route.MetaFunction = () => {
-  return [
-    { title: 'Account' },
-    { name: 'robots', content: 'noindex' },
-  ];
-};
+  return [{ title: 'Account' }, { name: 'robots', content: 'noindex' }]
+}
 
 export function shouldRevalidate() {
-  return true;
+  return true
 }
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const { customerAccount } = context;
+  const { customerAccount } = context
   const { data, errors } = await customerAccount.query(CUSTOMER_DETAILS_QUERY, {
     variables: {
       language: customerAccount.i18n.language,
     },
-  });
+  })
 
   if (errors?.length || !data?.customer) {
-    throw new Error('Customer not found');
+    throw new Error('Customer not found')
   }
 
   return remixData(
@@ -42,26 +33,24 @@ export async function loader({ context }: Route.LoaderArgs) {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
-    },
-  );
+    }
+  )
 }
 
 export default function AccountLayout() {
-  const { customer } = useLoaderData<typeof loader>();
+  const { customer } = useLoaderData<typeof loader>()
 
   const heading = customer
     ? customer.firstName
       ? `Welcome, ${customer.firstName}`
-      : `Welcome to your account.`
-    : 'Account Details';
+      : 'Welcome to your account.'
+    : 'Account Details'
 
   return (
     <div className="space-y-8 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <div>
         <h1 className="text-4xl font-bold mb-2">{heading}</h1>
-        <p className="text-muted-foreground">
-          Manage your orders, profile, and account settings
-        </p>
+        <p className="text-muted-foreground">Manage your orders, profile, and account settings</p>
       </div>
       <Card>
         <CardContent className="p-6">
@@ -70,7 +59,7 @@ export default function AccountLayout() {
       </Card>
       <Outlet context={{ customer }} />
     </div>
-  );
+  )
 }
 
 function AccountMenu() {
@@ -78,20 +67,17 @@ function AccountMenu() {
     { to: '/account/orders', label: 'Orders', icon: Package },
     { to: '/account/profile', label: 'Profile', icon: User },
     { to: '/account/addresses', label: 'Addresses', icon: MapPin },
-  ];
+  ]
 
   return (
-    <nav role="navigation" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+    <nav className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
       {menuItems.map((item, index) => (
         <div key={item.to} className="flex items-center">
           <NavLink to={item.to} className="flex-1 sm:flex-initial">
             {({ isActive, isPending }) => (
               <Button
                 variant={isActive ? 'default' : 'ghost'}
-                className={cn(
-                  'w-full sm:w-auto justify-start',
-                  isPending && 'opacity-50',
-                )}
+                className={cn('w-full sm:w-auto justify-start', isPending && 'opacity-50')}
               >
                 <item.icon className="h-4 w-4 mr-2" />
                 {item.label}
@@ -99,26 +85,27 @@ function AccountMenu() {
             )}
           </NavLink>
           {index < menuItems.length - 1 && (
-            <Separator
-              orientation="vertical"
-              className="hidden sm:block h-8 mx-2"
-            />
+            <Separator orientation="vertical" className="hidden sm:block h-8 mx-2" />
           )}
         </div>
       ))}
       <Separator orientation="vertical" className="hidden sm:block h-8 mx-2" />
       <Logout />
     </nav>
-  );
+  )
 }
 
 function Logout() {
   return (
     <Form method="POST" action="/account/logout" className="flex-1 sm:flex-initial">
-      <Button type="submit" variant="ghost" className="w-full sm:w-auto justify-start text-destructive hover:text-destructive hover:bg-destructive/10">
+      <Button
+        type="submit"
+        variant="ghost"
+        className="w-full sm:w-auto justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+      >
         <LogOut className="h-4 w-4 mr-2" />
         Sign out
       </Button>
     </Form>
-  );
+  )
 }

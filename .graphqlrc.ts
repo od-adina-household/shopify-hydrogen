@@ -1,5 +1,5 @@
-import { getSchema } from '@shopify/hydrogen-codegen';
-import type { IGraphQLConfig } from 'graphql-config';
+import { getSchema } from '@shopify/hydrogen-codegen'
+import type { IGraphQLConfig } from 'graphql-config'
 
 /**
  * GraphQL Config
@@ -24,4 +24,4 @@ export default {
 
     // Add your own GraphQL projects here for CMS, Shopify Admin API, etc.
   },
-} as IGraphQLConfig;
+} as IGraphQLConfig

@@ -1,14 +1,14 @@
-import { useLoaderData } from 'react-router';
-import { Card, CardContent } from '~/components/ui/card';
-import { Separator } from '~/components/ui/separator';
-import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import type { Route } from './+types/($locale).pages.$handle';
+import { useLoaderData } from 'react-router'
+import { Card, CardContent } from '~/components/ui/card'
+import { Separator } from '~/components/ui/separator'
+import { redirectIfHandleIsLocalized } from '~/lib/redirect'
+import type { Route } from './+types/($locale).pages.$handle'
 
 export const meta: Route.MetaFunction = ({ data, params }) => {
-  const page = data?.page;
-  const seoTitle = page?.seo?.title || page?.title;
-  const seoDescription = page?.seo?.description;
-  const handle = page?.handle || params.handle;
+  const page = data?.page
+  const seoTitle = page?.seo?.title || page?.title
+  const seoDescription = page?.seo?.description
+  const handle = page?.handle || params.handle
 
   return [
     { title: seoTitle ?? 'Page' },
@@ -21,17 +21,17 @@ export const meta: Route.MetaFunction = ({ data, params }) => {
     { name: 'twitter:card', content: 'summary' },
     { name: 'twitter:title', content: seoTitle },
     { name: 'twitter:description', content: seoDescription },
-  ];
-};
+  ]
+}
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  const deferredData = loadDeferredData(args)
 
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const criticalData = await loadCriticalData(args)
 
-  return { ...deferredData, ...criticalData };
+  return { ...deferredData, ...criticalData }
 }
 
 /**
@@ -40,7 +40,7 @@ export async function loader(args: Route.LoaderArgs) {
  */
 async function loadCriticalData({ context, request, params }: Route.LoaderArgs) {
   if (!params.handle) {
-    throw new Error('Missing page handle');
+    throw new Error('Missing page handle')
   }
 
   const [{ page }] = await Promise.all([
@@ -50,17 +50,17 @@ async function loadCriticalData({ context, request, params }: Route.LoaderArgs) 
       },
     }),
     // Add other queries here, so that they are loaded in parallel
-  ]);
+  ])
 
   if (!page) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Response('Not Found', { status: 404 })
   }
 
-  redirectIfHandleIsLocalized(request, { handle: params.handle, data: page });
+  redirectIfHandleIsLocalized(request, { handle: params.handle, data: page })
 
   return {
     page,
-  };
+  }
 }
 
 /**
@@ -69,11 +69,11 @@ async function loadCriticalData({ context, request, params }: Route.LoaderArgs) 
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({ context }: Route.LoaderArgs) {
-  return {};
+  return {}
 }
 
 export default function Page() {
-  const { page } = useLoaderData<typeof loader>();
+  const { page } = useLoaderData<typeof loader>()
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
@@ -103,7 +103,7 @@ export default function Page() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
 
 const PAGE_QUERY = `#graphql
@@ -124,4 +124,4 @@ const PAGE_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const

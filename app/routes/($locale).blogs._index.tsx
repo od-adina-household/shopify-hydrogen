@@ -1,26 +1,26 @@
-import { getPaginationVariables } from '@shopify/hydrogen';
-import { ArrowRight, BookOpen } from 'lucide-react';
-import { Link, useLoaderData } from 'react-router';
-import type { BlogsQuery } from 'storefrontapi.generated';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import type { Route } from './+types/($locale).blogs._index';
+import { getPaginationVariables } from '@shopify/hydrogen'
+import { ArrowRight, BookOpen } from 'lucide-react'
+import { Link, useLoaderData } from 'react-router'
+import type { BlogsQuery } from 'storefrontapi.generated'
+import { PaginatedResourceSection } from '~/components/PaginatedResourceSection'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import type { Route } from './+types/($locale).blogs._index'
 
-type BlogNode = BlogsQuery['blogs']['nodes'][0];
+type BlogNode = BlogsQuery['blogs']['nodes'][0]
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Blog' }];
-};
+  return [{ title: 'Blog' }]
+}
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  const deferredData = loadDeferredData(args)
 
   // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  const criticalData = await loadCriticalData(args)
 
-  return { ...deferredData, ...criticalData };
+  return { ...deferredData, ...criticalData }
 }
 
 /**
@@ -30,7 +30,7 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({ context, request }: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 10,
-  });
+  })
 
   const [{ blogs }] = await Promise.all([
     context.storefront.query(BLOGS_QUERY, {
@@ -39,9 +39,9 @@ async function loadCriticalData({ context, request }: Route.LoaderArgs) {
       },
     }),
     // Add other queries here, so that they are loaded in parallel
-  ]);
+  ])
 
-  return { blogs };
+  return { blogs }
 }
 
 /**
@@ -50,19 +50,17 @@ async function loadCriticalData({ context, request }: Route.LoaderArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({ context }: Route.LoaderArgs) {
-  return {};
+  return {}
 }
 
 export default function Blogs() {
-  const { blogs } = useLoaderData<typeof loader>();
+  const { blogs } = useLoaderData<typeof loader>()
 
   return (
     <div className="space-y-8 mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
       <div className="space-y-2">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Blogs</h1>
-        <p className="text-lg text-muted-foreground">
-          Explore our latest articles and stories
-        </p>
+        <p className="text-lg text-muted-foreground">Explore our latest articles and stories</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <PaginatedResourceSection<BlogNode> connection={blogs}>
@@ -94,7 +92,7 @@ export default function Blogs() {
         </PaginatedResourceSection>
       </div>
     </div>
-  );
+  )
 }
 
 // NOTE: https://shopify.dev/docs/api/storefront/latest/objects/blog
@@ -129,4 +127,4 @@ const BLOGS_QUERY = `#graphql
       }
     }
   }
-` as const;
+` as const

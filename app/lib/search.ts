@@ -1,23 +1,17 @@
-import type {
-  PredictiveSearchQuery,
-  RegularSearchQuery,
-} from 'storefrontapi.generated';
+import type { PredictiveSearchQuery, RegularSearchQuery } from 'storefrontapi.generated'
 
 type ResultWithItems<Type extends 'predictive' | 'regular', Items> = {
-  type: Type;
-  term: string;
-  error?: string;
-  result: { total: number; items: Items } | null;
-};
+  type: Type
+  term: string
+  error?: string
+  result: { total: number; items: Items } | null
+}
 
-export type RegularSearchReturn = ResultWithItems<
-  'regular',
-  RegularSearchQuery
->;
+export type RegularSearchReturn = ResultWithItems<'regular', RegularSearchQuery>
 export type PredictiveSearchReturn = ResultWithItems<
   'predictive',
   NonNullable<PredictiveSearchQuery['predictiveSearch']>
->;
+>
 
 /**
  * Returns the empty state of a predictive search result to reset the search state.
@@ -32,18 +26,18 @@ export function getEmptyPredictiveSearchResult(): PredictiveSearchReturn['result
       pages: [],
       queries: [],
     },
-  };
+  }
 }
 
 interface UrlWithTrackingParams {
   /** The base URL to which the tracking parameters will be appended. */
-  baseUrl: string;
+  baseUrl: string
   /** The trackingParams returned by the Storefront API. */
-  trackingParams?: string | null;
+  trackingParams?: string | null
   /** Any additional query parameters to be appended to the URL. */
-  params?: Record<string, string>;
+  params?: Record<string, string>
   /** The search term to be appended to the URL. */
-  term: string;
+  term: string
 }
 
 /**
@@ -69,11 +63,11 @@ export function urlWithTrackingParams({
   let search = new URLSearchParams({
     ...extraParams,
     q: encodeURIComponent(term),
-  }).toString();
+  }).toString()
 
   if (trackingParams) {
-    search = `${search}&${trackingParams}`;
+    search = `${search}&${trackingParams}`
   }
 
-  return `${baseUrl}?${search}`;
+  return `${baseUrl}?${search}`
 }

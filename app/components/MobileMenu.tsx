@@ -1,12 +1,12 @@
-import { NavLink } from 'react-router';
-import type { HeaderQuery } from 'storefrontapi.generated';
+import { NavLink } from 'react-router'
+import type { HeaderQuery } from 'storefrontapi.generated'
 
 interface MobileMenuProps {
-  isOpen: boolean;
-  onClose: () => void;
-  menu: HeaderQuery['menu'];
-  primaryDomainUrl: string;
-  publicStoreDomain: string;
+  isOpen: boolean
+  onClose: () => void
+  menu: HeaderQuery['menu']
+  primaryDomainUrl: string
+  publicStoreDomain: string
 }
 
 export function MobileMenu({
@@ -16,25 +16,36 @@ export function MobileMenu({
   primaryDomainUrl,
   publicStoreDomain,
 }: MobileMenuProps) {
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
-  const menuItems = menu?.items || [];
+  const menuItems = menu?.items || []
 
   return (
     <div
       className="fixed inset-0 z-40 bg-background pt-28 px-6 overflow-y-auto"
       onClick={onClose}
+      onKeyDown={e => {
+        if (e.key === 'Escape') onClose()
+      }}
+      // biome-ignore lint/a11y/useSemanticElements: Using div with role=dialog is standard React pattern for mobile menu overlay
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mobile navigation"
     >
-      <nav className="flex flex-col" onClick={(e) => e.stopPropagation()}>
-        {menuItems.map((item) => {
-          if (!item.url) return null;
+      <nav
+        className="flex flex-col"
+        onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
+      >
+        {menuItems.map(item => {
+          if (!item.url) return null
 
           const url =
             item.url.includes('myshopify.com') ||
             item.url.includes(publicStoreDomain) ||
             item.url.includes(primaryDomainUrl)
               ? new URL(item.url).pathname
-              : item.url;
+              : item.url
 
           return (
             <NavLink
@@ -45,9 +56,9 @@ export function MobileMenu({
             >
               {item.title}
             </NavLink>
-          );
+          )
         })}
       </nav>
     </div>
-  );
+  )
 }
