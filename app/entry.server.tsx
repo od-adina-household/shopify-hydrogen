@@ -16,17 +16,17 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
-    defaultSrc: ['self', 'http://localhost:*', 'ws://localhost:*', 'wss://localhost:*'],
+    defaultSrc: ["'self'", 'http://localhost:*', 'ws://localhost:*', 'wss://localhost:*'],
     scriptSrc: [
-      'self',
-      'unsafe-inline',
-      'unsafe-eval',
+      "'self'",
+      "'unsafe-inline'",
+      "'unsafe-eval'",
       'http://localhost:*',
       'ws://localhost:*',
       'https://cdn.shopify.com',
     ],
     connectSrc: [
-      'self',
+      "'self'",
       'http://localhost:*',
       'ws://localhost:*',
       'wss://localhost:*',
@@ -36,7 +36,7 @@ export default async function handleRequest(
       'https://behold.pictures',
     ],
     imgSrc: [
-      'self',
+      "'self'",
       'data:',
       'http://localhost:*',
       'https://cdn.shopify.com',
@@ -44,10 +44,10 @@ export default async function handleRequest(
       'https://behold.pictures',
     ],
     mediaSrc: [
-      'self',
+      "'self'",
       'https://*.cdninstagram.com',
     ],
-    manifestSrc: ['self', 'http://localhost:*'],
+    manifestSrc: ["'self'", 'http://localhost:*'],
   })
 
   const body = await renderToReadableStream(
