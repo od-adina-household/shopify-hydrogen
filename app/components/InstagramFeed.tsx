@@ -162,9 +162,9 @@ function InstagramFeed({ posts, isLoading, error }: InstagramFeedProps) {
                 )}
 
                 {/* Caption overlay — slides up from bottom on hover */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent px-4 pt-10 pb-5 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-[transform,opacity] duration-300 ease-out rounded-b-[24px] md:rounded-b-[32px]">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent px-3 md:px-4 pt-8 md:pt-10 pb-6 md:pb-8 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-[transform,opacity] duration-300 ease-out">
                   {caption !== 'Instagram post' && (
-                    <p className="text-amber-50 text-sm leading-relaxed line-clamp-3 mb-2">
+                    <p className="text-amber-50 text-sm leading-relaxed line-clamp-2 md:line-clamp-3 mb-2">
                       {caption}
                     </p>
                   )}
