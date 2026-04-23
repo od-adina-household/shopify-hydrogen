@@ -100,7 +100,7 @@ export default function Homepage() {
 
       <div className="w-full">
         <HeroSection />
-        <InstagramFeed posts={posts} isLoading={!instagramFeedData} error={null} />
+        <InstagramFeed posts={posts} isLoading={false} error={null} />
         <IntroSection
           text="Let us guide you in the art of living — we bring ambience to your home with objects that inspire."
           buttonLabel="COLLECTION 25-26"
