@@ -233,10 +233,11 @@ function CollectionCardsSection({ cards }: { cards: CollectionCard[] }) {
             <img
               src={card.imageSrc}
               alt={card.imageAlt}
-              className="h-full w-full object-cover transition-all duration-700 group-hover:opacity-90 md:group-hover:opacity-100 md:group-hover:scale-105 max-w-full max-h-full"
+              className="h-full w-full object-cover transition-[opacity,transform] duration-700 group-hover:opacity-90 md:group-hover:opacity-100 md:group-hover:scale-105 max-w-full max-h-full"
+              loading="lazy"
             />
             <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 md:bottom-8 md:right-8">
-              <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-primary/80 backdrop-blur-sm border border-primary/20 transition-all duration-300 group-hover:bg-primary w-fit">
+              <div className="flex items-center justify-between md:justify-start gap-3 px-5 py-3 bg-primary/80 backdrop-blur-sm border border-primary/20 transition-colors duration-300 group-hover:bg-primary w-fit">
                 <span className="text-sm font-medium tracking-wider text-primary-foreground uppercase">
                   {card.title}
                 </span>
@@ -319,6 +320,7 @@ function HeroSection() {
           alt="White ceramic dishes with gold accents, dried flowers, and greenery arranged on neutral background"
           width={1920}
           height={1080}
+          fetchPriority="high"
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/40 to-transparent" />
@@ -483,6 +485,7 @@ function SplitSection({
             src={imageSrc}
             alt={imageAlt}
             className="h-full w-full object-cover max-w-full max-h-full"
+            loading="lazy"
           />
         </Link>
       ) : (
@@ -490,6 +493,7 @@ function SplitSection({
           src={imageSrc}
           alt={imageAlt}
           className="h-full w-full object-cover max-w-full max-h-full"
+            loading="lazy"
         />
       )}
     </div>
