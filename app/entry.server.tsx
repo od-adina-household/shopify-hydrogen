@@ -32,6 +32,20 @@ export default async function handleRequest(
       'wss://localhost:*',
       'https://cdn.shopify.com',
       'https://monorail-edge.shopifysvc.com',
+      'https://feeds.behold.so',
+      'https://behold.pictures',
+    ],
+    imgSrc: [
+      'self',
+      'data:',
+      'http://localhost:*',
+      'https://cdn.shopify.com',
+      'https://shopify.com',
+      'https://behold.pictures',
+    ],
+    mediaSrc: [
+      'self',
+      'https://*.cdninstagram.com',
     ],
     manifestSrc: ['self', 'http://localhost:*'],
   })

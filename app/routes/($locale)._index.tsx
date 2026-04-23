@@ -1,11 +1,13 @@
 import { ArrowRight } from 'lucide-react'
 import { useRef } from 'react'
-import { Link, useRouteLoaderData } from 'react-router'
+import { Link, useLoaderData, useRouteLoaderData } from 'react-router'
 // import { MessageCircle, Download, Building2 } from 'lucide-react';
 import { Button } from '~/components/ui/button'
+import InstagramFeed from '~/components/InstagramFeed'
 import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn'
 import { gsap, useGSAP } from '~/lib/gsap'
 import { organizationJsonLd, websiteJsonLd } from '~/lib/seo'
+import type { InstagramPost } from '~/types/instagram'
 import type { RootLoader } from '~/root'
 import type { Route } from './+types/($locale)._index'
 
@@ -41,8 +43,33 @@ export const meta: Route.MetaFunction = ({ data }) => {
   ]
 }
 
-export async function loader(_args: Route.LoaderArgs) {
+export async function loader(args: Route.LoaderArgs) {
+  const [deferredData, criticalData] = await Promise.all([
+    loadDeferredData(args),
+    loadCriticalData(args),
+  ])
+  return { ...deferredData, ...criticalData }
+}
+
+async function loadCriticalData(_args: Route.LoaderArgs) {
   return {}
+}
+
+async function loadDeferredData({ context }: Route.LoaderArgs) {
+  const { env } = context
+
+  if (!env.BEHOLD_FEED_ID) {
+    return { instagramFeed: null }
+  }
+
+  try {
+    const res = await fetch(`https://feeds.behold.so/${env.BEHOLD_FEED_ID}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const data = (await res.json()) as { posts: InstagramPost[] }
+    return { instagramFeed: data }
+  } catch {
+    return { instagramFeed: null }
+  }
 }
 
 export default function Homepage() {
@@ -50,6 +77,10 @@ export default function Homepage() {
   const shopName = rootData?.header?.shop?.name || 'Adina Household'
   const url = rootData?.header?.shop?.primaryDomain?.url || ''
   const searchUrl = url ? `${url}/search?q={search_term_string}` : '/search?q={search_term_string}'
+  const { instagramFeed: instagramFeedData } = useLoaderData<typeof loader>()
+  // instagramFeed is a Promise from deferred loading — React Router resolves it before render
+  const parsedFeed = (instagramFeedData as unknown) as { posts: InstagramPost[] } | null
+  const posts = parsedFeed?.posts ?? null
 
   return (
     <>
@@ -69,6 +100,7 @@ export default function Homepage() {
 
       <div className="w-full">
         <HeroSection />
+        <InstagramFeed posts={posts} isLoading={!instagramFeedData} error={null} />
         <IntroSection
           text="Let us guide you in the art of living — we bring ambience to your home with objects that inspire."
           buttonLabel="COLLECTION 25-26"
