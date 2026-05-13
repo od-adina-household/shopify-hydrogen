@@ -5,13 +5,14 @@ import {
   TruckIcon,
   UploadCloudIcon,
 } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
   data,
   useFetcher,
   useLoaderData,
+  useActionData,
 } from 'react-router'
 import type { Route } from './+types/($locale).checkout'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
@@ -94,7 +95,9 @@ export async function action({ request, context }: ActionFunctionArgs) {
         if (!shippingResult.cart) throw new Error('Failed to update shipping')
       }
 
-      return data({ ok: true })
+      return data({ ok: true, intent: 'information' }, {
+    headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
+  })
     }
     case 'bankTransferProof': {
       const objectKey = formData.get('objectKey') as string
@@ -103,7 +106,9 @@ export async function action({ request, context }: ActionFunctionArgs) {
         { key: 'bank_transfer_proof_object_key', value: objectKey, type: 'single_line_text_field' },
       ])
       if (!result.cart) throw new Error('Failed to store proof')
-      return data({ ok: true, checkoutUrl: result.cart.checkoutUrl })
+      return data({ ok: true, checkoutUrl: result.cart.checkoutUrl, intent: 'bankTransferProof' }, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
+    })
     }
     default:
       throw new Error(`Unknown intent: ${intent}`)
@@ -113,12 +118,36 @@ export async function action({ request, context }: ActionFunctionArgs) {
 // ── UI ────────────────────────────────────────────────────────────────────────────
 
 export default function Checkout() {
-  const cart = useLoaderData<typeof loader>()
+  const cartData = useLoaderData<typeof loader>()
+  const fetcher = useFetcher()
+  const actionData = useActionData<typeof action>()
   const [activeStep, setActiveStep] = useState('information')
   const [completedInfo, setCompletedInfo] = useState(false)
   const [proofObjectKey, setProofObjectKey] = useState<string>(
-    (cart as any)?.bankTransferProof?.value || ''
+    (cartData as any)?.bankTransferProof?.value || ''
   )
+
+  const isReloading = fetcher.state !== 'idle'
+
+  // Use fetcher data when reloaded after information submission, otherwise use loader data
+  const cart = (fetcher.data as any)?.cart || cartData
+
+  // When information step completes, refetch cart to get updated shipping options
+  useEffect(() => {
+    if (actionData?.ok && actionData?.intent === 'information') {
+      setCompletedInfo(true)
+      setActiveStep('review')
+      fetcher.load(window.location.href)
+    }
+  }, [actionData])
+
+  // Sync proofObjectKey with cart metafield after reload
+  useEffect(() => {
+    const freshKey = (cart as any)?.bankTransferProof?.value
+    if (freshKey && freshKey !== proofObjectKey) {
+      setProofObjectKey(freshKey)
+    }
+  }, [(cart as any)?.bankTransferProof?.value])
 
   const progressPct = activeStep === 'information' ? 50 : 100
 
@@ -321,8 +350,10 @@ function InformationStep({
           {/* Shipping Method */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Shipping Method</h3>
-            {shippingOptions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No shipping options available yet.</p>
+            {deliveryGroups.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Add items to your cart to see available shipping options.</p>
+            ) : shippingOptions.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No shipping options available for this address. Please ensure your shipping address is complete.</p>
             ) : (
               <div className="space-y-2">
                 {shippingOptions.map((opt: any) => (

@@ -33,16 +33,17 @@ Replace Shopify's hosted checkout with a custom Hydrogen checkout page that reta
 - At final step: `cart.setMetafields([{key: 'bank_transfer_proof_object_key', value: objectKey, type: 'single_line_text_field'}])`
 - Shopify auto-copies to order via `cartToOrderCopyable` on the `custom.bank_transfer_proof_object_key` metafield definition
 
-### Pending Changes (not yet committed/saved)
+### Shipping Options — Fixed This Session
 
-In-progress edits to `app/routes/($locale).checkout.tsx`:
-1. Country dropdown reduced to **Pakistan only** (`PK`) — was multi-country list
-2. All address fields except `address2` (apt/suite) and `zip` (postal) had `required` removed — only `zip` and `address2` remain optional
-3. Default country changed to `PK` (Pakistan) on the Select component
-4. Container changed from `max-w-3xl` → `max-w-7xl`
-5. Grid changed from `lg:grid-cols-5` → `lg:grid-cols-4` for wider form cards
+**Problem:** "No shipping options available yet" appeared even after filling address.
 
-These changes were interrupted — typecheck/run was not confirmed. **Run `bun run typecheck` before committing.**
+**Root cause:** `InformationStep` called `onComplete()` immediately from fetcher data, navigating to Review tab before Shopify had computed the new `deliveryOptions` from the address mutation.
+
+**Fix:**
+- Action returns `{ ok: true, intent: 'information' }` with `Cache-Control: no-store` headers
+- `Checkout` component uses `fetcher.load(window.location.href)` to re-fetch the loader after action completes, getting the cart **after** Shopify computes shipping options
+- Uses `fetcher.data?.cart || cartData` pattern — falls back to loader data until re-fetch completes
+- `intent` field on action response prevents wrong triggering for `bankTransferProof` intent
 
 ## What Worked
 
@@ -54,6 +55,7 @@ These changes were interrupted — typecheck/run was not confirmed. **Run `bun r
 - `updateDeliveryAddresses` input shape: `{id, address: {deliveryAddress: {...}}}`
 - `updateSelectedDeliveryOption` takes `CartSelectedDeliveryOptionInput[]` — array of `{deliveryGroupId, deliveryOptionHandle}`
 - `CartDeliveryOption` has `estimatedCost` (not `price`) and no `carrier`/`estimatedDeliveryDate`
+- **`fetcher.load()` re-fetch pattern** — force-refresh cart after mutations to get computed shipping options from Shopify
 
 ## What Didn't Work
 
@@ -62,29 +64,30 @@ These changes were interrupted — typecheck/run was not confirmed. **Run `bun r
 - **PRIVATE_ADMIN_API_TOKEN** lacked Admin API access — created metafield manually via Shopify Admin UI
 - **`--allow-mutations` flag** doesn't exist in CLI v3.94.3
 - **`shopify app init --template checkout-ui`** template flag not supported
+- **Immediate `onComplete()` in InformationStep useEffect** — triggered navigation before Shopify computed new shipping options. Fixed by deferring to `fetcher.load()` re-fetch in parent component.
 
 ## Next Steps
 
-### P0 — Finish In-Progress Work
-1. Run `bun run typecheck` to confirm Pakistan-only country / optional fields edits are valid
-2. Run `bun run build` to verify codegen passes
-3. Commit the pending changes to `app/routes/($locale).checkout.tsx`
+### P0 — Shipping Options Verification
+1. Run `bun run dev` → add item to cart → navigate to `/checkout` → fill address → submit → **verify shipping options appear** on Review step before testing other flows
 
 ### P1 — Test the Full Flow
-4. `bun run dev` → add item to cart → verify redirect to `/checkout` (not Shopify URL)
-5. Fill Information step → submit → verify Review step unlocks
-6. Upload bank transfer proof → Place Order → verify redirects to Shopify checkout
-7. In Shopify Admin > Orders > metafield → verify `bank_transfer_proof_object_key` is populated
+2. Fill Information step → submit → verify Review step unlocks with shipping options visible
+3. Upload bank transfer proof → Place Order → verify redirects to Shopify checkout
+4. In Shopify Admin > Orders > metafield → verify `bank_transfer_proof_object_key` is populated
 
-### P2 — Cleanup
-8. **Uninstall `bank-transfer-checkout` extension** from Shopify Partners dashboard — no longer needed
-9. Remove or simplify the Payment step (it's just an interstitial now that all info is collected in step 1)
+### P2 — Commit Pending Changes
+5. Run `bun run typecheck` and `bun run build` to confirm shipping options fix compiles
+6. Commit shipping options fix
+
+### P3 — Cleanup
+7. **Uninstall `bank-transfer-checkout` extension** from Shopify Partners dashboard — no longer needed
 
 ## Key Files
 
 ```
 app/
-├── routes/($locale).checkout.tsx      # Custom checkout (2-step)
+├── routes/($locale).checkout.tsx      # Custom checkout (2-step), shipping options fix
 ├── routes/($locale).api.r2.upload-url.tsx  # R2 presigned PUT URL
 ├── routes/($locale).api.r2.view-url.tsx    # R2 presigned GET URL
 ├── routes/($locale).cart.$lines.tsx   # Redirect → /checkout
