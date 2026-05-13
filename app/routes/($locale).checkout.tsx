@@ -123,7 +123,7 @@ export default function Checkout() {
   const progressPct = activeStep === 'information' ? 50 : 100
 
   return (
-    <div className="mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12 max-w-3xl mx-auto">
+    <div className="mt-20 md:mt-24 px-4 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12 max-w-7xl mx-auto">
       <div className="mb-6 space-y-2">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Checkout</h1>
         <p className="text-lg text-muted-foreground">Complete your order</p>
@@ -158,8 +158,7 @@ export default function Checkout() {
         </TabsList>
 
         <TabsContent value="information" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            {/* Form on mobile: order below; on desktop: left column */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-3 order-2 lg:order-1">
               <InformationStep
                 initialEmail={(cart as any)?.buyerIdentity?.email || ''}
@@ -179,14 +178,14 @@ export default function Checkout() {
               />
             </div>
             {/* Order summary on mobile: top; on desktop: right column */}
-            <div className="lg:col-span-2 order-1 lg:order-2">
+            <div className="lg:col-span-1 order-1 lg:order-2">
               <OrderSummary cart={cart} />
             </div>
           </div>
         </TabsContent>
 
         <TabsContent value="review" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-3 order-2 lg:order-1">
               <ReviewStep
                 cart={cart}
@@ -195,7 +194,7 @@ export default function Checkout() {
                 onBack={() => setActiveStep('information')}
               />
             </div>
-            <div className="lg:col-span-2 order-1 lg:order-2">
+            <div className="lg:col-span-1 order-1 lg:order-2">
               <OrderSummary cart={cart} />
             </div>
           </div>
@@ -275,16 +274,16 @@ function InformationStep({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="firstName">First Name</Label>
-                <Input id="firstName" name="firstName" defaultValue={initialAddress.firstName} required />
+                <Input id="firstName" name="firstName" defaultValue={initialAddress.firstName} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" name="lastName" defaultValue={initialAddress.lastName} required />
+                <Input id="lastName" name="lastName" defaultValue={initialAddress.lastName} />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="address1">Address</Label>
-              <Input id="address1" name="address1" defaultValue={initialAddress.address1} placeholder="123 Main St" required />
+              <Input id="address1" name="address1" defaultValue={initialAddress.address1} placeholder="123 Main St" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="address2">Apt, suite, etc. (optional)</Label>
@@ -293,11 +292,11 @@ function InformationStep({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="city">City</Label>
-                <Input id="city" name="city" defaultValue={initialAddress.city} required />
+                <Input id="city" name="city" defaultValue={initialAddress.city} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="province">State / Province</Label>
-                <Input id="province" name="province" defaultValue={initialAddress.province} required />
+                <Input id="province" name="province" defaultValue={initialAddress.province} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -307,17 +306,10 @@ function InformationStep({
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="country">Country</Label>
-                <Select name="country" defaultValue={initialAddress.country} onValueChange={(v) => setCountry(v)}>
+                <Select name="country" defaultValue="PK" onValueChange={(v) => setCountry(v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="US">United States</SelectItem>
-                    <SelectItem value="CA">Canada</SelectItem>
-                    <SelectItem value="GB">United Kingdom</SelectItem>
-                    <SelectItem value="AU">Australia</SelectItem>
-                    <SelectItem value="MY">Malaysia</SelectItem>
-                    <SelectItem value="SG">Singapore</SelectItem>
-                    <SelectItem value="ID">Indonesia</SelectItem>
-                    <SelectItem value="TH">Thailand</SelectItem>
+                    <SelectItem value="PK">Pakistan</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
