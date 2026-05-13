@@ -163,6 +163,27 @@ export const CART_QUERY_FRAGMENT = `#graphql
       key
       value
     }
+    deliveryGroups(first: 10) {
+      nodes {
+        id
+        deliveryOptions {
+          handle
+          title
+          description
+          estimatedCost {
+            ...Money
+          }
+        }
+        selectedDeliveryOption {
+          handle
+          title
+          description
+          estimatedCost {
+            ...Money
+          }
+        }
+      }
+    }
   }
 ` as const
 

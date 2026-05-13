@@ -57,9 +57,9 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   // Update cart id in cookie
   const headers = cart.setCartId(cartResult.id)
 
-  // redirect to checkout
+  // redirect to custom checkout
   if (cartResult.checkoutUrl) {
-    return redirect(cartResult.checkoutUrl, { headers })
+    return redirect('/checkout', { headers })
   }
   throw new Error('No checkout URL found')
 }

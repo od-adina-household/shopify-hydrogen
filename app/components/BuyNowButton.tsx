@@ -23,9 +23,8 @@ function BuyNowButtonInner({
 
   useEffect(() => {
     if (prevStateRef.current !== 'idle' && fetcher.state === 'idle') {
-      const checkoutUrl = fetcher.data?.checkoutUrl
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl
+      if (fetcher.data?.checkoutUrl) {
+        window.location.href = '/checkout'
       }
     }
     prevStateRef.current = fetcher.state

@@ -12,4 +12,4 @@ block_progress = true
 
 [[extensions.targeting]]
 module = "./src/index.tsx"
-target = "customer-account.order-status.block.render"
+target = "purchase.checkout.block.render"
