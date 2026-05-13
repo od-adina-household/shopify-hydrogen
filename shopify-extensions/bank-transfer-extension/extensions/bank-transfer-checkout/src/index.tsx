@@ -56,8 +56,8 @@ extension('checkout.customer-account.render', (root, { api }) => {
             await api.applyMetafieldChange({
               type: 'updateCartMetafield',
               metafield: {
-                namespace: 'bank_transfer',
-                key: 'proof_object_key',
+                namespace: 'custom',
+                key: 'bank_transfer_proof_object_key',
                 value: objectKey,
                 type: 'single_line_text_field',
               },

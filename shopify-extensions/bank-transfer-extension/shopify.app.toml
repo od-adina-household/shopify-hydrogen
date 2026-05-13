@@ -1,5 +1,5 @@
 name = "bank-transfer-extension"
-client_id = "3e6e3c3e3e3e3e3e3e3e3e3e3e3e3e3e"
+client_id = "a93b78f39cae4893de6b43e2bd0108d9"
 oauth_scopes = "write_checkouts"
 org = "adinahousehold"
 

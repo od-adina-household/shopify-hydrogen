@@ -159,7 +159,7 @@ export const CART_QUERY_FRAGMENT = `#graphql
       code
       applicable
     }
-    bankTransferProof: metafield(namespace: "bank_transfer", key: "proof_object_key") {
+    bankTransferProof: metafield(namespace: "custom", key: "bank_transfer_proof_object_key") {
       key
       value
     }

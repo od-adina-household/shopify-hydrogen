@@ -1,6 +1,15 @@
-[extensions]
-target = "checkout-ui"
+api_version = "2025-10"
+[[extensions]]
+type = "ui_extension"
+handle = "bank-transfer-checkout"
+uid = "bf4f3e2a-1c5d-4e6f-8a9b-0c1d2e3f4a5b"
+name = "Bank Transfer Checkout"
+description = "Upload bank transfer proof before checkout"
 
-[[extensions.name]]
-path = "extensions/bank-transfer-checkout"
-name = "bank-transfer-checkout"
+[extensions.capabilities]
+network_access = true
+block_progress = true
+
+[[extensions.targeting]]
+module = "./src/index.tsx"
+target = "customer-account.order-status.block.render"

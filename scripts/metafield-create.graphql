@@ -1,0 +1,27 @@
+mutation createBankTransferMetafieldDefinition {
+  metafieldDefinitionCreate(definition: {
+    namespace: "bank_transfer"
+    key: "proof_object_key"
+    name: "Bank Transfer Proof Object Key"
+    description: "R2 object key for bank transfer screenshot. Copied from cart at checkout completion."
+    type: "single_line_text_field"
+    ownerType: ORDER
+    capabilities: {
+      cartToOrderCopyable: {
+        enabled: true
+      }
+    }
+  }) {
+    createdDefinition {
+      id
+      namespace
+      key
+      name
+      type { name }
+      capabilities {
+        cartToOrderCopyable { enabled eligible }
+      }
+    }
+    userErrors { field message }
+  }
+}
