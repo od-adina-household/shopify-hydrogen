@@ -1,0 +1,6 @@
+[extensions]
+target = "checkout-ui"
+
+[[extensions.name]]
+path = "extensions/bank-transfer-checkout"
+name = "bank-transfer-checkout"

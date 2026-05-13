@@ -1,0 +1,11 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": ["https://1arsxq-81.myshopify.com", "https://checkout.adinahousehold.com", "https://adinahousehold.com"],
+        "methods": ["PUT", "HEAD"]
+      },
+      "maxAgeSeconds": 3600
+    }
+  ]
+}

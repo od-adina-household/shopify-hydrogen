@@ -1,0 +1,8 @@
+name = "bank-transfer-extension"
+client_id = "3e6e3c3e3e3e3e3e3e3e3e3e3e3e3e3e"
+oauth_scopes = "write_checkouts"
+org = "adinahousehold"
+
+[[webhooks]]
+topics = ["checkout-completed"]
+uri = "/api/webhooks/checkout-completed"

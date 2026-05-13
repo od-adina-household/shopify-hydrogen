@@ -1,7 +1,6 @@
 name = "adina-household"
 main = "server.ts"
 compatibility_date = "2024-04-15"
-platform_type = "workers"
 
 [[r2_buckets]]
 binding = "ASSETS_BUCKET"

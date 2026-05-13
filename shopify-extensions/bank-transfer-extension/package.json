@@ -1,0 +1,13 @@
+{
+  "name": "bank-transfer-extension",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "shopify": "shopify",
+    "build": "shopify app build",
+    "dev": "shopify app dev",
+    "deploy": "shopify app deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
