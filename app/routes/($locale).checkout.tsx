@@ -8,14 +8,19 @@ import {
 import { useRef, useState, useEffect } from 'react'
 import {
   type ActionFunctionArgs,
+  type FetcherWithComponents,
   type LoaderFunctionArgs,
   data,
   useFetcher,
   useLoaderData,
-  useActionData,
 } from 'react-router'
 import type { Route } from './+types/($locale).checkout'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Progress } from '~/components/ui/progress'
@@ -36,12 +41,28 @@ export const meta: Route.MetaFunction = () => [
 export async function loader({ context }: Route.LoaderArgs) {
   const { cart } = context
   const cartData = await cart.get()
+
+  // Redirect to cart if cart is empty or has no lines
+  if (!cartData || !cartData.lines?.nodes?.length) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: '/cart',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
+    })
+  }
+
   return data(cartData, {
     headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
   })
 }
 
-export async function action({ request, context }: ActionFunctionArgs) {
+type ActionResponse =
+  | { ok: true; intent: 'information' | 'bankTransferProof'; checkoutUrl?: string }
+  | { ok: false; intent: 'information' | 'bankTransferProof'; errors: string[] }
+
+export async function action({ request, context }: Route.ActionArgs) {
   const { cart } = context
   const formData = await request.formData()
   const intent = formData.get('intent') as string
@@ -58,22 +79,54 @@ export async function action({ request, context }: ActionFunctionArgs) {
       const province = formData.get('province') as string
       const zip = formData.get('zip') as string
       const country = formData.get('country') as string
-      const deliveryGroupId = formData.get('deliveryGroupId') as string
       const deliveryOptionHandle = formData.get('deliveryOptionHandle') as string
 
-      // 1. Update buyer identity
-      const identityResult = await cart.updateBuyerIdentity({ email, phone })
-      if (!identityResult.cart) throw new Error('Failed to update contact')
+      // ── Server-side validation ─────────────────────────────────────────────
+      const errors: string[] = []
+      if (!email) errors.push('Email is required')
+      if (!address1) errors.push('Address is required')
+      if (!city) errors.push('City is required')
+      if (!zip) errors.push('ZIP / Postal Code is required')
+      if (!country) errors.push('Country is required')
+      if (!deliveryOptionHandle) errors.push('Please select a shipping method')
 
-      // 2. Update address
-      if (deliveryGroupId && address1) {
-        await cart.updateDeliveryAddresses([
+      if (errors.length > 0) {
+        return data<ActionResponse>(
+          { ok: false, intent: 'information', errors },
+          { status: 422, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+        )
+      }
+
+      // ── Mutation 1: Update buyer identity ──────────────────────────────────
+      const identityResult = await cart.updateBuyerIdentity({
+        email,
+        phone,
+        countryCode: country as any,
+      })
+      if (!identityResult.cart) {
+        return data<ActionResponse>(
+          { ok: false, intent: 'information', errors: ['Failed to update contact'] },
+          { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+        )
+      }
+      if (identityResult.userErrors?.length) {
+        console.error('[checkout] updateBuyerIdentity userErrors:', identityResult.userErrors)
+        const msgs = identityResult.userErrors.map((e) => e.message)
+        return data<ActionResponse>(
+          { ok: false, intent: 'information', errors: msgs },
+          { status: 422, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+        )
+      }
+
+      // ── Mutation 2: Add delivery address ───────────────────────────────────
+      // Creates a new selectable address which triggers Shopify to compute
+      // delivery groups and shipping options.
+      let selectedDeliveryGroupId = ''
+      if (address1) {
+        const addressResult = await cart.addDeliveryAddresses([
           {
-            id: deliveryGroupId,
             address: {
               deliveryAddress: {
-                firstName: firstName || '',
-                lastName: lastName || '',
                 address1: address1 || '',
                 address2: address2 || '',
                 city: city || '',
@@ -85,30 +138,77 @@ export async function action({ request, context }: ActionFunctionArgs) {
             selected: true,
           },
         ])
+        if (!addressResult.cart) {
+          return data<ActionResponse>(
+            { ok: false, intent: 'information', errors: ['Failed to add delivery address'] },
+            { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+          )
+        }
+        if (addressResult.userErrors?.length) {
+          console.error('[checkout] addDeliveryAddresses userErrors:', addressResult.userErrors)
+          const msgs = addressResult.userErrors.map((e) => e.message)
+          return data<ActionResponse>(
+            { ok: false, intent: 'information', errors: msgs },
+            { status: 422, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+          )
+        }
+        selectedDeliveryGroupId = addressResult.cart.deliveryGroups?.nodes?.[0]?.id || ''
       }
 
-      // 3. Update shipping option
-      if (deliveryGroupId && deliveryOptionHandle) {
+      // ── Mutation 3: Update shipping option ─────────────────────────────────
+      if (selectedDeliveryGroupId && deliveryOptionHandle) {
         const shippingResult = await cart.updateSelectedDeliveryOption([
-          { deliveryGroupId, deliveryOptionHandle },
+          { deliveryGroupId: selectedDeliveryGroupId, deliveryOptionHandle },
         ])
-        if (!shippingResult.cart) throw new Error('Failed to update shipping')
+        if (!shippingResult.cart) {
+          return data<ActionResponse>(
+            { ok: false, intent: 'information', errors: ['Failed to update shipping option'] },
+            { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+          )
+        }
+        if (shippingResult.userErrors?.length) {
+          console.error('[checkout] updateSelectedDeliveryOption userErrors:', shippingResult.userErrors)
+          const msgs = shippingResult.userErrors.map((e) => e.message)
+          return data<ActionResponse>(
+            { ok: false, intent: 'information', errors: msgs },
+            { status: 422, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+          )
+        }
       }
 
-      return data({ ok: true, intent: 'information' }, {
-    headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
-  })
+      return data<ActionResponse>(
+        { ok: true, intent: 'information' },
+        { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+      )
     }
     case 'bankTransferProof': {
       const objectKey = formData.get('objectKey') as string
-      if (!objectKey) throw new Error('No proof uploaded')
+      if (!objectKey) {
+        return data<ActionResponse>(
+          { ok: false, intent: 'bankTransferProof', errors: ['No proof uploaded'] },
+          { status: 400, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+        )
+      }
       const result = await cart.setMetafields([
         { key: 'bank_transfer_proof_object_key', value: objectKey, type: 'single_line_text_field' },
       ])
-      if (!result.cart) throw new Error('Failed to store proof')
-      return data({ ok: true, checkoutUrl: result.cart.checkoutUrl, intent: 'bankTransferProof' }, {
-      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
-    })
+      if (!result.cart) {
+        return data<ActionResponse>(
+          { ok: false, intent: 'bankTransferProof', errors: ['Failed to store proof'] },
+          { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+        )
+      }
+      if (result.errors?.length) {
+        console.error('[checkout] setMetafields errors:', result.errors)
+        return data<ActionResponse>(
+          { ok: false, intent: 'bankTransferProof', errors: result.errors.map((e) => String(e)) },
+          { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+        )
+      }
+      return data<ActionResponse>(
+        { ok: true, intent: 'bankTransferProof', checkoutUrl: result.cart.checkoutUrl },
+        { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+      )
     }
     default:
       throw new Error(`Unknown intent: ${intent}`)
@@ -119,27 +219,35 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
 export default function Checkout() {
   const cartData = useLoaderData<typeof loader>()
-  const fetcher = useFetcher()
-  const actionData = useActionData<typeof action>()
+  // Parent-level fetcher — the parent renders the form so useActionData()
+  // can observe action results from InformationStep's submission.
+  const fetcher = useFetcher<ActionResponse>()
   const [activeStep, setActiveStep] = useState('information')
   const [completedInfo, setCompletedInfo] = useState(false)
+  const [formErrors, setFormErrors] = useState<string[]>([])
   const [proofObjectKey, setProofObjectKey] = useState<string>(
     (cartData as any)?.bankTransferProof?.value || ''
   )
 
-  const isReloading = fetcher.state !== 'idle'
-
   // Use fetcher data when reloaded after information submission, otherwise use loader data
-  const cart = (fetcher.data as any)?.cart || cartData
+  const cart = fetcher.data?.ok === true && fetcher.data?.intent === 'information' && fetcher.state === 'idle'
+    ? cartData  // action succeeded but cart not yet refetched — use loader data
+    : (fetcher.data as any)?.cart || cartData
 
-  // When information step completes, refetch cart to get updated shipping options
+  // Watch fetcher for information step completion — canonical pattern from CartSummary gift card
   useEffect(() => {
-    if (actionData?.ok && actionData?.intent === 'information') {
+    if (fetcher.data?.ok && fetcher.data.intent === 'information') {
       setCompletedInfo(true)
       setActiveStep('review')
-      fetcher.load(window.location.href)
+      setFormErrors([])
+      // Refetch cart to get computed shipping options with prices
+      const checkoutPath = import.meta.env.DEV ? '/checkout' : window.location.href
+      fetcher.load(checkoutPath)
+    } else if (fetcher.data?.ok === false && fetcher.data?.intent === 'information') {
+      // Surface validation errors from the action
+      setFormErrors((fetcher.data as any).errors || [])
     }
-  }, [actionData])
+  }, [fetcher.data])
 
   // Sync proofObjectKey with cart metafield after reload
   useEffect(() => {
@@ -161,7 +269,6 @@ export default function Checkout() {
       <Progress value={progressPct} className="mb-8" />
 
       <Tabs value={activeStep} onValueChange={(val) => {
-        // Block backward navigation only
         if (val === 'information' || completedInfo) {
           setActiveStep(val)
         }
@@ -190,6 +297,7 @@ export default function Checkout() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-3 order-2 lg:order-1">
               <InformationStep
+                fetcher={fetcher}
                 initialEmail={(cart as any)?.buyerIdentity?.email || ''}
                 initialPhone={(cart as any)?.buyerIdentity?.phone || ''}
                 initialAddress={{
@@ -200,13 +308,12 @@ export default function Checkout() {
                   city: (cart as any)?.buyerIdentity?.address?.city || '',
                   province: (cart as any)?.buyerIdentity?.address?.province || '',
                   zip: (cart as any)?.buyerIdentity?.address?.zip || '',
-                  country: (cart as any)?.buyerIdentity?.address?.country || 'US',
+                  country: (cart as any)?.buyerIdentity?.countryCode || 'PK',
                 }}
                 deliveryGroups={(cart as any)?.deliveryGroups?.nodes || []}
-                onComplete={() => setCompletedInfo(true)}
+                formErrors={formErrors}
               />
             </div>
-            {/* Order summary on mobile: top; on desktop: right column */}
             <div className="lg:col-span-1 order-1 lg:order-2">
               <OrderSummary cart={cart} />
             </div>
@@ -239,12 +346,14 @@ import { Button } from '~/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 
 function InformationStep({
+  fetcher,
   initialEmail,
   initialPhone,
   initialAddress,
   deliveryGroups,
-  onComplete,
+  formErrors,
 }: {
+  fetcher: FetcherWithComponents<ActionResponse>
   initialEmail: string
   initialPhone: string
   initialAddress: {
@@ -252,12 +361,11 @@ function InformationStep({
     city: string; province: string; zip: string; country: string
   }
   deliveryGroups: any[]
-  onComplete: () => void
+  formErrors: string[]
 }) {
-  const fetcher = useFetcher()
   const isSubmitting = fetcher.state !== 'idle'
   const [selectedShipping, setSelectedShipping] = useState<string>('')
-  const [country, setCountry] = useState(initialAddress.country || 'US')
+  const [country, setCountry] = useState(initialAddress.country || 'PK')
 
   const groupId = deliveryGroups[0]?.id || ''
   const shippingOptions = deliveryGroups.flatMap((g: any) =>
@@ -275,132 +383,151 @@ function InformationStep({
         <CardTitle>Your Information & Shipping</CardTitle>
       </CardHeader>
       <CardContent>
-        <fetcher.Form method="post" className="space-y-6">
-          <input type="hidden" name="intent" value="information" />
-          <input type="hidden" name="deliveryGroupId" value={groupId} />
-          <input type="hidden" name="deliveryOptionHandle" value={selectedShipping} />
-
-          {/* Contact */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Contact</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" defaultValue={initialEmail} placeholder="you@example.com" required />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="phone">Phone (optional)</Label>
-                <Input id="phone" name="phone" type="tel" defaultValue={initialPhone} placeholder="+1 (555) 000-0000" />
-              </div>
-            </div>
+        {formErrors.length > 0 && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-400 space-y-1">
+            {formErrors.map((err, i) => (
+              <p key={i} className="text-sm">{err}</p>
+            ))}
           </div>
+        )}
+        <div className="space-y-6">
+          <fetcher.Form method="post" className="space-y-6">
+            <input type="hidden" name="intent" value="information" />
+            <input type="hidden" name="deliveryGroupId" value={groupId} />
+            <input type="hidden" name="deliveryOptionHandle" value={selectedShipping} />
 
-          <Separator />
+            {/* Contact */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Contact</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" name="email" type="email" defaultValue={initialEmail} placeholder="you@example.com" required />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone">Phone (optional)</Label>
+                  <Input id="phone" name="phone" type="tel" defaultValue={initialPhone} placeholder="0300 1234567" />
+                </div>
+              </div>
+            </div>
 
-          {/* Shipping Address */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Shipping Address</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input id="firstName" name="firstName" defaultValue={initialAddress.firstName} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" name="lastName" defaultValue={initialAddress.lastName} />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="address1">Address</Label>
-              <Input id="address1" name="address1" defaultValue={initialAddress.address1} placeholder="123 Main St" />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="address2">Apt, suite, etc. (optional)</Label>
-              <Input id="address2" name="address2" defaultValue={initialAddress.address2} placeholder="Apt 4B" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="city">City</Label>
-                <Input id="city" name="city" defaultValue={initialAddress.city} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="province">State / Province</Label>
-                <Input id="province" name="province" defaultValue={initialAddress.province} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="zip">ZIP / Postal Code</Label>
-                <Input id="zip" name="zip" defaultValue={initialAddress.zip} required />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="country">Country</Label>
-                <Select name="country" defaultValue="PK" onValueChange={(v) => setCountry(v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PK">Pakistan</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
+            <Separator />
 
-          <Separator />
+            {/* Shipping Address */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Shipping Address</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input id="firstName" name="firstName" defaultValue={initialAddress.firstName} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input id="lastName" name="lastName" defaultValue={initialAddress.lastName} />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="address1">Address</Label>
+                <Input id="address1" name="address1" defaultValue={initialAddress.address1} placeholder="123 Main St" required />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="address2">Apt, suite, etc. (optional)</Label>
+                <Input id="address2" name="address2" defaultValue={initialAddress.address2} placeholder="Apt 4B" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="city">City</Label>
+                  <Input id="city" name="city" defaultValue={initialAddress.city} required />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="province">Province</Label>
+                  <Select name="province" defaultValue={initialAddress.province} required>
+                    <SelectTrigger><SelectValue placeholder="Select province" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Balochistan">Balochistan</SelectItem>
+                      <SelectItem value="Punjab">Punjab</SelectItem>
+                      <SelectItem value="Sindh">Sindh</SelectItem>
+                      <SelectItem value="Khyber Pakhtunkhwa">Khyber Pakhtunkhwa</SelectItem>
+                      <SelectItem value="Gilgit-Baltistan">Gilgit-Baltistan</SelectItem>
+                      <SelectItem value="Azad Kashmir">Azad Kashmir</SelectItem>
+                      <SelectItem value="Islamabad Capital Territory">Islamabad Capital Territory</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="zip">ZIP / Postal Code</Label>
+                  <Input id="zip" name="zip" defaultValue={initialAddress.zip} required />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="country">Country</Label>
+                  <Select name="country" defaultValue={country} onValueChange={(v) => setCountry(v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PK">Pakistan</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
 
-          {/* Shipping Method */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Shipping Method</h3>
-            {deliveryGroups.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Add items to your cart to see available shipping options.</p>
-            ) : shippingOptions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No shipping options available for this address. Please ensure your shipping address is complete.</p>
-            ) : (
-              <div className="space-y-2">
-                {shippingOptions.map((opt: any) => (
-                  <label
-                    key={opt.handle}
-                    className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-                      selectedShipping === opt.handle
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="shippingOpt"
-                        value={opt.handle}
-                        checked={selectedShipping === opt.handle}
-                        onChange={() => setSelectedShipping(opt.handle)}
-                        className="accent-primary"
-                        required
-                      />
-                      <div>
-                        <p className="font-medium text-sm">{opt.title}</p>
-                        {opt.description && (
-                          <p className="text-xs text-muted-foreground">{opt.description}</p>
-                        )}
+            <Separator />
+
+            {/* Shipping Method */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Shipping Method</h3>
+              {deliveryGroups.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Add items to your cart to see available shipping options.</p>
+              ) : shippingOptions.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No shipping options available for this address. Please ensure your shipping address is complete.</p>
+              ) : (
+                <div className="space-y-2">
+                  {shippingOptions.map((opt: any) => (
+                    <label
+                      key={opt.handle}
+                      className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+                        selectedShipping === opt.handle
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="shippingOpt"
+                          value={opt.handle}
+                          checked={selectedShipping === opt.handle}
+                          onChange={() => setSelectedShipping(opt.handle)}
+                          className="accent-primary"
+                          required
+                        />
+                        <div>
+                          <p className="font-medium text-sm">{opt.title}</p>
+                          {opt.description && (
+                            <p className="text-xs text-muted-foreground">{opt.description}</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-sm font-medium">
-                      {opt.price?.amount === '0.00' ? 'Free' : opt.price ? <Money data={opt.price} /> : '—'}
-                    </p>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
+                      <p className="text-sm font-medium">
+                        {opt.price?.amount === '0.00' ? 'Free' : opt.price ? <Money data={opt.price} /> : '—'}
+                      </p>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          <Button
-            type="submit"
-            disabled={isSubmitting || !selectedShipping}
-            className="w-full"
-            size="lg"
-          >
-            {isSubmitting ? 'Saving...' : 'Continue to Review'}
-          </Button>
-        </fetcher.Form>
-        {fetcher.data?.ok && onComplete()}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full"
+              size="lg"
+            >
+              {isSubmitting ? 'Saving...' : 'Continue to Review'}
+            </Button>
+          </fetcher.Form>
+        </div>
       </CardContent>
     </Card>
   )
@@ -417,17 +544,11 @@ function ReviewStep({
   onObjectKeyReady: (key: string) => void
   onBack: () => void
 }) {
-  const fetcher = useFetcher()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
   const [uploadedKey, setUploadedKey] = useState(proofObjectKey)
   const [placing, setPlacing] = useState(false)
-
-  const lines = cart?.lines?.nodes || []
-  const subtotal = cart?.cost?.subtotalAmount
-  const tax = cart?.cost?.totalTaxAmount
-  const total = cart?.cost?.totalAmount
 
   async function handleFileUpload(file: File) {
     setUploadError('')
@@ -462,7 +583,8 @@ function ReviewStep({
         const fd = new FormData()
         fd.set('intent', 'bankTransferProof')
         fd.set('objectKey', uploadedKey)
-        await fetch('/checkout', { method: 'POST', body: fd })
+        // Fire and forget — don't block redirect on failure
+        await fetch('/checkout', { method: 'POST', body: fd }).catch(() => {})
       }
       if (cart?.checkoutUrl) {
         window.location.href = cart.checkoutUrl
@@ -481,7 +603,7 @@ function ReviewStep({
 
         {/* Line items */}
         <div className="space-y-3">
-          {lines.map((line: any) => (
+          {cart?.lines?.nodes?.map((line: any) => (
             <div key={line.id} className="flex gap-3">
               {line.merchandise?.image && (
                 <img
@@ -506,20 +628,32 @@ function ReviewStep({
 
         <Separator />
 
-        {/* Totals */}
+        {/* Totals — includes discounts & gift cards */}
         <div className="space-y-1.5 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Subtotal</span>
-            <span>{subtotal ? <Money data={subtotal} /> : '—'}</span>
+            <div>{cart?.cost?.subtotalAmount ? <Money data={cart.cost.subtotalAmount} /> : '—'}</div>
           </div>
+          {cart?.discountCodes?.filter((d: any) => d.applicable)?.length > 0 && (
+            <div className="flex justify-between text-green-600 dark:text-green-400">
+              <span>Discount</span>
+              <div>{cart.discountCodes.find((d: any) => d.applicable)?.code}</div>
+            </div>
+          )}
+          {cart?.appliedGiftCards?.map((giftCard: any) => (
+            <div key={giftCard.id} className="flex justify-between text-green-600 dark:text-green-400">
+              <span>Gift Card (*** {giftCard.lastCharacters})</span>
+              <div><Money data={giftCard.amountUsed} /></div>
+            </div>
+          ))}
           <div className="flex justify-between">
             <span className="text-muted-foreground">Tax</span>
-            <span>{tax ? <Money data={tax} /> : '—'}</span>
+            <div>{cart?.cost?.totalTaxAmount ? <Money data={cart.cost.totalTaxAmount} /> : '—'}</div>
           </div>
           <Separator />
           <div className="flex justify-between font-semibold text-base">
             <span>Total</span>
-            <span>{total ? <Money data={total} /> : '—'}</span>
+            <div>{cart?.cost?.totalAmount ? <Money data={cart.cost.totalAmount} /> : '—'}</div>
           </div>
         </div>
 
@@ -628,11 +762,11 @@ function OrderSummary({ cart }: { cart: any }) {
         <div className="space-y-1 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>Subtotal</span>
-            <span>{subtotal ? <Money data={subtotal} /> : '—'}</span>
+            <div>{subtotal ? <Money data={subtotal} /> : '—'}</div>
           </div>
           <div className="flex justify-between font-semibold text-base">
             <span>Total</span>
-            <span>{total ? <Money data={total} /> : '—'}</span>
+            <div>{total ? <Money data={total} /> : '—'}</div>
           </div>
         </div>
       </CardContent>
