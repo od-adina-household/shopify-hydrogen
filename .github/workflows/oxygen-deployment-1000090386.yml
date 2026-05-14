@@ -20,4 +20,6 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build and Publish to Oxygen
-        run: bunx shopify hydrogen deploy --token ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000090386 }}
+        run: |
+          echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" > $RUNNER_TEMP/env.pass
+          bunx shopify hydrogen deploy --token ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000090386 }} --env-file $RUNNER_TEMP/env.pass
