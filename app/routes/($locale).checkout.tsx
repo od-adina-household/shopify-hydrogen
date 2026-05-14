@@ -229,14 +229,21 @@ export default function Checkout() {
     (cartData as any)?.bankTransferProof?.value || ''
   )
 
-  // Use fetcher data when reloaded after information submission, otherwise use loader data
-  const cart = fetcher.data?.ok === true && fetcher.data?.intent === 'information' && fetcher.state === 'idle'
-    ? cartData  // action succeeded but cart not yet refetched — use loader data
-    : (fetcher.data as any)?.cart || cartData
+  // Determine cart source:
+  // - Before any interaction: use loader data (stale is fine, delivery options not ready yet)
+  // - After action success (ok=true): use cartData (action response, not a cart)
+  // - After action failure (ok=false) OR after fetcher.load(): use fetcher.data cart
+  const cart = fetcher.state === 'idle' && fetcher.data
+    ? (('ok' in (fetcher.data as any)) && (fetcher.data as any).ok === true ? cartData : (fetcher.data as any))
+    : cartData
 
   // Watch fetcher for information step completion — canonical pattern from CartSummary gift card
+  // Also re-render when fetcher loads fresh cart (with computed delivery groups)
   useEffect(() => {
+    if (!fetcher.data) return
+
     if (fetcher.data?.ok && fetcher.data.intent === 'information') {
+      // Action succeeded — switch to review
       setCompletedInfo(true)
       setActiveStep('review')
       setFormErrors([])
@@ -478,7 +485,7 @@ function InformationStep({
             <div className="space-y-3">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Shipping Method</h3>
               {deliveryGroups.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Add items to your cart to see available shipping options.</p>
+                <p className="text-sm text-muted-foreground">Enter your shipping address above to see available shipping options.</p>
               ) : shippingOptions.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No shipping options available for this address. Please ensure your shipping address is complete.</p>
               ) : (

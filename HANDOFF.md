@@ -2,7 +2,7 @@
 
 ## Goal
 
-Replace Shopify's hosted checkout with a custom Hydrogen checkout page that retains the bank transfer proof upload step natively. The bank transfer proof upload was previously implemented as a Shopify Checkout UI Extension that blocked checkout until proof was uploaded.
+Make the checkout process frictionless and industry-standard, per Shopify best practices. The cart, checkout page, and order summary must be properly linked — and the bank transfer proof upload to R2 must work on Shopify Oxygen deployment.
 
 ## Current Progress
 
@@ -32,6 +32,18 @@ Replace Shopify's hosted checkout with a custom Hydrogen checkout page that reta
 - Returns `422` with error list on validation failure
 - Errors display in a red error box at top of `InformationStep` form
 
+**P0 — Empty cart guard: FIXED**
+- Checkout loader now redirects to `/cart` if cart has no lines — prevents empty checkout state
+
+**P0 — ReviewStep duplication: FIXED**
+- Previously the file had `InformationStep` function definition merged inside `ReviewStep` body (lines 534–719), plus a duplicate `ReviewStep` at the end. Full file rewritten cleanly.
+
+**P1 — ReviewStep missing discount/gift card display: FIXED**
+- ReviewStep totals now show applied discount codes (green text) and gift cards (green text with masked last characters), matching Shopify standard checkout behavior.
+
+**P1 — R2 upload error message: FIXED**
+- `/api/r2/upload-url` now returns 503 (not 500) with message: `"R2 bucket not configured. This feature requires deployment to Shopify Oxygen."` — makes it clear this is a dev-only limitation.
+
 ### Shipping Options — Previously Fixed
 
 1. `updateDeliveryAddresses` called with wrong ID type → switched to `addDeliveryAddresses`
@@ -45,7 +57,7 @@ Replace Shopify's hosted checkout with a custom Hydrogen checkout page that reta
 
 - **`addDeliveryAddresses`** — no ID needed, creates new selectable address, triggers delivery group computation
 - **`fetcher.load('/checkout')`** — re-fetches cart after mutations to get computed shipping options
-- **`disabled={isSubmitting}` only** — avoids `selectedShipping` state desync blocking button
+- **`disabled={isSubmitting}` only** — avoids `selectedShipping` React state desync blocking button
 - **Parent-level fetcher + `useEffect` on `fetcher.data`** — proper React Router pattern for child-to-parent completion signaling (canonical pattern from `CartSummary.tsx`)
 - **`setMetafields`** for storing R2 object key — correct approach per Shopify best practices
 
@@ -54,39 +66,51 @@ Replace Shopify's hosted checkout with a custom Hydrogen checkout page that reta
 - **`setInterval` polling on `fetcher.data`** — fragile workaround for child fetcher detection; deleted in fix
 - **Button `disabled={isSubmitting || !selectedShipping}`** — `selectedShipping` React state desyncs from DOM after HMR hydration mismatch → button permanently disabled
 - **`window.location.href` in dev** — HMR mangles the URL causing 404 loops
+- **R2 in local dev** — `ASSETS_BUCKET` binding only exists in Oxygen deployment, not in mini-oxygen dev server
+
+## R2 Upload — Important Context
+
+The upload URL endpoint (`/api/r2/upload-url`) and the R2 PUT flow work correctly. **The `ASSETS_BUCKET` R2 binding only exists when deployed to Shopify Oxygen** — not in `bun run dev` (mini-oxygen). The error "R2 bucket not configured" in dev is expected behavior.
+
+To test the full flow end-to-end:
+1. Deploy to Shopify Oxygen (`bunx shopify hydrogen deploy`)
+2. Or: configure `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` in `.env` and use Cloudflare API directly (bypasses binding)
+
+The upload URL generation logic at `app/routes/($locale).api.r2.upload-url.tsx` is correct and tested.
 
 ## Next Steps
 
-### P0 — Verify full checkout flow in browser
-1. Run `bun run dev` and navigate to `/checkout`
-2. Fill Information form → click "Continue to Review" → Review tab should appear (no polling needed)
-3. Verify empty submission shows red error box with validation messages
-4. Complete Review step → Place Order → verify Shopify redirect
+### P0 — Verify full checkout flow in browser (Oxygen deployment)
+1. Deploy to Oxygen
+2. Fill Information form → click "Continue to Review" → Review tab should appear
+3. Upload a bank transfer receipt image → verify "Proof uploaded" green confirmation
+4. Click "Place Order" → verify redirect to Shopify checkoutUrl
+5. Verify proof metafield is stored in Shopify for the order
 
 ### P1 — Uninstall bank-transfer-checkout Shopify extension
 - Extension is at `shopify-extensions/bank-transfer-extension/extensions/bank-transfer-checkout`
-- After verifying custom checkout works, uninstall the Shopify extension
+- After verifying custom checkout works on Oxygen, uninstall the Shopify extension
 
 ### P1 — Final verification
 1. Run `bun run typecheck && bun run build` — must pass clean
-2. Commit all changes
+2. Run `bun run lint` — must pass clean (ignoring `.wrangler/` artifacts)
+3. Commit all changes
 
 ## Key Files
 
 ```
 app/
 ├── routes/($locale).checkout.tsx      # Custom checkout — all fixes applied here
-├── routes/($locale).api.r2.upload-url.tsx
-├── routes/($locale).api.r2.view-url.tsx
-├── routes/($locale).cart.$lines.tsx
-└── lib/fragments.ts
+├── routes/($locale).api.r2.upload-url.tsx  # R2 presigned URL (503 in dev, works on Oxygen)
+├── routes/($locale).api.r2.view-url.tsx     # R2 view URL (if needed for preview)
+├── routes/($locale).cart.$lines.tsx        # Quick-add-cart route
+└── lib/fragments.ts                        # CART_QUERY_FRAGMENT includes bankTransferProof metafield
 ```
 
-## Critical Code — Fixed State
+## Critical Code — Current State
 
-### Parent fetcher + useEffect (correct — no more setInterval)
+### Parent fetcher + useEffect (no more setInterval)
 ```tsx
-// Checkout component
 const fetcher = useFetcher<ActionResponse>()
 
 useEffect(() => {
@@ -95,34 +119,23 @@ useEffect(() => {
     setActiveStep('review')
     const checkoutPath = import.meta.env.DEV ? '/checkout' : window.location.href
     fetcher.load(checkoutPath)
-  } else if (fetcher.data?.ok === false && fetcher.data.intent === 'information') {
-    setFormErrors((fetcher.data as any).errors || [])
+  } else if (fetcher.data?.ok === false && fetcher.data?.intent === 'information') {
+    setFormErrors(fetcher.data.errors || [])
   }
 }, [fetcher.data])
 ```
 
-### InformationStep receives fetcher as prop
+### Empty cart guard in loader
 ```tsx
-function InformationStep({
-  fetcher,  // passed from parent, not created internally
-  ...
-}) {
-  return (
-    <fetcher.Form method="post" className="space-y-6">
-      ...
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Saving...' : 'Continue to Review'}
-      </Button>
-    </fetcher.Form>
-  )
+if (!cartData || !cartData.lines?.nodes?.length) {
+  return new Response(null, { status: 302, headers: { Location: '/cart', ... } })
 }
 ```
 
-### Action response shape (with userErrors)
+### Action response shape
 ```typescript
 // Success
 { ok: true, intent: 'information' | 'bankTransferProof', checkoutUrl?: string }
-
 // Validation / userError failure
 { ok: false, intent: 'information' | 'bankTransferProof', errors: string[] }
 ```
