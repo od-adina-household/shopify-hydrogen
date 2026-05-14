@@ -390,7 +390,9 @@ function InformationStep({
   formErrors: string[]
 }) {
   const isSubmitting = fetcher.state !== 'idle'
-  const [selectedShipping, setSelectedShipping] = useState<string>('')
+  const [selectedShipping, setSelectedShipping] = useState<string>(
+    deliveryGroups.flatMap((g: any) => (g.deliveryOptions || [])).find((o: any) => o.handle)?.handle || ''
+  )
   const [country, setCountry] = useState(initialAddress.country || 'PK')
 
   const groupId = deliveryGroups[0]?.id || ''
