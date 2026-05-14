@@ -1,11 +1,7 @@
 import { Image, Money } from '@shopify/hydrogen'
 import { memo, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import type {
-  CollectionItemFragment,
-  ProductItemFragment,
-  RecommendedProductFragment,
-} from 'storefrontapi.generated'
+import type { CollectionItemFragment, ProductItemFragment } from 'storefrontapi.generated'
 import { AspectRatio } from '~/components/ui/aspect-ratio'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
@@ -19,7 +15,7 @@ export const ProductItem = memo(function ProductItem({
   product,
   loading,
 }: {
-  product: CollectionItemFragment | ProductItemFragment | RecommendedProductFragment
+  product: CollectionItemFragment | ProductItemFragment
   loading?: 'eager' | 'lazy'
 }) {
   const variantUrl = useVariantUrl(product.handle)

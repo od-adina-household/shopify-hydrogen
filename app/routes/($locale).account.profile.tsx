@@ -65,9 +65,9 @@ export async function action({ request, context }: Route.ActionArgs) {
       error: null,
       customer: data?.customerUpdate?.customer,
     }
-  } catch (error: any) {
+  } catch (error) {
     return data(
-      { error: error.message, customer: null },
+      { error: error instanceof Error ? error.message : 'Unknown error', customer: null },
       {
         status: 400,
       }

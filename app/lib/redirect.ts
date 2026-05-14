@@ -4,7 +4,7 @@ export function redirectIfHandleIsLocalized(
   request: Request,
   ...localizedResources: Array<{
     handle: string
-    data: { handle: string } & unknown
+    data: { handle: string; [key: string]: unknown }
   }>
 ) {
   const url = new URL(request.url)

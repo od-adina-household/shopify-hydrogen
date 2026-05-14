@@ -11,14 +11,14 @@ import type { RootLoader } from '~/root'
 import type { InstagramPost } from '~/types/instagram'
 import type { Route } from './+types/($locale)._index'
 
+interface RootData {
+  header?: {
+    shop?: { name?: string; description?: string; primaryDomain?: { url?: string } }
+  }
+}
+
 export const meta: Route.MetaFunction = ({ data }) => {
-  const rootData = data as unknown as
-    | {
-        header?: {
-          shop?: { name?: string; description?: string; primaryDomain?: { url?: string } }
-        }
-      }
-    | undefined
+  const rootData = data as RootData | undefined
   const shopName = rootData?.header?.shop?.name || 'Adina Household'
   const description =
     rootData?.header?.shop?.description ||
@@ -79,7 +79,10 @@ export default function Homepage() {
   const searchUrl = url ? `${url}/search?q={search_term_string}` : '/search?q={search_term_string}'
   const { instagramFeed: instagramFeedData } = useLoaderData<typeof loader>()
   // instagramFeed is a Promise from deferred loading — React Router resolves it before render
-  const parsedFeed = instagramFeedData as unknown as { posts: InstagramPost[] } | null
+  interface InstagramFeedData {
+    posts: InstagramPost[]
+  }
+  const parsedFeed = instagramFeedData as InstagramFeedData | null
   const posts = parsedFeed?.posts ?? null
 
   return (

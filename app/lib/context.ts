@@ -27,7 +27,7 @@ export async function createHydrogenRouterContext(
   request: Request,
   env: Env,
   executionContext: ExecutionContext
-) {
+): Promise<ReturnType<typeof createHydrogenContext>> {
   /**
    * Open a cache instance in the worker and a custom session instance.
    */

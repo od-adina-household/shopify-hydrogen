@@ -1,8 +1,11 @@
 import { Money } from '@shopify/hydrogen'
+import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types'
 import { Heart, X } from 'lucide-react'
 import { Link } from 'react-router'
 import { Button } from '~/components/ui/button'
 import { useWishlist } from '~/lib/useWishlist'
+
+type WishlistMoney = { amount: string; currencyCode: CurrencyCode }
 
 export default function WishlistPage() {
   const { items, remove } = useWishlist()
@@ -42,14 +45,7 @@ export default function WishlistPage() {
                   {item.title}
                 </Link>
                 <p className="text-sm text-muted-foreground mt-1">
-                  <Money
-                    data={
-                      item.price as unknown as {
-                        amount: string
-                        currencyCode: import('@shopify/hydrogen/storefront-api-types').CurrencyCode
-                      }
-                    }
-                  />
+                  <Money data={item.price as WishlistMoney} />
                 </p>
               </div>
               <button

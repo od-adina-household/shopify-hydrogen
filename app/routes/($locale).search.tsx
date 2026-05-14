@@ -28,7 +28,6 @@ export async function loader({
 }: Route.LoaderArgs): Promise<PredictiveSearchReturn | RegularSearchReturn> {
   const url = new URL(request.url)
   const isPredictive = url.searchParams.has('predictive')
-  const type = isPredictive ? 'predictive' : 'regular'
 
   try {
     const searchPromise: Promise<PredictiveSearchReturn | RegularSearchReturn> = isPredictive
@@ -39,16 +38,18 @@ export async function loader({
   } catch (error) {
     // Handle request cancellation (user typing rapidly aborts previous requests)
     if (error instanceof DOMException && error.name === 'AbortError') {
-      return { type, term: '', result: null, error: undefined } as unknown as
-        | PredictiveSearchReturn
-        | RegularSearchReturn
+      if (isPredictive) {
+        return { type: 'predictive' as const, term: '', result: null, error: undefined }
+      }
+      return { type: 'regular' as const, term: '', result: null, error: undefined }
     }
 
     console.error('Search loader error:', error)
     const message = error instanceof Error ? error.message : 'Unknown error'
-    return { type, term: '', result: null, error: message } as unknown as
-      | PredictiveSearchReturn
-      | RegularSearchReturn
+    if (isPredictive) {
+      return { type: 'predictive' as const, term: '', result: null, error: message }
+    }
+    return { type: 'regular' as const, term: '', result: null, error: message }
   }
 }
 
@@ -261,10 +262,7 @@ async function regularSearch({
     throw new Error('No search data returned from Shopify API')
   }
 
-  const total = Object.values(items).reduce(
-    (acc, { nodes }: { nodes: Array<unknown> }) => acc + nodes.length,
-    0
-  )
+  const total = Object.values(items).reduce((acc, { nodes }) => acc + (nodes?.length ?? 0), 0)
 
   const error = undefined
 
@@ -438,10 +436,7 @@ async function predictiveSearch({
     throw new Error('No predictive search data returned from Shopify API')
   }
 
-  const total = Object.values(items).reduce(
-    (acc: number, item: Array<unknown>) => acc + item.length,
-    0
-  )
+  const total = Object.values(items).reduce((acc, item) => acc + (item?.length ?? 0), 0)
 
   return { type, term, result: { items, total } }
 }

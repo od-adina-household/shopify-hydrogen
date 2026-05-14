@@ -18,7 +18,7 @@ import gsap from 'gsap'
  * and project-wide defaults. Safe to call multiple times (idempotent).
  */
 let _initialized = false
-export function initGSAP() {
+export function initGSAP(): void {
   if (_initialized) return
   _initialized = true
   gsap.registerPlugin(useGSAP)

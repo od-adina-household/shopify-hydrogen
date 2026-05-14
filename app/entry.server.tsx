@@ -49,6 +49,8 @@ export default async function handleRequest(
     manifestSrc: ["'self'", 'http://localhost:*'],
   })
 
+  let didError = false
+
   const body = await renderToReadableStream(
     <NonceProvider>
       <ServerRouter context={reactRouterContext} url={request.url} nonce={nonce} />
@@ -58,6 +60,7 @@ export default async function handleRequest(
       signal: request.signal,
       onError(error) {
         console.error(error)
+        didError = true
       },
     }
   )
@@ -71,6 +74,6 @@ export default async function handleRequest(
 
   return new Response(body, {
     headers: responseHeaders,
-    status: 500,
+    status: didError ? 500 : _responseStatusCode,
   })
 }

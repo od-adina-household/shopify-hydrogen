@@ -89,7 +89,7 @@ export default function OrderRoute() {
             <div>
               <CardTitle className="text-2xl">Order {order.name}</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Placed on {new Date(order.processedAt!).toDateString()}
+                Placed on {order.processedAt ? new Date(order.processedAt).toDateString() : 'N/A'}
               </p>
               {order.confirmationNumber && (
                 <p className="text-sm text-muted-foreground">
@@ -133,13 +133,13 @@ export default function OrderRoute() {
               <TableRow>
                 <TableCell colSpan={3}>Subtotal</TableCell>
                 <TableCell className="text-right">
-                  <Money data={order.subtotal!} />
+                  <Money data={order.subtotal ?? { amount: '0', currencyCode: 'USD' }} />
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell colSpan={3}>Tax</TableCell>
                 <TableCell className="text-right">
-                  <Money data={order.totalTax!} />
+                  <Money data={order.totalTax ?? { amount: '0', currencyCode: 'USD' }} />
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -147,7 +147,7 @@ export default function OrderRoute() {
                   Total
                 </TableCell>
                 <TableCell className="text-right font-bold">
-                  <Money data={order.totalPrice!} />
+                  <Money data={order.totalPrice ?? { amount: '0', currencyCode: 'USD' }} />
                 </TableCell>
               </TableRow>
             </TableFooter>
@@ -227,11 +227,11 @@ function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
         </div>
       </TableCell>
       <TableCell className="text-right">
-        <Money data={lineItem.price!} />
+        <Money data={lineItem.price ?? { amount: '0', currencyCode: 'USD' }} />
       </TableCell>
       <TableCell className="text-right">{lineItem.quantity}</TableCell>
       <TableCell className="text-right">
-        <Money data={lineItem.totalDiscount!} />
+        <Money data={lineItem.totalDiscount ?? { amount: '0', currencyCode: 'USD' }} />
       </TableCell>
     </TableRow>
   )
