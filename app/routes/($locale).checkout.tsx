@@ -88,7 +88,9 @@ export async function action({ request, context }: Route.ActionArgs) {
       if (!city) errors.push('City is required')
       if (!zip) errors.push('ZIP / Postal Code is required')
       if (!country) errors.push('Country is required')
-      if (!deliveryOptionHandle) errors.push('Please select a shipping method')
+      // Note: deliveryOptionHandle is NOT validated here because deliveryGroups
+      // may be empty on initial load (Shopify computes options only after address mutation).
+      // If still empty after mutations, we return a specific error from that step.
 
       if (errors.length > 0) {
         return data<ActionResponse>(
@@ -155,10 +157,21 @@ export async function action({ request, context }: Route.ActionArgs) {
         selectedDeliveryGroupId = addressResult.cart.deliveryGroups?.nodes?.[0]?.id || ''
       }
 
+      // ── Re-fetch cart to get computed delivery options ─────────────────────
+      // After addDeliveryAddresses, Shopify may compute delivery options async.
+      // The returned cart might not have deliveryOptions populated yet — refetch
+      // to get the computed shipping rates.
+      const refreshedCart = selectedDeliveryGroupId
+        ? await cart.get()
+        : null
+      const deliveryOptions = refreshedCart?.deliveryGroups?.nodes?.[0]?.deliveryOptions || []
+      const firstGroupId = refreshedCart?.deliveryGroups?.nodes?.[0]?.id || selectedDeliveryGroupId
+
       // ── Mutation 3: Update shipping option ─────────────────────────────────
-      if (selectedDeliveryGroupId && deliveryOptionHandle) {
+      // Only attempt if we have a delivery group AND options exist
+      if (firstGroupId && deliveryOptionHandle) {
         const shippingResult = await cart.updateSelectedDeliveryOption([
-          { deliveryGroupId: selectedDeliveryGroupId, deliveryOptionHandle },
+          { deliveryGroupId: firstGroupId, deliveryOptionHandle },
         ])
         if (!shippingResult.cart) {
           return data<ActionResponse>(
@@ -174,6 +187,12 @@ export async function action({ request, context }: Route.ActionArgs) {
             { status: 422, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
           )
         }
+      } else if (firstGroupId && deliveryOptions.length === 0 && deliveryOptionHandle) {
+        // Address was added but no shipping options available for this location
+        return data<ActionResponse>(
+          { ok: false, intent: 'information', errors: ['No shipping options available for this address. Please check the shipping address or contact us for assistance.'] },
+          { status: 422, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+        )
       }
 
       return data<ActionResponse>(
