@@ -267,8 +267,9 @@ export default function Checkout() {
       setActiveStep('review')
       setFormErrors([])
       // Refetch cart to get computed shipping options with prices
-      const checkoutPath = import.meta.env.DEV ? '/checkout' : window.location.href
-      fetcher.load(checkoutPath)
+      // Always use /checkout — window.location.href causes React Router to construct
+      // a malformed data-fetch URL like /checkout/https://adinahousehold.com/checkout.data
+      fetcher.load('/checkout')
     } else if (fetcher.data?.ok === false && fetcher.data?.intent === 'information') {
       // Surface validation errors from the action
       setFormErrors((fetcher.data as any).errors || [])
