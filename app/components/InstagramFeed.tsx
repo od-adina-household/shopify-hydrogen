@@ -65,13 +65,12 @@ function InstagramFeed({ posts, isLoading, error }: InstagramFeedProps) {
   if (isLoading) {
     return (
       <section ref={sectionRef} className="w-full py-20">
-        <div
-          role="status"
+        <output
           aria-label="Loading Instagram feed"
           className="flex items-center justify-center h-48"
         >
           <div className="w-6 h-6 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
-        </div>
+        </output>
       </section>
     )
   }
@@ -99,7 +98,10 @@ function InstagramFeed({ posts, isLoading, error }: InstagramFeedProps) {
   }
 
   return (
-    <section ref={sectionRef} className="w-full py-16 md:py-24 lg:py-28 bg-secondary overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="w-full py-16 md:py-24 lg:py-28 bg-secondary overflow-hidden"
+    >
       <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
         {/* Header */}
         <div className="mb-10 md:mb-14">
@@ -119,10 +121,7 @@ function InstagramFeed({ posts, isLoading, error }: InstagramFeedProps) {
         </div>
 
         {/* Staggered portrait grid — even-indexed cards offset down */}
-        <div
-          ref={gridRef}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 items-start"
-        >
+        <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 items-start">
           {posts.slice(0, 8).map((post, index) => {
             const isVideo = post.mediaType === 'VIDEO'
             const imageUrl = post.sizes?.medium?.mediaUrl || post.mediaUrl
@@ -130,7 +129,8 @@ function InstagramFeed({ posts, isLoading, error }: InstagramFeedProps) {
             const imgWidth = post.sizes?.medium?.width || 525
             const imgHeight = post.sizes?.medium?.height || 700
             const isOffset = index % 2 === 1
-            const caption = post.prunedCaption?.split('[')[0].trim().slice(0, 80) || 'Instagram post'
+            const caption =
+              post.prunedCaption?.split('[')[0].trim().slice(0, 80) || 'Instagram post'
 
             return (
               <Link

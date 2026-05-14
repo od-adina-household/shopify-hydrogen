@@ -6,7 +6,7 @@ import { ServerRouter } from 'react-router'
 
 export default async function handleRequest(
   request: Request,
-  responseStatusCode: number,
+  _responseStatusCode: number,
   responseHeaders: Headers,
   reactRouterContext: EntryContext,
   context: HydrogenRouterContextProvider
@@ -43,10 +43,9 @@ export default async function handleRequest(
       'https://shopify.com',
       'https://behold.pictures',
     ],
-    mediaSrc: [
-      "'self'",
-      'https://*.cdninstagram.com',
-    ],
+    mediaSrc: ["'self'", 'https://*.cdninstagram.com'],
+    objectSrc: ["'none'"],
+    frameSrc: ["'none'"],
     manifestSrc: ["'self'", 'http://localhost:*'],
   })
 
@@ -59,7 +58,6 @@ export default async function handleRequest(
       signal: request.signal,
       onError(error) {
         console.error(error)
-        responseStatusCode = 500
       },
     }
   )
@@ -73,6 +71,6 @@ export default async function handleRequest(
 
   return new Response(body, {
     headers: responseHeaders,
-    status: responseStatusCode,
+    status: 500,
   })
 }

@@ -56,6 +56,7 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
   const [{ collection }] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: { handle, ...paginationVariables },
+      cache: storefront.CacheLong(),
       // Add other queries here, so that they are loaded in parallel
     }),
   ])
@@ -79,7 +80,7 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({ context }: Route.LoaderArgs) {
+function loadDeferredData({ context: _ }: Route.LoaderArgs) {
   return {}
 }
 
@@ -191,7 +192,7 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
   }
 ` as const
 
-// NOTE: https://shopify.dev/docs/api/storefront/2022-04/objects/collection
+// NOTE: https://shopify.dev/docs/api/storefront/2026-01/objects/collection
 const COLLECTION_QUERY = `#graphql
   ${PRODUCT_ITEM_FRAGMENT}
   query Collection(

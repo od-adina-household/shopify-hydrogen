@@ -104,6 +104,7 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
   const [{ product }] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: { handle, selectedOptions: getSelectedProductOptions(request) },
+      cache: storefront.CacheLong(),
     }),
     // Add other queries here, so that they are loaded in parallel
   ])
@@ -243,6 +244,7 @@ export default function Product() {
                           <Image
                             data={image}
                             sizes="(min-width: 1024px) 55vw, 100vw"
+                            fetchPriority={index === 0 ? 'high' : undefined}
                             className="w-full h-auto object-contain max-h-[40vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[65vh] xl:max-h-[75vh]"
                           />
                         </div>

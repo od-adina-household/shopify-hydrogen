@@ -1,14 +1,14 @@
 import { ArrowRight } from 'lucide-react'
 import { useRef } from 'react'
 import { Link, useLoaderData, useRouteLoaderData } from 'react-router'
+import InstagramFeed from '~/components/InstagramFeed'
 // import { MessageCircle, Download, Building2 } from 'lucide-react';
 import { Button } from '~/components/ui/button'
-import InstagramFeed from '~/components/InstagramFeed'
 import { useStaggerFadeIn } from '~/hooks/useStaggerFadeIn'
 import { gsap, useGSAP } from '~/lib/gsap'
 import { organizationJsonLd, websiteJsonLd } from '~/lib/seo'
-import type { InstagramPost } from '~/types/instagram'
 import type { RootLoader } from '~/root'
+import type { InstagramPost } from '~/types/instagram'
 import type { Route } from './+types/($locale)._index'
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -79,7 +79,7 @@ export default function Homepage() {
   const searchUrl = url ? `${url}/search?q={search_term_string}` : '/search?q={search_term_string}'
   const { instagramFeed: instagramFeedData } = useLoaderData<typeof loader>()
   // instagramFeed is a Promise from deferred loading — React Router resolves it before render
-  const parsedFeed = (instagramFeedData as unknown) as { posts: InstagramPost[] } | null
+  const parsedFeed = instagramFeedData as unknown as { posts: InstagramPost[] } | null
   const posts = parsedFeed?.posts ?? null
 
   return (
@@ -493,7 +493,7 @@ function SplitSection({
           src={imageSrc}
           alt={imageAlt}
           className="h-full w-full object-cover max-w-full max-h-full"
-            loading="lazy"
+          loading="lazy"
         />
       )}
     </div>
@@ -572,61 +572,3 @@ function SplitSection({
 //     </section>
 //   );
 // }
-
-const _RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
-    id
-    title
-    handle
-    availableForSale
-    collections(first: 5) {
-      nodes {
-        id
-        title
-        handle
-      }
-    }
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    featuredImage {
-      id
-      url
-      altText
-      width
-      height
-    }
-    options {
-      name
-      optionValues {
-        name
-      }
-    }
-    variants(first: 100) {
-      nodes {
-        id
-        title
-        availableForSale
-        selectedOptions {
-          name
-          value
-        }
-        price {
-          amount
-          currencyCode
-        }
-      }
-    }
-  }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...RecommendedProduct
-      }
-    }
-  }
-` as const

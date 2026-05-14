@@ -84,7 +84,7 @@ async function loadCriticalData({ context, request, params }: Route.LoaderArgs) 
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({ context }: Route.LoaderArgs) {
+function loadDeferredData({ context: _ }: Route.LoaderArgs) {
   return {}
 }
 
