@@ -18,7 +18,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 
   const ASSETS_BUCKET = context.env.ASSETS_BUCKET
   if (!ASSETS_BUCKET) {
-    throw new Response('R2 bucket not configured', { status: 500 })
+    throw new Response('R2 bucket not configured. This feature requires deployment to Shopify Oxygen.', { status: 503 })
   }
 
   // Generate a presigned PUT URL with 15-minute expiry
