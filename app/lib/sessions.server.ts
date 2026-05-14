@@ -5,10 +5,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 // For theme storage, we don't need a secure secret since it's just storing light/dark preference
 // Use environment variable if available, otherwise use a default value
-const sessionSecret = process.env.SESSION_SECRET
-if (!sessionSecret) {
-  throw new Error('SESSION_SECRET environment variable is required')
-}
+const sessionSecret = process.env.SESSION_SECRET || 'default-theme-secret-change-in-production'
 
 const sessionStorage = createCookieSessionStorage({
   cookie: {
