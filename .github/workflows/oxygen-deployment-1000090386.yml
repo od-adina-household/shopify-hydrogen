@@ -21,5 +21,14 @@ jobs:
 
       - name: Build and Publish to Oxygen
         run: |
-          echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" > $RUNNER_TEMP/env.pass
+          cat > $RUNNER_TEMP/env.pass << 'EOF'
+          SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+          PUBLIC_STORE_DOMAIN=${{ vars.PUBLIC_STORE_DOMAIN }}
+          PUBLIC_STOREFRONT_API_TOKEN=${{ secrets.PUBLIC_STOREFRONT_API_TOKEN }}
+          PRIVATE_STOREFRONT_API_TOKEN=${{ secrets.PRIVATE_STOREFRONT_API_TOKEN }}
+          PUBLIC_STOREFRONT_ID=${{ vars.PUBLIC_STOREFRONT_ID }}
+          PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID=${{ secrets.PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID }}
+          PUBLIC_CUSTOMER_ACCOUNT_API_URL=${{ vars.PUBLIC_CUSTOMER_ACCOUNT_API_URL }}
+          PUBLIC_CHECKOUT_DOMAIN=${{ vars.PUBLIC_CHECKOUT_DOMAIN }}
+          EOF
           bunx shopify hydrogen deploy --token ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000090386 }} --env-file $RUNNER_TEMP/env.pass
