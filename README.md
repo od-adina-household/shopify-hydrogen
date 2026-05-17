@@ -1,4 +1,4 @@
-# Shopify Hydrogen Storefront — Od Adina Household
+#  Shopify Hydrogen Storefront — Od Adina Household
 
 A headless Shopify storefront built with Hydrogen, React Router 7, shadcn/ui, and TypeScript. Deploys exclusively to Shopify Oxygen (Cloudflare Workers runtime). Uses Bun as the package manager.
 
